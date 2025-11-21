@@ -2,7 +2,7 @@
 This is the code repository for our NeurIPS 2025 paper [RAD: Towards Trustworthy Retrieval-Augmented Multi-modal Clinical Diagnosis](https://openreview.net/pdf?id=Iicv9iTPcU). 
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2509.19980" target="_blank"><img src="https://img.shields.io/badge/arXiv-2505.21497-red"></a>
+  <a href="https://arxiv.org/abs/2509.19980" target="_blank"><img src="https://img.shields.io/badge/arXiv-2509.19980-red"></a>
   <!-- <a href="https://paper2poster.github.io/" target="_blank"><img src="https://img.shields.io/badge/Project-Page-brightgreen"></a> -->
   <!-- <a href="https://huggingface.co/datasets/Paper2Poster/Paper2Poster" target="_blank"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-orange"></a> -->
   <a href="https://huggingface.co/papers/2509.19980" target="_blank"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Daily Papers-red"></a>
