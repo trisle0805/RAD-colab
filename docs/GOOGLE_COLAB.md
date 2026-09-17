@@ -33,8 +33,11 @@ assert torch.cuda.is_available()
 For SkinCAP, install the focused dependency file. It intentionally does not pin `torch` or `torchvision`; retain Colab's compatible GPU pair unless an observed error requires changing it.
 
 ```bash
+!pip install -q --upgrade pip
 !pip install -q -r requirements-colab-skin.txt
 ```
+
+`requirements-colab-skin.txt` uses Python 3.13-compatible NumPy, scikit-learn, and OpenCV wheels. Do not replace it with the repository's broad `requirements.txt`.
 
 For NACC, additionally install NIfTI and scientific-image dependencies:
 
