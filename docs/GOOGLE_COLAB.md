@@ -78,9 +78,7 @@ Expected CSV formats are positional:
 | NACC | relative NIfTI path, EHR text, labels from column 2 onward. |
 | ICD53 | relative MIMIC JPEG path, text, 53 labels from column 2 onward. For `main_rad_icd.py`, text must follow `<Report>: ... <EHR>: ...`. |
 
-The label ordering must match both the supplied task guideline JSONL and the hard-coded label lists in the training engines. The provided SkinCAP CSVs use `pilar cyst` at label index 30, and the SkinCAP engine label lists have been aligned with that order. Do not reorder CSV label columns.
-
-> **Required before training:** the supplied `qwen_maxtoken2k_skincap50_4sources.jsonl` instead contains `urticaria pigmentosa` and has no `pilar cyst` entry. Update or regenerate that guideline JSONL with a medically appropriate `pilar cyst` entry before running. Otherwise the program stops with `RuntimeError: guideline do not match label!`.
+The label ordering must match both the supplied task guideline JSONL and the hard-coded label lists in the training engines. The provided SkinCAP CSVs use `pilar cyst` at label index 30, and the SkinCAP engine label lists and supplied guideline JSONL have been aligned with that order. Do not reorder CSV label columns.
 
 ### SkinCAP data layout
 
@@ -92,7 +90,14 @@ The supplied SkinCAP CSVs are already preprocessed; do **not** run anything in `
 /content/drive/MyDrive/Cao học/Experiments/SkinCAP
 ```
 
-Place the corresponding `.png` files directly in that directory. It is used for both the training and test CSVs.
+Place the corresponding `.png` files and both preprocessed CSVs directly in that directory. The configured CSV paths are:
+
+```text
+/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_train_set.csv
+/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_test_set.csv
+```
+
+The CSV files are intentionally stored outside the cloned repository, so `csv_files/` is not required for the SkinCAP Colab run.
 
 ## 4. ClinicalBERT and pretrained vision weights
 
@@ -123,7 +128,7 @@ Set the optional CUDA allocator configuration before Python begins:
 
 ### SkinCAP example
 
-After correcting the SkinCAP guideline JSONL noted above, run:
+Run:
 
 ```bash
 %cd /content/RAD

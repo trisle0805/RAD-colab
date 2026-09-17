@@ -1,5 +1,5 @@
-ICD_train_file: '/content/RAD/csv_files/skincap_50_train_set.csv'
-ICD_test_file: '/content/RAD/csv_files/skincap_50_test_set.csv'
+ICD_train_file: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_train_set.csv'
+ICD_test_file: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_test_set.csv'
 image_root: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP'
 
 image_res: 512
