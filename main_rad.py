@@ -50,8 +50,9 @@ def seed_torch(seed=42):
     torch.backends.cudnn.benchmark = False
 
 def main(args, config):
+    if not torch.cuda.is_available():
+        raise RuntimeError('RAD training requires a CUDA-enabled PyTorch runtime.')
     torch.cuda.current_device()
-    torch.cuda._initialized = True
     print("Total CUDA devices: ", torch.cuda.device_count()) 
     torch.set_default_tensor_type('torch.FloatTensor')
     
@@ -68,23 +69,29 @@ def main(args, config):
     sampler_rank = global_rank
     print('sampler_rank',sampler_rank,'num_tasks',num_tasks)
 
+    image_root = args.image_root or config.get('image_root')
+    if not image_root:
+        raise ValueError('Set image_root in the YAML configuration or pass --image_root.')
+    train_num_workers = config.get('num_workers', 2)
+    test_num_workers = config.get('test_num_workers', train_num_workers)
+
     #### Dataset #### 
     print("Creating dataset")
     if 'fair_ori' in args.dataset:
-        train_dataset = Fair_ori_train_dataset(config['ICD_train_file'], config['image_res'])
+        train_dataset = Fair_ori_train_dataset(config['ICD_train_file'], config['image_res'], image_root)
     elif 'skin' in args.dataset:
-        train_dataset = Skin_Train_Dataset(config['ICD_train_file'], config['image_res'])
+        train_dataset = Skin_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
     elif 'nacc' in args.dataset:
-        train_dataset = NACC_Train_Dataset(config['ICD_train_file'], config['image_res'])
+        train_dataset = NACC_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
     else:
-        train_dataset = ICD_Train_Dataset(config['ICD_train_file'], config['image_res'])
+        train_dataset = ICD_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
     
   
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset,num_replicas=num_tasks, rank=sampler_rank, shuffle=True)
     train_dataloader = DataLoader(
             train_dataset,
             batch_size=config['batch_size'],
-            num_workers=8,
+            num_workers=train_num_workers,
             pin_memory=True,
             sampler=train_sampler, 
             collate_fn=None,
@@ -95,18 +102,18 @@ def main(args, config):
     train_dataloader.num_batches = len(train_dataloader)  
 
     if 'fair_ori' in args.dataset:
-        val_dataset = Fair_ori_test_dataset(config['ICD_test_file'],config['image_res'])
+        val_dataset = Fair_ori_test_dataset(config['ICD_test_file'], config['image_res'], image_root)
     elif 'skin' in args.dataset:
-        val_dataset = Skin_Test_Dataset(config['ICD_test_file'],config['image_res'])
+        val_dataset = Skin_Test_Dataset(config['ICD_test_file'], config['image_res'], image_root)
     elif 'nacc' in args.dataset:
-        val_dataset = NACC_Test_Dataset(config['ICD_test_file'], config['image_res'])
+        val_dataset = NACC_Test_Dataset(config['ICD_test_file'], config['image_res'], image_root)
     else:
-        val_dataset = ICD_Dataset(config['ICD_test_file'],config['image_res'])
+        val_dataset = ICD_Dataset(config['ICD_test_file'], config['image_res'], image_root)
     val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset,num_replicas=num_tasks, rank=sampler_rank, shuffle=True)
     val_dataloader =DataLoader(
             val_dataset,
             batch_size=config['test_batch_size'],
-            num_workers=8,
+            num_workers=test_num_workers,
             pin_memory=True,
             sampler=val_sampler,
             collate_fn=None,
@@ -245,6 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--dist_backend', default='nccl')
 
     parser.add_argument('--output_dir', default='./output_dir/0116_toy')
+    parser.add_argument('--image_root', default='', help='Root directory for relative image paths stored in the CSV files.')
     parser.add_argument('--image_encoder_name', default='resnet50')
 
     parser.add_argument('--guideline_path', default='')
@@ -255,8 +263,8 @@ if __name__ == '__main__':
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--seed', default=42, type=int)
 
-    parser.add_argument('--world_size', default=2, type=int, help='number of distributed processes')
-    parser.add_argument('--distributed', default=True)
+    parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
+    parser.add_argument('--distributed', default=False)
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     

@@ -66,9 +66,18 @@ class Text_Encoder_Bert(nn.Module):
     def _get_bert_basemodel(self, bert_model_name, freeze_layers=None):#12
         try:
             print(bert_model_name)
-            config = AutoConfig.from_pretrained(bert_model_name, output_hidden_states=True)#bert-base-uncased
+            local_files_only = pathlib.Path(bert_model_name).exists()
+            config = AutoConfig.from_pretrained(
+                bert_model_name,
+                output_hidden_states=True,
+                local_files_only=local_files_only,
+            )#bert-base-uncased
             print("Config loaded successfully.", flush=True)
-            model = AutoModel.from_pretrained(bert_model_name, config=config)#, return_dict=True)
+            model = AutoModel.from_pretrained(
+                bert_model_name,
+                config=config,
+                local_files_only=local_files_only,
+            )#, return_dict=True)
             print("Model loaded successfully.", flush=True)
             print("Text feature extractor:", bert_model_name)
         except:

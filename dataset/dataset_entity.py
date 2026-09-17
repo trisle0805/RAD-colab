@@ -23,13 +23,25 @@ import torch.nn as nn
 import nibabel as nib
 from dataset.augmentation.augment import *
 
+def _resolve_image_path(image_root, image_path):
+    image_path = os.fspath(image_path)
+    if os.path.isabs(image_path):
+        return image_path
+    if not image_root:
+        raise ValueError(
+            "image_root is required when CSV image paths are relative. "
+            "Set image_root in the YAML configuration or pass --image_root."
+        )
+    return os.path.join(image_root, image_path)
+
 class Fair_ori_train_dataset(Dataset):
-    def __init__(self, csv_path, image_res):
+    def __init__(self, csv_path, image_res, image_root=None):
         data_info = pd.read_csv(csv_path)
 
         self.img_path_list = np.asarray(data_info.iloc[:,0])
         self.class_list = np.asarray(data_info.iloc[:,3:])
         self.text_list = np.asarray(data_info.iloc[:,1])
+        self.image_root = image_root
 
         normalize = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         self.transform = transforms.Compose([                        
@@ -49,7 +61,7 @@ class Fair_ori_train_dataset(Dataset):
         return len(self.img_path_list)
 
     def __getitem__(self, index):
-        img_path = '/your_path/Harvard-FairVLMed/' + self.img_path_list[index]
+        img_path = _resolve_image_path(self.image_root, self.img_path_list[index])
         label = self.class_list[index]    # Fourth column is the label
         text = self.text_list[index]  
         npz_data = np.load(img_path)
@@ -70,7 +82,7 @@ class Fair_ori_train_dataset(Dataset):
         }
 
 class ICD_Train_Dataset(Dataset):
-    def __init__(self, csv_path, image_res):
+    def __init__(self, csv_path, image_res, image_root=None):
         data_info = pd.read_csv(csv_path)
 
         self.img_path_list = np.asarray(data_info.iloc[:,0])
@@ -78,6 +90,7 @@ class ICD_Train_Dataset(Dataset):
         self.class_list = np.asarray(data_info.iloc[:,2:])
         
         self.text_list = np.asarray(data_info.iloc[:,1])
+        self.image_root = image_root
 
         normalize = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         self.transform = transforms.Compose([                        
@@ -99,7 +112,7 @@ class ICD_Train_Dataset(Dataset):
     
     def __getitem__(self, index):
 
-            img_path = '/your_path/MIMIC-CXR-JPG/files/' + self.img_path_list[index]
+            img_path = _resolve_image_path(self.image_root, self.img_path_list[index])
             class_label = self.class_list[index]  
             caption_list = ''
             head = [
@@ -174,7 +187,7 @@ class ICD_Train_Dataset(Dataset):
     
 
 class Skin_Train_Dataset(Dataset):
-    def __init__(self, csv_path, image_res):
+    def __init__(self, csv_path, image_res, image_root=None):
         data_info = pd.read_csv(csv_path)
 
         self.img_path_list = np.asarray(data_info.iloc[:,0])
@@ -182,6 +195,7 @@ class Skin_Train_Dataset(Dataset):
         self.class_list = np.asarray(data_info.iloc[:,2:])
         
         self.text_list = np.asarray(data_info.iloc[:,1])
+        self.image_root = image_root
 
         normalize = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         self.transform = transforms.Compose([                        
@@ -203,7 +217,7 @@ class Skin_Train_Dataset(Dataset):
     
     def __getitem__(self, index):
 
-            img_path = '/your_path/skincap/' + self.img_path_list[index]
+            img_path = _resolve_image_path(self.image_root, self.img_path_list[index])
             class_label = self.class_list[index]  
             
             entity_details = self.text_list[index]  
@@ -219,7 +233,7 @@ class Skin_Train_Dataset(Dataset):
             }
 
 class NACC_Train_Dataset(Dataset):
-    def __init__(self, csv_path, image_res):
+    def __init__(self, csv_path, image_res, image_root=None):
         data_info = pd.read_csv(csv_path)
 
         self.img_path_list = np.asarray(data_info.iloc[:,0])
@@ -227,6 +241,7 @@ class NACC_Train_Dataset(Dataset):
         self.class_list = np.asarray(data_info.iloc[:,2:])
         
         self.text_list = np.asarray(data_info.iloc[:,1])
+        self.image_root = image_root
 
         self.augmentation = False
 
@@ -238,7 +253,7 @@ class NACC_Train_Dataset(Dataset):
     
     def __getitem__(self, index):
 
-        img_path = '/your_path/NACC_images/' + self.img_path_list[index]
+        img_path = _resolve_image_path(self.image_root, self.img_path_list[index])
         class_label = self.class_list[index]  
             
         entity_details = self.text_list[index]  
