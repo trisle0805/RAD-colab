@@ -69,7 +69,11 @@ def main(args, config):
     sampler_rank = global_rank
     print('sampler_rank',sampler_rank,'num_tasks',num_tasks)
 
+    train_csv = args.train_csv or config.get('ICD_train_file')
+    test_csv = args.test_csv or config.get('ICD_test_file')
     image_root = args.image_root or config.get('image_root')
+    if not train_csv or not test_csv:
+        raise ValueError('Set train/test CSV paths in the YAML configuration or pass --train_csv and --test_csv.')
     if not image_root:
         raise ValueError('Set image_root in the YAML configuration or pass --image_root.')
     train_num_workers = config.get('num_workers', 2)
@@ -78,13 +82,13 @@ def main(args, config):
     #### Dataset #### 
     print("Creating dataset")
     if 'fair_ori' in args.dataset:
-        train_dataset = Fair_ori_train_dataset(config['ICD_train_file'], config['image_res'], image_root)
+        train_dataset = Fair_ori_train_dataset(train_csv, config['image_res'], image_root)
     elif 'skin' in args.dataset:
-        train_dataset = Skin_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
+        train_dataset = Skin_Train_Dataset(train_csv, config['image_res'], image_root)
     elif 'nacc' in args.dataset:
-        train_dataset = NACC_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
+        train_dataset = NACC_Train_Dataset(train_csv, config['image_res'], image_root)
     else:
-        train_dataset = ICD_Train_Dataset(config['ICD_train_file'], config['image_res'], image_root)
+        train_dataset = ICD_Train_Dataset(train_csv, config['image_res'], image_root)
     
   
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset,num_replicas=num_tasks, rank=sampler_rank, shuffle=True)
@@ -102,13 +106,13 @@ def main(args, config):
     train_dataloader.num_batches = len(train_dataloader)  
 
     if 'fair_ori' in args.dataset:
-        val_dataset = Fair_ori_test_dataset(config['ICD_test_file'], config['image_res'], image_root)
+        val_dataset = Fair_ori_test_dataset(test_csv, config['image_res'], image_root)
     elif 'skin' in args.dataset:
-        val_dataset = Skin_Test_Dataset(config['ICD_test_file'], config['image_res'], image_root)
+        val_dataset = Skin_Test_Dataset(test_csv, config['image_res'], image_root)
     elif 'nacc' in args.dataset:
-        val_dataset = NACC_Test_Dataset(config['ICD_test_file'], config['image_res'], image_root)
+        val_dataset = NACC_Test_Dataset(test_csv, config['image_res'], image_root)
     else:
-        val_dataset = ICD_Dataset(config['ICD_test_file'], config['image_res'], image_root)
+        val_dataset = ICD_Dataset(test_csv, config['image_res'], image_root)
     val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset,num_replicas=num_tasks, rank=sampler_rank, shuffle=True)
     val_dataloader =DataLoader(
             val_dataset,
@@ -252,6 +256,8 @@ if __name__ == '__main__':
     parser.add_argument('--dist_backend', default='nccl')
 
     parser.add_argument('--output_dir', default='./output_dir/0116_toy')
+    parser.add_argument('--train_csv', default='', help='Training CSV path. Overrides ICD_train_file in the YAML configuration.')
+    parser.add_argument('--test_csv', default='', help='Validation/test CSV path. Overrides ICD_test_file in the YAML configuration.')
     parser.add_argument('--image_root', default='', help='Root directory for relative image paths stored in the CSV files.')
     parser.add_argument('--image_encoder_name', default='resnet50')
 

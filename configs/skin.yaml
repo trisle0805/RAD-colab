@@ -1,6 +1,6 @@
-ICD_train_file: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_train_set.csv'
-ICD_test_file: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_test_set.csv'
-image_root: '/content/drive/MyDrive/Cao học/Experiments/SkinCAP'
+ICD_train_file: ''  # Set with --train_csv for local or Colab data.
+ICD_test_file: ''   # Set with --test_csv for local or Colab data.
+image_root: ''      # Set with --image_root for local or Colab image files.
 
 image_res: 512
 batch_size: 16

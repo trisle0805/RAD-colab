@@ -59,15 +59,15 @@ from google.colab import drive
 drive.mount('/content/drive')
 ```
 
-The YAML files expose three paths that must match your layout:
+The YAML files may contain default dataset paths. Use the command-line overrides below for private local or Colab paths, so they do not need to be committed into a YAML file:
 
 | Field | Meaning |
 |---|---|
-| `ICD_train_file` | Training CSV path |
-| `ICD_test_file` | Validation/test CSV path |
-| `image_root` | Root prepended to relative image paths in column 0 of the CSV |
+| `--train_csv` | Training CSV path; overrides `ICD_train_file` |
+| `--test_csv` | Validation/test CSV path; overrides `ICD_test_file` |
+| `--image_root` | Root prepended to relative image paths in column 0 of the CSV; overrides `image_root` |
 
-All configuration defaults use `/content/...` as examples. Either edit the selected YAML or override only the image root with `--image_root`. Absolute image paths in the CSV are also accepted and do not need `image_root`.
+Absolute image paths in the CSV are also accepted and do not need `--image_root`.
 
 Expected CSV formats are positional:
 
@@ -84,20 +84,23 @@ The label ordering must match both the supplied task guideline JSONL and the har
 
 The supplied SkinCAP CSVs are already preprocessed; do **not** run anything in `preprocess/skin/` again. Their first column contains image filenames such as `3413.png`, so the loader combines each filename with the configured image root.
 
-`configs/skin.yaml` is set to this Drive directory:
+In a Colab cell, set your private dataset root once. Replace the placeholder with your own Drive location:
 
-```text
-/content/drive/MyDrive/Cao học/Experiments/SkinCAP
+```python
+SKINCAP_ROOT = "/content/drive/MyDrive/path/to/SkinCAP"
 ```
 
-Place the corresponding `.png` files and both preprocessed CSVs directly in that directory. The configured CSV paths are:
+The expected layout beneath that root is:
 
 ```text
-/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_train_set.csv
-/content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_50_test_set.csv
+SkinCAP/
+├── skincap_50_train_set.csv
+├── skincap_50_test_set.csv
+└── skincap/
+  └── 3413.png
 ```
 
-The CSV files are intentionally stored outside the cloned repository, so `csv_files/` is not required for the SkinCAP Colab run.
+The CSV files are intentionally stored outside the cloned repository, so `csv_files/` is not required. Supply all three private paths with the SkinCAP command below instead of editing and committing `configs/skin.yaml`.
 
 ## 4. ClinicalBERT and pretrained vision weights
 
@@ -135,6 +138,9 @@ Run:
 !python main_rad.py \
   --config ./configs/skin.yaml \
   --dataset skin \
+  --train_csv "{SKINCAP_ROOT}/skincap_50_train_set.csv" \
+  --test_csv "{SKINCAP_ROOT}/skincap_50_test_set.csv" \
+  --image_root "{SKINCAP_ROOT}/skincap" \
   --output_dir /content/drive/MyDrive/RAD-outputs/skin-run-01 \
   --bert_model_name /content/models/ClinicalBERT \
   --guideline_path ./guideline/qwen_maxtoken2k_skincap50_4sources.jsonl \
