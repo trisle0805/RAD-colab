@@ -37,7 +37,7 @@ For SkinCAP, install the focused dependency file. It intentionally does not pin 
 !pip install -q -r requirements-colab-skin.txt
 ```
 
-`requirements-colab-skin.txt` uses Python 3.13-compatible NumPy, scikit-learn, and OpenCV wheels. It also uses TensorBoardX 2.6.4 and Protobuf 5, avoiding the legacy Protobuf 3.20.1 constraint in the authors' original environment. Do not replace it with the repository's broad `requirements.txt`.
+`requirements-colab-skin.txt` uses Python 3.13-compatible NumPy, scikit-learn, and OpenCV wheels. It also uses TensorBoardX 2.6.4 and Protobuf 5, avoiding the legacy Protobuf 3.20.1 constraint in the authors' original environment. Transformers 4.47.1 requires Hugging Face Hub below 1.0, so the focused file pins the compatible 0.36.2 release. Do not replace it with the repository's broad `requirements.txt`.
 
 For NACC, additionally install NIfTI and scientific-image dependencies:
 
