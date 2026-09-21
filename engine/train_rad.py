@@ -795,12 +795,19 @@ def evaluate_combined_logits(gt, logits1, logits2, n_class, args):
     final_path = os.path.join(args.output_dir, f"pred_fused.npy")
 
     np.save(final_path, final_combined_logits)
+
+    final_metrics_text = (
+        "Final Metrics:\n"
+        f"AUCs: {np.mean(final_metrics[0]) * 100}\n"
+        f"Mean AP: {final_metrics[2] * 100}\n"
+        f"Accuracies: {np.mean(final_metrics[3]) * 100}\n"
+        f"Max F1 Scores: {np.mean(final_metrics[4]) * 100}\n"
+        f"Precisions: {np.mean(final_metrics[5]) * 100}\n"
+        f"Recalls: {np.mean(final_metrics[6]) * 100}\n"
+        f"Subset Accuracy: {final_metrics[7] * 100}\n"
+    )
+    final_metrics_path = os.path.join(args.output_dir, "final_metrics.txt")
+    with open(final_metrics_path, "w", encoding="utf-8") as metrics_file:
+        metrics_file.write(final_metrics_text)
     
-    print("\nFinal Metrics:")
-    print(f"AUCs: {np.mean(final_metrics[0]) * 100}")
-    print(f"Mean AP: {final_metrics[2] * 100}")
-    print(f"Accuracies: {np.mean(final_metrics[3]) * 100}")
-    print(f"Max F1 Scores: {np.mean(final_metrics[4]) * 100}")
-    print(f"Precisions: {np.mean(final_metrics[5]) * 100}")
-    print(f"Recalls: {np.mean(final_metrics[6]) * 100}")
-    print(f"Subset Accuracy: {final_metrics[7] * 100}")
+    print(f"\n{final_metrics_text}")
