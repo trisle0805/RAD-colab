@@ -1,4 +1,5 @@
 import argparse
+import csv
 import os
 import logging
 import yaml
@@ -8,6 +9,7 @@ import time
 import datetime
 import json
 import math
+import shutil
 from pathlib import Path
 from functools import partial
 from sklearn.metrics import roc_auc_score
@@ -49,6 +51,49 @@ def seed_torch(seed=42):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+def _atomic_torch_save(state, checkpoint_path):
+    """Write a checkpoint completely before replacing the previous latest state."""
+    checkpoint_path = Path(checkpoint_path)
+    temporary_path = checkpoint_path.with_suffix(checkpoint_path.suffix + '.tmp')
+    torch.save(state, temporary_path)
+    os.replace(temporary_path, checkpoint_path)
+
+def _write_epoch_metrics(metrics_dir, record):
+    """Append durable history and replace the latest metric snapshot."""
+    metrics_dir = Path(metrics_dir)
+    metrics_dir.mkdir(parents=True, exist_ok=True)
+    history_path = metrics_dir / 'metrics_history.csv'
+    write_header = not history_path.exists() or history_path.stat().st_size == 0
+    with open(history_path, 'a', newline='', encoding='utf-8') as history_file:
+        writer = csv.DictWriter(history_file, fieldnames=record.keys())
+        if write_header:
+            writer.writeheader()
+        writer.writerow(record)
+        history_file.flush()
+        os.fsync(history_file.fileno())
+
+    latest_path = metrics_dir / 'latest_metrics.json'
+    temporary_path = latest_path.with_suffix('.json.tmp')
+    with open(temporary_path, 'w', encoding='utf-8') as metrics_file:
+        json.dump(record, metrics_file, ensure_ascii=False, indent=2)
+        metrics_file.write('\n')
+        metrics_file.flush()
+        os.fsync(metrics_file.fileno())
+    os.replace(temporary_path, latest_path)
+
+def _configure_logging(output_dir):
+    logs_dir = Path(output_dir) / 'logs'
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s | %(levelname)s | %(message)s',
+        handlers=[
+            logging.FileHandler(logs_dir / 'training.log', encoding='utf-8'),
+            logging.StreamHandler(),
+        ],
+        force=True,
+    )
+
 def main(args, config):
     if not torch.cuda.is_available():
         raise RuntimeError('RAD training requires a CUDA-enabled PyTorch runtime.')
@@ -63,6 +108,14 @@ def main(args, config):
     start_epoch = 0
     max_epoch = config['schedular']['epochs']
     warmup_steps = config['schedular']['warmup_epochs']
+    output_dir = Path(args.output_dir)
+    checkpoints_dir = output_dir / 'checkpoints'
+    metrics_dir = output_dir / 'metrics'
+    tensorboard_dir = output_dir / 'tensorboard'
+    for directory in (checkpoints_dir, metrics_dir, output_dir / 'predictions', tensorboard_dir):
+        directory.mkdir(parents=True, exist_ok=True)
+    if utils.is_main_process():
+        _configure_logging(output_dir)
 
     num_tasks = utils.get_world_size()
     global_rank = utils.get_rank()
@@ -162,31 +215,38 @@ def main(args, config):
     arg_sche = utils.AttrDict(config['schedular'])
     lr_scheduler, _ = create_scheduler(arg_sche, optimizer) 
 
-    if os.path.exists(args.output_dir):
-        checkpoints = [f for f in os.listdir(args.output_dir) if f.startswith("checkpoint_") and f.endswith(".pt")]
-        if checkpoints:
-            latest_checkpoint = max(checkpoints, key=lambda x: int(x.split("_")[1].split(".")[0]))
-            checkpoint_path = os.path.join(args.output_dir, latest_checkpoint)
-            checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            
-            model.load_state_dict(checkpoint['model'])
-            model_guideline.load_state_dict(checkpoint['model_guideline'])
-            image_encoder.load_state_dict(checkpoint['image_encoder'])
-            text_encoder.load_state_dict(checkpoint['text_encoder'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
-            
-            start_epoch = checkpoint['epoch'] + 1
-            print(f"Resuming training from epoch {start_epoch}, checkpoint: {latest_checkpoint}")
-        else:
-            print("No checkpoint found, starting training from scratch.")
+    checkpoint_path = checkpoints_dir / 'latest.pt'
+    if checkpoint_path.is_file():
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
+        checkpoint_name = checkpoint_path.name
     else:
-        print("Output directory does not exist, starting training from scratch.")
+        legacy_checkpoints = [
+            path for path in output_dir.glob('checkpoint_*.pt')
+            if path.stem.removeprefix('checkpoint_').isdigit()
+        ]
+        if legacy_checkpoints:
+            checkpoint_path = max(legacy_checkpoints, key=lambda path: int(path.stem.removeprefix('checkpoint_')))
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            checkpoint_name = checkpoint_path.name
+        else:
+            checkpoint = None
+
+    if checkpoint is not None:
+        model.load_state_dict(checkpoint['model'])
+        model_guideline.load_state_dict(checkpoint['model_guideline'])
+        image_encoder.load_state_dict(checkpoint['image_encoder'])
+        text_encoder.load_state_dict(checkpoint['text_encoder'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
+        start_epoch = checkpoint['epoch'] + 1
+        logging.info('Resuming training from epoch %s using %s.', start_epoch + 1, checkpoint_name)
+    else:
+        logging.info('No checkpoint found, starting training from scratch.')
 
     print("Start training")
     start_time = time.time()
-    if utils.is_main_process(): 
-        writer = SummaryWriter(args.output_dir) 
+    if utils.is_main_process():
+        writer = SummaryWriter(str(tensorboard_dir))
 
 
     for epoch in range(start_epoch, max_epoch):
@@ -197,23 +257,30 @@ def main(args, config):
 
         train_stats = train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenizer, train_dataloader, optimizer, epoch, warmup_steps, device, lr_scheduler, args, config, writer, config['grad_accumulation_steps'], args.guideline_path) 
 
-        for k, v in train_stats.items():
-            if k == 'loss':
-                train_loss_epoch = v
-            elif k == 'loss_ce':
-                train_loss_ce_epoch = v
-            elif k == 'loss_clip':
-                train_loss_clip_epoch = v
+        train_loss_epoch = float(train_stats.get('loss', 'nan'))
+        train_loss_ce_epoch = float(train_stats.get('loss_ce', 'nan'))
+        train_loss_clip_epoch = float(train_stats.get('loss_clip', 'nan'))
+        learning_rate = float(lr_scheduler._get_lr(epoch)[0])
         
-        writer.add_scalar('loss/train_loss_epoch', float(train_loss_epoch), epoch)
-        writer.add_scalar('loss/train_loss_ce_epoch', float(train_loss_ce_epoch), epoch)
-        writer.add_scalar('loss/train_loss_clip_epoch', float(train_loss_clip_epoch), epoch)
-        writer.add_scalar('lr/leaning_rate',  lr_scheduler._get_lr(epoch)[0] , epoch)
+        writer.add_scalar('loss/train_loss_epoch', train_loss_epoch, epoch)
+        writer.add_scalar('loss/train_loss_ce_epoch', train_loss_ce_epoch, epoch)
+        writer.add_scalar('loss/train_loss_clip_epoch', train_loss_clip_epoch, epoch)
+        writer.add_scalar('lr/learning_rate', learning_rate, epoch)
 
+        validation_summary = valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer, val_dataloader,epoch,device,args,config, args.guideline_path)
 
-        valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer, val_dataloader,epoch,device,args,config, args.guideline_path)
-
-        if utils.is_main_process() and (epoch+1)%10==0 :  
+        if utils.is_main_process():
+            epoch_number = epoch + 1
+            metrics_record = {
+                'epoch': epoch_number,
+                'completed_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                'train_loss': train_loss_epoch,
+                'train_loss_ce': train_loss_ce_epoch,
+                'train_loss_clip': train_loss_clip_epoch,
+                'learning_rate': learning_rate,
+                **validation_summary,
+            }
+            _write_epoch_metrics(metrics_dir, metrics_record)
             save_obj = {
                     'model': model.state_dict(),
                     'model_guideline': model_guideline.state_dict(),
@@ -223,9 +290,21 @@ def main(args, config):
                     'lr_scheduler': lr_scheduler.state_dict(),
                     'config': config,
                     'epoch': epoch,
+                    'metrics': metrics_record,
                 }
-
-            torch.save(save_obj, os.path.join(args.output_dir, 'checkpoint_'+str(epoch)+'.pt'))
+            latest_checkpoint = checkpoints_dir / 'latest.pt'
+            _atomic_torch_save(save_obj, latest_checkpoint)
+            if epoch_number % 10 == 0:
+                shutil.copy2(latest_checkpoint, checkpoints_dir / f'epoch_{epoch_number:03d}.pt')
+            writer.flush()
+            for handler in logging.getLogger().handlers:
+                handler.flush()
+            logging.info(
+                'Epoch %03d completed and persisted. score=%.6f, checkpoint=%s',
+                epoch_number,
+                metrics_record['best_validation_score'],
+                latest_checkpoint,
+            )
             
             
     total_time = time.time() - start_time
@@ -233,6 +312,9 @@ def main(args, config):
     print('Training time {}'.format(total_time_str))
     print('Evaluating')
     test_logits(args, config, max_epoch)
+    if utils.is_main_process():
+        writer.flush()
+        writer.close()
 
 
 

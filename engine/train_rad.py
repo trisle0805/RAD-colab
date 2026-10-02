@@ -2,6 +2,7 @@ import json
 import logging
 import math
 import os
+import re
 import cv2
 import time
 import numpy as np
@@ -635,24 +636,65 @@ def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer,
     gt_np = gt.cpu().numpy()
     pred_np = pred.cpu().numpy()
 
-    pred_file_name = f"pred_epoch_{epoch}.npy" 
-    pred_file_path = os.path.join(args.output_dir, pred_file_name)
-    np.save(pred_file_path, pred_np)
-
-    gt_file_name = f"gt_epoch_{epoch}.npy" 
-    gt_file_path = os.path.join(args.output_dir, gt_file_name)
-    np.save(gt_file_path, gt_np)
-
+    epoch_number = epoch + 1
+    n_class = gt_np.shape[1]
+    label_metrics = compute_metrics(gt_np, pred_np, n_class)
+    summary = _metric_summary(label_metrics, 'label')
     if guideline_path:
         pred_guideline_np = pred_guideline.cpu().numpy()
-        pred_guideline_file_name = f"pred_guideline_epoch_{epoch}.npy" 
-        pred_guideline_file_path = os.path.join(args.output_dir, pred_guideline_file_name)
-        np.save(pred_guideline_file_path, pred_guideline_np)
-
         pred_avg_np = pred_avg.cpu().numpy()
-        pred_avg_file_name = f"pred_avg_epoch_{epoch}.npy" 
-        pred_avg_file_path = os.path.join(args.output_dir, pred_avg_file_name)
-        np.save(pred_avg_file_path, pred_avg_np)
+        guideline_metrics = compute_metrics(gt_np, pred_guideline_np, n_class)
+        summary.update(_metric_summary(guideline_metrics, 'guideline'))
+        summary['best_validation_score'] = max(
+            summary['label_validation_score'],
+            summary['guideline_validation_score'],
+        )
+        summary['selected_stream'] = (
+            'label'
+            if summary['label_validation_score'] >= summary['guideline_validation_score']
+            else 'guideline'
+        )
+    else:
+        pred_guideline_np = np.empty((0, n_class), dtype=pred_np.dtype)
+        pred_avg_np = np.empty((0, n_class), dtype=pred_np.dtype)
+        summary['best_validation_score'] = summary['label_validation_score']
+        summary['selected_stream'] = 'label'
+
+    predictions_dir = os.path.join(args.output_dir, 'predictions')
+    os.makedirs(predictions_dir, exist_ok=True)
+    prediction_file_name = f"epoch_{epoch_number:03d}.npz"
+    prediction_path = os.path.join(predictions_dir, prediction_file_name)
+    temporary_path = f"{prediction_path}.tmp.npz"
+    np.savez_compressed(
+        temporary_path,
+        gt=gt_np,
+        pred_label=pred_np,
+        pred_guideline=pred_guideline_np,
+        pred_average=pred_avg_np,
+    )
+    os.replace(temporary_path, prediction_path)
+
+    summary['epoch'] = epoch_number
+    summary['prediction_file'] = os.path.join('predictions', prediction_file_name)
+    return summary
+
+def _metric_summary(metrics, prefix):
+    """Return JSON/CSV-friendly aggregate metrics for one prediction stream."""
+    aucs, _, mean_ap, accuracy, max_f1, precision, recall, subset_accuracy, _ = metrics
+    validation_score = np.mean([
+        np.mean(aucs), mean_ap, np.mean(accuracy), np.mean(max_f1),
+        np.mean(precision), np.mean(recall), subset_accuracy,
+    ])
+    return {
+        f'{prefix}_mean_auc': float(np.mean(aucs)),
+        f'{prefix}_mean_ap': float(mean_ap),
+        f'{prefix}_mean_accuracy': float(np.mean(accuracy)),
+        f'{prefix}_mean_f1': float(np.mean(max_f1)),
+        f'{prefix}_mean_precision': float(np.mean(precision)),
+        f'{prefix}_mean_recall': float(np.mean(recall)),
+        f'{prefix}_subset_accuracy': float(subset_accuracy),
+        f'{prefix}_validation_score': float(validation_score),
+    }
 
 def test_logits(args, config, max_epoch):
     if 'fair_ori' in args.dataset:
@@ -663,19 +705,27 @@ def test_logits(args, config, max_epoch):
         n_class = 11
     else:
         n_class = 53
-    best_epoch = 0
-    best_metrics = 0
-    for i in range(0, max_epoch):
-        gt_file_name = f"gt_epoch_{i}.npy" 
-        gt_file_path = os.path.join(args.output_dir, gt_file_name)
-        pred1_file_name = f"pred_epoch_{i}.npy" 
-        pred1_file_path = os.path.join(args.output_dir, pred1_file_name)
-        pred2_file_name = f"pred_guideline_epoch_{i}.npy" 
-        pred2_file_path = os.path.join(args.output_dir, pred2_file_name)
 
-        gt = np.load(gt_file_path)
-        logits1 = np.load(pred1_file_path)
-        logits2 = np.load(pred2_file_path)
+    predictions_dir = os.path.join(args.output_dir, 'predictions')
+    prediction_files = []
+    if os.path.isdir(predictions_dir):
+        for file_name in os.listdir(predictions_dir):
+            match = re.fullmatch(r'epoch_(\d+)\.npz', file_name)
+            if match:
+                prediction_files.append((int(match.group(1)), os.path.join(predictions_dir, file_name)))
+    prediction_files.sort()
+    if not prediction_files:
+        raise FileNotFoundError(f'No per-epoch prediction files found in {predictions_dir}.')
+
+    best_epoch = 0
+    best_metrics = -math.inf
+    for epoch_number, prediction_path in prediction_files:
+        with np.load(prediction_path) as prediction_data:
+            gt = prediction_data['gt']
+            logits1 = prediction_data['pred_label']
+            logits2 = prediction_data['pred_guideline']
+        if logits2.size == 0:
+            raise ValueError('Final fusion requires guideline predictions, but they are absent from the saved artifact.')
 
         current_metrics_1 = compute_metrics(gt, logits1, n_class)
         current_metrics_2 = compute_metrics(gt, logits2, n_class)
@@ -685,12 +735,13 @@ def test_logits(args, config, max_epoch):
                                 np.mean(current_metrics_2[4]), np.mean(current_metrics_2[5]), np.mean(current_metrics_2[6]), current_metrics_2[7]])
         high = max(avg_metrics_1, avg_metrics_2)
         if high>best_metrics:
-            best_epoch = i
+            best_epoch = epoch_number
             best_metrics = high
             best_gt = gt
             best_logits1 = logits1
             best_logits2 = logits2
 
+        logging.info('Selected epoch %s for final label/guideline fusion (validation score %.6f).', best_epoch, best_metrics)
     evaluate_combined_logits(best_gt, best_logits1, best_logits2, n_class, args)
 
 
