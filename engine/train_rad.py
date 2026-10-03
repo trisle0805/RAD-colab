@@ -12,7 +12,16 @@ import random
 from PIL import Image
 from contextlib import suppress
 from itertools import chain
-from sklearn.metrics import roc_auc_score, average_precision_score, accuracy_score, confusion_matrix, precision_recall_curve,recall_score
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    balanced_accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    recall_score,
+    roc_auc_score,
+)
 import contextlib
 
 import torch
@@ -639,12 +648,16 @@ def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer,
     epoch_number = epoch + 1
     n_class = gt_np.shape[1]
     label_metrics = compute_metrics(gt_np, pred_np, n_class)
-    summary = _metric_summary(label_metrics, 'label')
+    skin_multiclass_metrics = _multiclass_metrics(gt_np, pred_np) if 'skin' in args.dataset else None
+    summary = _metric_summary(label_metrics, 'label', skin_multiclass_metrics)
     if guideline_path:
         pred_guideline_np = pred_guideline.cpu().numpy()
         pred_avg_np = pred_avg.cpu().numpy()
         guideline_metrics = compute_metrics(gt_np, pred_guideline_np, n_class)
-        summary.update(_metric_summary(guideline_metrics, 'guideline'))
+        guideline_multiclass_metrics = (
+            _multiclass_metrics(gt_np, pred_guideline_np) if 'skin' in args.dataset else None
+        )
+        summary.update(_metric_summary(guideline_metrics, 'guideline', guideline_multiclass_metrics))
         summary['best_validation_score'] = max(
             summary['label_validation_score'],
             summary['guideline_validation_score'],
@@ -678,14 +691,21 @@ def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer,
     summary['prediction_file'] = os.path.join('predictions', prediction_file_name)
     return summary
 
-def _metric_summary(metrics, prefix):
+def _multiclass_metrics(gt, pred):
+    """Evaluate one-hot single-label targets using a single predicted class per sample."""
+    target_classes = np.argmax(gt, axis=1)
+    predicted_classes = np.argmax(pred, axis=1)
+    return {
+        'top1_accuracy': float(accuracy_score(target_classes, predicted_classes)),
+        'macro_f1': float(f1_score(target_classes, predicted_classes, average='macro', zero_division=0)),
+        'balanced_accuracy': float(balanced_accuracy_score(target_classes, predicted_classes)),
+    }
+
+
+def _metric_summary(metrics, prefix, multiclass_metrics=None):
     """Return JSON/CSV-friendly aggregate metrics for one prediction stream."""
     aucs, _, mean_ap, accuracy, max_f1, precision, recall, subset_accuracy, _ = metrics
-    validation_score = np.mean([
-        np.mean(aucs), mean_ap, np.mean(accuracy), np.mean(max_f1),
-        np.mean(precision), np.mean(recall), subset_accuracy,
-    ])
-    return {
+    summary = {
         f'{prefix}_mean_auc': float(np.mean(aucs)),
         f'{prefix}_mean_ap': float(mean_ap),
         f'{prefix}_mean_accuracy': float(np.mean(accuracy)),
@@ -693,8 +713,19 @@ def _metric_summary(metrics, prefix):
         f'{prefix}_mean_precision': float(np.mean(precision)),
         f'{prefix}_mean_recall': float(np.mean(recall)),
         f'{prefix}_subset_accuracy': float(subset_accuracy),
-        f'{prefix}_validation_score': float(validation_score),
     }
+    if multiclass_metrics is None:
+        validation_score = np.mean([
+            summary[f'{prefix}_mean_auc'], summary[f'{prefix}_mean_ap'],
+            summary[f'{prefix}_mean_accuracy'], summary[f'{prefix}_mean_f1'],
+            summary[f'{prefix}_mean_precision'], summary[f'{prefix}_mean_recall'],
+            summary[f'{prefix}_subset_accuracy'],
+        ])
+    else:
+        summary.update({f'{prefix}_{name}': value for name, value in multiclass_metrics.items()})
+        validation_score = multiclass_metrics['macro_f1']
+    summary[f'{prefix}_validation_score'] = float(validation_score)
+    return summary
 
 def test_logits(args, config, max_epoch):
     if 'fair_ori' in args.dataset:
@@ -729,10 +760,14 @@ def test_logits(args, config, max_epoch):
 
         current_metrics_1 = compute_metrics(gt, logits1, n_class)
         current_metrics_2 = compute_metrics(gt, logits2, n_class)
-        avg_metrics_1 = np.mean([np.mean(current_metrics_1[0]), current_metrics_1[2], np.mean(current_metrics_1[3]), 
-                                np.mean(current_metrics_1[4]), np.mean(current_metrics_1[5]), np.mean(current_metrics_1[6]), current_metrics_1[7]])
-        avg_metrics_2 = np.mean([np.mean(current_metrics_2[0]), current_metrics_2[2], np.mean(current_metrics_2[3]), 
-                                np.mean(current_metrics_2[4]), np.mean(current_metrics_2[5]), np.mean(current_metrics_2[6]), current_metrics_2[7]])
+        if 'skin' in args.dataset:
+            avg_metrics_1 = _multiclass_metrics(gt, logits1)['macro_f1']
+            avg_metrics_2 = _multiclass_metrics(gt, logits2)['macro_f1']
+        else:
+            avg_metrics_1 = np.mean([np.mean(current_metrics_1[0]), current_metrics_1[2], np.mean(current_metrics_1[3]),
+                                    np.mean(current_metrics_1[4]), np.mean(current_metrics_1[5]), np.mean(current_metrics_1[6]), current_metrics_1[7]])
+            avg_metrics_2 = np.mean([np.mean(current_metrics_2[0]), current_metrics_2[2], np.mean(current_metrics_2[3]),
+                                    np.mean(current_metrics_2[4]), np.mean(current_metrics_2[5]), np.mean(current_metrics_2[6]), current_metrics_2[7]])
         high = max(avg_metrics_1, avg_metrics_2)
         if high>best_metrics:
             best_epoch = epoch_number
@@ -832,8 +867,11 @@ def evaluate_combined_logits(gt, logits1, logits2, n_class, args):
             combined_logits = logits1 * current_weights.reshape(1, -1) + logits2 * (1 - current_weights).reshape(1, -1)
             
             metrics = compute_metrics(gt, combined_logits, n_class)
-            avg_metrics = np.mean([np.mean(metrics[0]), metrics[2], np.mean(metrics[3]), 
-                                   np.mean(metrics[4]), np.mean(metrics[5]), np.mean(metrics[6]), metrics[7]])
+            if 'skin' in args.dataset:
+                avg_metrics = _multiclass_metrics(gt, combined_logits)['macro_f1']
+            else:
+                avg_metrics = np.mean([np.mean(metrics[0]), metrics[2], np.mean(metrics[3]),
+                                       np.mean(metrics[4]), np.mean(metrics[5]), np.mean(metrics[6]), metrics[7]])
 
             if avg_metrics > best_avg_metric:
                 best_avg_metric = avg_metrics
