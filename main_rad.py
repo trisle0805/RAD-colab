@@ -250,18 +250,14 @@ def main(args, config):
 
 
     for epoch in range(start_epoch, max_epoch):
-        if epoch>0:
-            lr_scheduler.step(epoch+warmup_steps)
         train_dataloader.sampler.set_epoch(epoch)
-
+        learning_rate = float(optimizer.param_groups[0]['lr'])
 
         train_stats = train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenizer, train_dataloader, optimizer, epoch, warmup_steps, device, lr_scheduler, args, config, writer, config['grad_accumulation_steps'], args.guideline_path) 
 
         train_loss_epoch = float(train_stats.get('loss', 'nan'))
         train_loss_ce_epoch = float(train_stats.get('loss_ce', 'nan'))
-        train_loss_clip_epoch = float(train_stats.get('loss_clip', 'nan'))
-        learning_rate = float(lr_scheduler._get_lr(epoch)[0])
-        
+        train_loss_clip_epoch = float(train_stats.get('loss_clip', 'nan'))        
         writer.add_scalar('loss/train_loss_epoch', train_loss_epoch, epoch)
         writer.add_scalar('loss/train_loss_ce_epoch', train_loss_ce_epoch, epoch)
         writer.add_scalar('loss/train_loss_clip_epoch', train_loss_clip_epoch, epoch)
@@ -300,11 +296,15 @@ def main(args, config):
             for handler in logging.getLogger().handlers:
                 handler.flush()
             logging.info(
-                'Epoch %03d completed and persisted. score=%.6f, checkpoint=%s',
+                'Epoch %03d completed and persisted. score=%.6f, lr=%.8g, checkpoint=%s',
                 epoch_number,
                 metrics_record['best_validation_score'],
+                learning_rate,
                 latest_checkpoint,
             )
+
+        if epoch + 1 < max_epoch:
+            lr_scheduler.step(epoch + 1)
             
             
     total_time = time.time() - start_time

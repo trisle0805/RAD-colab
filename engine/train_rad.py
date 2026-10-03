@@ -145,7 +145,7 @@ def train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenize
     metric_logger.add_meter('loss_contrast_text', utils.SmoothedValue(window_size=50, fmt='{value:.6f}'))
     metric_logger.add_meter('loss_contrast_vision', utils.SmoothedValue(window_size=50, fmt='{value:.6f}'))
     metric_logger.update(loss=1.0)
-    metric_logger.update(lr = scheduler._get_lr(epoch)[0])
+    metric_logger.update(lr=optimizer.param_groups[0]['lr'])
 
     header = 'Train Epoch: [{}]'.format(epoch)
     print_freq = 5
