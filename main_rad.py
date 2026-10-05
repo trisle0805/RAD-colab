@@ -419,6 +419,10 @@ if __name__ == '__main__':
     parser.add_argument('--guideline_path', default='')
     parser.add_argument('--bert_model_name', default='')
     parser.add_argument('--max_length', default=512, type=int)
+    parser.add_argument(
+        '--topk', nargs='+', type=int, default=[1, 2, 3],
+        help='Ranking cutoffs for SkinCAP metrics (default: 1 2 3).',
+    )
     parser.add_argument('--embed_dim', type=int, default=768, help='embedding dim')
     
     parser.add_argument('--device', default='cuda')
@@ -431,6 +435,9 @@ if __name__ == '__main__':
     
     parser.add_argument('--gpu', default='0', type=str, help='gpu')
     args = parser.parse_args()
+    args.topk = sorted(set(args.topk))
+    if not args.topk or any(k < 1 for k in args.topk):
+        parser.error('--topk must contain one or more positive integers.')
     os.environ['MASTER_PORT'] = f'{args.port}'
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)

@@ -553,14 +553,18 @@ def valid_on_ICD(
     epoch_number = epoch + 1
     n_class = gt_np.shape[1]
     label_metrics = compute_metrics(gt_np, pred_np, n_class)
-    skin_multiclass_metrics = _multiclass_metrics(gt_np, pred_np) if 'skin' in args.dataset else None
+    skin_multiclass_metrics = (
+        _multiclass_metrics(gt_np, pred_np, args.topk)
+        if 'skin' in args.dataset else None
+    )
     summary = _metric_summary(label_metrics, 'label', skin_multiclass_metrics)
     if guideline_path:
         pred_guideline_np = pred_guideline.cpu().numpy()
         pred_avg_np = pred_avg.cpu().numpy()
         guideline_metrics = compute_metrics(gt_np, pred_guideline_np, n_class)
         guideline_multiclass_metrics = (
-            _multiclass_metrics(gt_np, pred_guideline_np) if 'skin' in args.dataset else None
+            _multiclass_metrics(gt_np, pred_guideline_np, args.topk)
+            if 'skin' in args.dataset else None
         )
         summary.update(_metric_summary(guideline_metrics, 'guideline', guideline_multiclass_metrics))
         summary['best_validation_score'] = max(
@@ -599,18 +603,42 @@ def valid_on_ICD(
     summary['prediction_file'] = os.path.join('predictions', prediction_file_name)
     return summary
 
-def _multiclass_metrics(gt, pred):
-    """Evaluate one-hot single-label targets using a single predicted class per sample."""
+def _multiclass_metrics(gt, pred, topk=(1, 2, 3)):
+    """Evaluate single-label predictions with deterministic rank-based metrics."""
+    topk = sorted({int(k) for k in topk})
+    if not topk or any(k < 1 for k in topk):
+        raise ValueError('topk must contain one or more positive integers.')
+    if any(k > pred.shape[1] for k in topk):
+        raise ValueError(f'topk cannot exceed the number of classes ({pred.shape[1]}).')
+
     target_classes = np.argmax(gt, axis=1)
+    true_scores = pred[np.arange(pred.shape[0]), target_classes]
+    ranks = 1 + np.sum(pred > true_scores[:, None], axis=1)
     predicted_classes = np.argmax(pred, axis=1)
-    top_k = min(3, pred.shape[1])
-    top_classes = np.argpartition(pred, -top_k, axis=1)[:, -top_k:]
-    return {
-        'top1_accuracy': float(accuracy_score(target_classes, predicted_classes)),
-        'top3_accuracy': float(np.mean(np.any(top_classes == target_classes[:, None], axis=1))),
+    metrics = {
         'macro_f1': float(f1_score(target_classes, predicted_classes, average='macro', zero_division=0)),
         'balanced_accuracy': float(balanced_accuracy_score(target_classes, predicted_classes)),
     }
+    for k in topk:
+        metrics[f'top{k}_accuracy'] = float(np.mean(ranks <= k))
+        if k >= 2:
+            reciprocal_rank_at_k = np.where(ranks <= k, 1.0 / ranks, 0.0)
+            metrics[f'mrr_at_{k}'] = float(np.mean(reciprocal_rank_at_k))
+            class_mrrs = [
+                float(np.mean(reciprocal_rank_at_k[target_classes == class_idx]))
+                for class_idx in np.unique(target_classes)
+            ]
+            metrics[f'macro_mrr_at_{k}'] = float(np.mean(class_mrrs))
+
+    if {1, 2, 3}.issubset(topk):
+        expected_mrr_at_3 = (
+            0.5 * metrics['top1_accuracy']
+            + metrics['top2_accuracy'] / 6
+            + metrics['top3_accuracy'] / 3
+        )
+        if abs(metrics['mrr_at_3'] - expected_mrr_at_3) > 1e-9:
+            raise AssertionError('mrr_at_3 does not match the top-k metric identity.')
+    return metrics
 
 
 def _metric_summary(metrics, prefix, multiclass_metrics=None):
@@ -651,24 +679,21 @@ def _legacy_metrics_summary(metrics):
     }
 
 
-def _skin_final_metrics(gt, pred):
-    multiclass = _multiclass_metrics(gt, pred)
+def _skin_final_metrics(gt, pred, topk):
+    multiclass = _multiclass_metrics(gt, pred, topk)
     legacy = _legacy_metrics_summary(compute_metrics(gt, pred, gt.shape[1]))
     return {
-        'macro_f1': multiclass['macro_f1'],
-        'top1_accuracy': multiclass['top1_accuracy'],
-        'top3_accuracy': multiclass['top3_accuracy'],
-        'balanced_accuracy': multiclass['balanced_accuracy'],
+        **multiclass,
         'macro_auc': legacy['mean_auc'],
         'mAP': legacy['mean_ap'],
         'rad_legacy_metrics': legacy,
     }
 
 
-def _fit_skin_fusion_weights(gt, logits1, logits2):
+def _fit_skin_fusion_weights(gt, logits1, logits2, topk=(1, 2, 3)):
     weights = np.arange(0, 1.02, 0.1)
     best_weights = np.ones(gt.shape[1])
-    best_macro_f1 = _multiclass_metrics(gt, logits1)['macro_f1']
+    best_macro_f1 = _multiclass_metrics(gt, logits1, topk)['macro_f1']
     for class_idx in range(gt.shape[1]):
         best_weight_for_class = best_weights[class_idx]
         for weight in weights:
@@ -678,7 +703,7 @@ def _fit_skin_fusion_weights(gt, logits1, logits2):
                 logits1 * candidate_weights.reshape(1, -1)
                 + logits2 * (1 - candidate_weights).reshape(1, -1)
             )
-            macro_f1 = _multiclass_metrics(gt, combined_logits)['macro_f1']
+            macro_f1 = _multiclass_metrics(gt, combined_logits, topk)['macro_f1']
             if macro_f1 > best_macro_f1:
                 best_macro_f1 = macro_f1
                 best_weight_for_class = weight
@@ -687,9 +712,8 @@ def _fit_skin_fusion_weights(gt, logits1, logits2):
             logits1 * best_weights.reshape(1, -1)
             + logits2 * (1 - best_weights).reshape(1, -1)
         )
-        best_macro_f1 = _multiclass_metrics(gt, combined_logits)['macro_f1']
+        best_macro_f1 = _multiclass_metrics(gt, combined_logits, topk)['macro_f1']
     return best_weights
-
 
 def evaluate_skin_test(
     model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, device, args, config,
@@ -707,7 +731,7 @@ def evaluate_skin_test(
         val_guideline = val_predictions['pred_guideline']
     if val_guideline.size == 0:
         raise ValueError('SkinCAP fusion requires guideline predictions from validation.')
-    fusion_weights = _fit_skin_fusion_weights(val_gt, val_label, val_guideline)
+    fusion_weights = _fit_skin_fusion_weights(val_gt, val_label, val_guideline, args.topk)
 
     test_summary = valid_on_ICD(
         model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, int(best_epoch) - 1,
@@ -726,9 +750,9 @@ def evaluate_skin_test(
         'best_epoch': int(best_epoch),
         'best_validation_score': float(best_validation_score),
         'fusion_weights': fusion_weights.tolist(),
-        'label': _skin_final_metrics(test_gt, test_label),
-        'guideline': _skin_final_metrics(test_gt, test_guideline),
-        'fused': _skin_final_metrics(test_gt, test_fused),
+        'label': _skin_final_metrics(test_gt, test_label, args.topk),
+        'guideline': _skin_final_metrics(test_gt, test_guideline, args.topk),
+        'fused': _skin_final_metrics(test_gt, test_fused, args.topk),
     }
     final_metrics_path = os.path.join(args.output_dir, 'final_metrics.json')
     temporary_path = f'{final_metrics_path}.tmp'
@@ -775,8 +799,8 @@ def test_logits(args, config, max_epoch):
         current_metrics_1 = compute_metrics(gt, logits1, current_n_class)
         current_metrics_2 = compute_metrics(gt, logits2, current_n_class)
         if 'skin' in args.dataset:
-            avg_metrics_1 = _multiclass_metrics(gt, logits1)['macro_f1']
-            avg_metrics_2 = _multiclass_metrics(gt, logits2)['macro_f1']
+            avg_metrics_1 = _multiclass_metrics(gt, logits1, args.topk)['macro_f1']
+            avg_metrics_2 = _multiclass_metrics(gt, logits2, args.topk)['macro_f1']
         else:
             avg_metrics_1 = np.mean([np.mean(current_metrics_1[0]), current_metrics_1[2], np.mean(current_metrics_1[3]),
                                     np.mean(current_metrics_1[4]), np.mean(current_metrics_1[5]), np.mean(current_metrics_1[6]), current_metrics_1[7]])
