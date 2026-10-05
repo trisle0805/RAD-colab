@@ -1,0 +1,2 @@
+disease,unit_id,prop_index,level,code,detail,canonical,polarity
+pityriasis rosea,29-010,1,INFO,NEGATIVE_POLARITY,,"lesions on the face, scalp, palms and soles",-1

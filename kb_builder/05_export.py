@@ -13,6 +13,7 @@ Cột action:
 """
 import argparse
 import csv
+import datetime
 import json
 from collections import Counter, defaultdict
 
@@ -26,28 +27,58 @@ EXCL_COLS = ["unit_id", "disease", "section", "subsection", "text", "exclude_rea
              "action", "restore_canonical", "restore_polarity", "restore_category", "note"]
 
 
-def review(cfg, synonyms):
+def _backup_review_file(path):
+    if not path.exists():
+        return
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup = path.with_name(f"{path.stem}.bak_{timestamp}{path.suffix}")
+    backup.write_bytes(path.read_bytes())
+    print(f"Đã sao lưu {path.name} -> {backup.name}")
+
+
+def _preserved_rows(path, disease_column, refreshed_diseases):
+    if not path.exists():
+        return []
+    return [row for row in _read_csv(path) if row[disease_column] not in refreshed_diseases]
+
+
+def review(cfg, synonyms, refreshed_diseases=None):
+    refreshed_diseases = set(refreshed_diseases or [])
     props = read_jsonl(cfg["_out"] / "props_dedup.jsonl")
     units = read_jsonl(cfg["_out"] / "units.jsonl")
     out = cfg["_out"] / "review"
     out.mkdir(parents=True, exist_ok=True)
-    with open(out / "review_propositions.csv", "w", newline="", encoding="utf-8-sig") as f:
+    props_path = out / "review_propositions.csv"
+    excluded_path = out / "review_excluded_units.csv"
+    old_props = _preserved_rows(props_path, "disease_id", refreshed_diseases)
+    old_excluded = _preserved_rows(excluded_path, "disease", refreshed_diseases)
+    _backup_review_file(props_path)
+    _backup_review_file(excluded_path)
+
+    with open(props_path, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=PROP_COLS)
         w.writeheader()
+        w.writerows(old_props)
         for p in props:
+            if p["disease_id"] not in refreshed_diseases and any(
+                row["proposition_id"] == p["proposition_id"] for row in old_props
+            ):
+                continue
             flags = check_proposition(p["canonicalDescription"], p["polarity"], p["category"], p["disease_id"], synonyms)
             w.writerow({"proposition_id": p["proposition_id"], "disease_id": p["disease_id"],
                         "category": p["category"], "polarity": p["polarity"],
                         "canonicalDescription": p["canonicalDescription"],
                         "sourceExcerpt": " || ".join(p["sourceExcerpt"]),
                         "sourceUnitIds": ";".join(p["sourceUnitIds"]), "flags": format_flags(flags)})
+
     unit_by_id = {u["unit_id"]: u for u in units}
-    with open(out / "review_excluded_units.csv", "w", newline="", encoding="utf-8-sig") as f:
+    with open(excluded_path, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=EXCL_COLS)
         w.writeheader()
+        w.writerows(old_excluded)
         for d in dict.fromkeys(u["disease"] for u in units):
             path = cfg["_out"] / "extract" / f"{slug(d)}.json"
-            if not path.exists():
+            if not path.exists() or (d not in refreshed_diseases and any(row["disease"] == d for row in old_excluded)):
                 continue
             for u in json.load(open(path, encoding="utf-8"))["units"]:
                 if u["decision"] == "EXCLUDE":
@@ -55,6 +86,8 @@ def review(cfg, synonyms):
                     w.writerow({"unit_id": u["unit_id"], "disease": d, "section": src["section"],
                                 "subsection": src["subsection"], "text": src["text"],
                                 "exclude_reason": u["exclude_reason"]})
+    if refreshed_diseases:
+        print(f"Cần duyệt lại: {', '.join(sorted(refreshed_diseases))}")
     print(f"Đã xuất bảng duyệt vào {out}")
 
 
@@ -212,11 +245,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["review", "finalize"])
     ap.add_argument("--partial", action="store_true", help="chạy thử khi chưa đủ 47 bệnh (bỏ kiểm tra khớp nhãn)")
+    ap.add_argument("--refreshed-diseases", nargs="*", default=[],
+                    help="các bệnh vừa chạy lại; xóa trạng thái duyệt cũ của các bệnh này")
     args = ap.parse_args()
     cfg = load_config()
     synonyms = json.load(open(resolve(cfg, "synonyms_path"), encoding="utf-8"))
     if args.mode == "review":
-        review(cfg, synonyms)
+        review(cfg, synonyms, args.refreshed_diseases)
     else:
         finalize(cfg, synonyms, args.partial)
 

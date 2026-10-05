@@ -1,0 +1,318 @@
+{
+  "disease": "pityriasis rosea",
+  "units": [
+    {
+      "unit_id": "29-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acute course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "papulosquamous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "age in childhood or young adulthood",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "single large oval erythematous patch preceding other lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "smaller similar lesions on the trunk and proximal extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Christmas tree distribution on the back",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "human herpesvirus 6 or 7 reactivation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-005",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "29-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild leukopenia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "relative lymphocytosis early in the disease course",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "extravasated erythrocytes within dermal papillae",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dyskeratotic cells within the dermis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "single large oval erythematous patch preceding other lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "initial lesion on the trunk, neck or upper arms",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "smaller oval scaly lesions following the initial patch",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "Christmas tree distribution on the back",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the trunk and proximal extremities",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the face, scalp, palms and soles",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild to moderate itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "severe pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "malaise before rash onset",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "low-grade fever before rash onset",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "single large oval erythematous patch preceding other lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "peripheral collarette scaling with central clearance",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset in spring or fall in temperate climates",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "age between 10 and 35 years",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "papular lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "purpuric lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "vesicular lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "localized lesions",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash persisting for more than 12 weeks",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "frequent severe systemic symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "29-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "29-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "29-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "29-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "29-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

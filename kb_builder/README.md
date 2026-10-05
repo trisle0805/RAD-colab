@@ -17,6 +17,26 @@ export OPENAI_API_KEY=...        # nếu provider: openai
 ```
 Trong `config.yaml`: điền `llm.provider` (`anthropic` hoặc `openai`) và `llm.model` (bắt buộc). Model không hỗ trợ `temperature` thì đặt `temperature: null`.
 
+## Chạy nhanh một nhóm bệnh
+
+Dùng `00_run.py` để chạy từ segment đến tạo CSV review (script **không** tự finalize):
+
+```bash
+python 00_run.py --only psoriasis acne
+python 00_run.py --random 3 --seed 42
+```
+
+- `--only`: chạy chính xác các bệnh đã nêu. Nếu bệnh đã có kết quả, kết quả trích được chạy lại và ghi đè; trạng thái duyệt cũ của bệnh đó bị xóa để duyệt lại.
+- `--random N`: chọn ngẫu nhiên `N` bệnh chưa có kết quả trích. Dùng `--seed` nếu cần tái lập tập bệnh đã chọn.
+- Mỗi lần cập nhật review, script sao lưu hai CSV hiện có thành `*.bak_YYYYMMDD_HHMMSS.csv`. Các bệnh không chạy lại giữ nguyên các cột `action`, `new_*`, `restore_*` và `note`.
+- Thêm `--no-llm-dedup` để chỉ gộp trùng chữ ở bước dedup.
+
+Sau khi duyệt CSV, tự chốt tập thử nghiệm bằng:
+
+```bash
+python 05_export.py finalize --partial
+```
+
 ## 5 bước (chạy trong thư mục kb_builder/)
 
 | Bước | Lệnh | Việc làm | Ai làm |

@@ -1,0 +1,304 @@
+{
+  "disease": "squamous cell carcinoma",
+  "units": [
+    {
+      "unit_id": "40-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "squamous cell origin",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-006",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-008",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hard lump with a scaly top layer",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "non-healing ulcer",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-010",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-011",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-012",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-015",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "prolonged sun and UV radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "male sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "smoking",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "previous history of skin cancer",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "slow lesion growth",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "association with precursor keratotic lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HPV association",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "trichilemmal differentiation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "spindle cell morphology",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acantholytic architecture",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "invasive intraepidermal epithelioma",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lymphoepithelioma-like histology",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-027",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hard lump with a scaly top layer",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "prolonged sun and UV radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "40-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "40-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

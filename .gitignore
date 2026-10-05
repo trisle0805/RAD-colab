@@ -2,3 +2,16 @@
 .env
 .env.*
 !.env.example
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+
+# Regenerable KB-pipeline artifacts
+kb_builder/outputs/units.jsonl
+kb_builder/outputs/extract/*.prompt.txt
+kb_builder/outputs/extract/*.response.txt
+kb_builder/outputs/extract/*.meta.json
+kb_builder/outputs/dedup/*.prompt.txt
+kb_builder/outputs/dedup/*.response.txt
+kb_builder/outputs/dedup/*.meta.json
