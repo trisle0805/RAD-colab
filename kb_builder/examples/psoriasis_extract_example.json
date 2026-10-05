@@ -1,0 +1,342 @@
+{
+ "disease": "psoriasis",
+ "units": [
+  {
+   "unit_id": "34-001",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "well-demarcated red scaly plaques",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "chronic course",
+     "polarity": 1,
+     "category": "history"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-002",
+   "decision": "EXCLUDE",
+   "exclude_reason": "EPIDEMIOLOGY",
+   "propositions": []
+  },
+  {
+   "unit_id": "34-003",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "HLA-C*06:02 risk allele",
+     "polarity": 1,
+     "category": "lab"
+    },
+    {
+     "canonical": "streptococcal infection as a trigger",
+     "polarity": 1,
+     "category": "history"
+    },
+    {
+     "canonical": "stress as a trigger",
+     "polarity": 1,
+     "category": "history"
+    },
+    {
+     "canonical": "smoking",
+     "polarity": 1,
+     "category": "history"
+    },
+    {
+     "canonical": "obesity",
+     "polarity": 1,
+     "category": "history"
+    },
+    {
+     "canonical": "alcohol consumption",
+     "polarity": 1,
+     "category": "history"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-004",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "guttate lesions",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "pustular lesions",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "erythroderma",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-005",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "elevated C-reactive protein",
+     "polarity": 1,
+     "category": "lab"
+    },
+    {
+     "canonical": "elevated erythrocyte sedimentation rate",
+     "polarity": 1,
+     "category": "lab"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-006",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "increased proinflammatory cytokines (IL-17, IL-23, TNF-α)",
+     "polarity": 1,
+     "category": "lab"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-007",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "HLA-C*06:02 risk allele",
+     "polarity": 1,
+     "category": "lab"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-008",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "well-demarcated red scaly plaques",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "extent ranging from a few patches to generalized involvement",
+     "polarity": 1,
+     "category": "location"
+    },
+    {
+     "canonical": "lesions on the elbows, knees, scalp and lower back",
+     "polarity": 1,
+     "category": "location"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-009",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "nail pitting",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "onycholysis (separation of the nail from the nail bed)",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "subungual hyperkeratosis",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-010",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "joint swelling, pain and stiffness",
+     "polarity": 1,
+     "category": "symptom"
+    },
+    {
+     "canonical": "involvement of the distal interphalangeal joints",
+     "polarity": 1,
+     "category": "location"
+    },
+    {
+     "canonical": "involvement of the spine (axial involvement)",
+     "polarity": 1,
+     "category": "location"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-011",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "new lesions at sites of skin trauma (Koebner phenomenon)",
+     "polarity": 1,
+     "category": "history"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-012",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "small bleeding points when scales are scraped off (Auspitz sign)",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-013",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "nail pitting",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "onycholysis (separation of the nail from the nail bed)",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-014",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "joint swelling, pain and stiffness",
+     "polarity": 1,
+     "category": "symptom"
+    },
+    {
+     "canonical": "involvement of the distal interphalangeal joints",
+     "polarity": 1,
+     "category": "location"
+    },
+    {
+     "canonical": "involvement of the spine (axial involvement)",
+     "polarity": 1,
+     "category": "location"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-015",
+   "decision": "EXCLUDE",
+   "exclude_reason": "MANAGEMENT",
+   "propositions": []
+  },
+  {
+   "unit_id": "34-016",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "well-demarcated red scaly plaques",
+     "polarity": 1,
+     "category": "morphology"
+    },
+    {
+     "canonical": "chronic course",
+     "polarity": 1,
+     "category": "history"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-017",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "elevated C-reactive protein",
+     "polarity": 1,
+     "category": "lab"
+    },
+    {
+     "canonical": "elevated erythrocyte sedimentation rate",
+     "polarity": 1,
+     "category": "lab"
+    },
+    {
+     "canonical": "increased proinflammatory cytokines (IL-17, IL-23, TNF-α)",
+     "polarity": 1,
+     "category": "lab"
+    },
+    {
+     "canonical": "HLA-C*06:02 risk allele",
+     "polarity": 1,
+     "category": "lab"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-018",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "well-demarcated red scaly plaques",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-019",
+   "decision": "KEEP",
+   "exclude_reason": null,
+   "propositions": [
+    {
+     "canonical": "new lesions at sites of skin trauma (Koebner phenomenon)",
+     "polarity": 1,
+     "category": "history"
+    },
+    {
+     "canonical": "small bleeding points when scales are scraped off (Auspitz sign)",
+     "polarity": 1,
+     "category": "morphology"
+    }
+   ]
+  },
+  {
+   "unit_id": "34-020",
+   "decision": "EXCLUDE",
+   "exclude_reason": "MANAGEMENT",
+   "propositions": []
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+# Cấu hình kb_builder. Đường dẫn tương đối tính từ thư mục kb_builder/.
+
+guideline_path: ../guideline/qwen_maxtoken2k_skincap47_4sources.jsonl
+label_csv: ../data/skincap_47_train.csv        # kiểm tra 47 tên bệnh khớp với nhãn dữ liệu
+synonyms_path: synonyms.json                   # tên bệnh + từ đồng nghĩa/viết tắt (kiểm tra quy tắc 4)
+output_dir: outputs
+
+# sourceReference của mỗi bệnh trong file KB cuối ({disease} được thay bằng tên bệnh)
+source_reference: "RAD guideline (Li et al., 2025), qwen_maxtoken2k_skincap47_4sources.jsonl, disease: {disease}"
+
+prompts:
+  extract: v2
+  dedup: v2
+
+llm:
+  provider: openai          # anthropic | openai
+  base_url: "http://localhost:20128/v1/"
+  model: "gpt-terra"
+  temperature: 0               # đặt null nếu model không hỗ trợ temperature
+  max_output_tokens: 16000
+  max_retries: 3
+  request_timeout: 600         # giây

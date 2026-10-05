@@ -1,0 +1,458 @@
+{
+ "acne": {
+  "names": [
+   "acne",
+   "acne vulgaris"
+  ],
+  "abbreviations": []
+ },
+ "actinic keratosis": {
+  "names": [
+   "actinic keratosis",
+   "actinic keratoses",
+   "solar keratosis",
+   "solar keratoses"
+  ],
+  "abbreviations": [
+   "AK",
+   "AKs"
+  ]
+ },
+ "allergic contact dermatitis": {
+  "names": [
+   "allergic contact dermatitis",
+   "contact dermatitis"
+  ],
+  "abbreviations": [
+   "ACD"
+  ]
+ },
+ "basal cell carcinoma": {
+  "names": [
+   "basal cell carcinoma",
+   "basal cell carcinomas",
+   "basalioma",
+   "rodent ulcer"
+  ],
+  "abbreviations": [
+   "BCC",
+   "BCCs"
+  ]
+ },
+ "dermatofibroma": {
+  "names": [
+   "dermatofibroma",
+   "dermatofibromas",
+   "fibrous histiocytoma"
+  ],
+  "abbreviations": [
+   "DF"
+  ]
+ },
+ "dermatomyositis": {
+  "names": [
+   "dermatomyositis",
+   "amyopathic dermatomyositis"
+  ],
+  "abbreviations": [
+   "DM",
+   "CADM"
+  ]
+ },
+ "drug eruption": {
+  "names": [
+   "drug eruption",
+   "drug eruptions",
+   "drug rash",
+   "drug reaction",
+   "drug reactions"
+  ],
+  "abbreviations": []
+ },
+ "eczema": {
+  "names": [
+   "eczema",
+   "atopic dermatitis",
+   "atopic eczema"
+  ],
+  "abbreviations": [
+   "AD"
+  ]
+ },
+ "epidermal-cyst": {
+  "names": [
+   "epidermal cyst",
+   "epidermal cysts",
+   "epidermoid cyst",
+   "epidermoid cysts",
+   "epidermal inclusion cyst",
+   "epidermal inclusion cysts",
+   "infundibular cyst",
+   "sebaceous cyst"
+  ],
+  "abbreviations": [
+   "EIC"
+  ]
+ },
+ "erythema multiforme": {
+  "names": [
+   "erythema multiforme"
+  ],
+  "abbreviations": [
+   "EM"
+  ]
+ },
+ "folliculitis": {
+  "names": [
+   "folliculitis"
+  ],
+  "abbreviations": []
+ },
+ "granuloma annulare": {
+  "names": [
+   "granuloma annulare"
+  ],
+  "abbreviations": [
+   "GA"
+  ]
+ },
+ "hailey hailey disease": {
+  "names": [
+   "hailey hailey disease",
+   "hailey-hailey disease",
+   "familial benign chronic pemphigus",
+   "familial benign pemphigus"
+  ],
+  "abbreviations": [
+   "HHD"
+  ]
+ },
+ "juvenile xanthogranuloma": {
+  "names": [
+   "juvenile xanthogranuloma",
+   "juvenile xanthogranulomas",
+   "xanthogranuloma"
+  ],
+  "abbreviations": [
+   "JXG"
+  ]
+ },
+ "keloid": {
+  "names": [
+   "keloid",
+   "keloids"
+  ],
+  "abbreviations": []
+ },
+ "lichen planus": {
+  "names": [
+   "lichen planus",
+   "oral lichen planus"
+  ],
+  "abbreviations": [
+   "LP",
+   "OLP"
+  ]
+ },
+ "lupus erythematosus": {
+  "names": [
+   "lupus erythematosus",
+   "systemic lupus erythematosus",
+   "lupus"
+  ],
+  "abbreviations": [
+   "SLE"
+  ]
+ },
+ "lupus subacute": {
+  "names": [
+   "subacute cutaneous lupus erythematosus",
+   "subacute lupus",
+   "lupus erythematosus",
+   "lupus"
+  ],
+  "abbreviations": [
+   "SCLE"
+  ]
+ },
+ "lyme disease": {
+  "names": [
+   "lyme disease",
+   "lyme borreliosis",
+   "lyme"
+  ],
+  "abbreviations": []
+ },
+ "melanocytic-nevi": {
+  "names": [
+   "melanocytic nevi",
+   "melanocytic nevus",
+   "melanocytic naevi",
+   "melanocytic naevus",
+   "nevus",
+   "nevi",
+   "naevus",
+   "naevi",
+   "mole",
+   "moles"
+  ],
+  "abbreviations": [
+   "CMN",
+   "AMN"
+  ]
+ },
+ "melanoma": {
+  "names": [
+   "melanoma",
+   "melanomas",
+   "malignant melanoma"
+  ],
+  "abbreviations": []
+ },
+ "mycosis fungoides": {
+  "names": [
+   "mycosis fungoides",
+   "cutaneous t cell lymphoma",
+   "cutaneous t-cell lymphoma"
+  ],
+  "abbreviations": [
+   "MF",
+   "CTCL"
+  ]
+ },
+ "necrobiosis lipoidica": {
+  "names": [
+   "necrobiosis lipoidica",
+   "necrobiosis lipoidica diabeticorum"
+  ],
+  "abbreviations": [
+   "NL",
+   "NLD"
+  ]
+ },
+ "nematode infection": {
+  "names": [
+   "nematode infection",
+   "nematode infections",
+   "helminthiasis",
+   "roundworm infection"
+  ],
+  "abbreviations": []
+ },
+ "neutrophilic dermatoses": {
+  "names": [
+   "neutrophilic dermatoses",
+   "neutrophilic dermatosis"
+  ],
+  "abbreviations": []
+ },
+ "pediculosis lids": {
+  "names": [
+   "pediculosis lids",
+   "pediculosis ciliaris",
+   "pediculosis palpebrarum",
+   "phthiriasis palpebrarum",
+   "pediculosis"
+  ],
+  "abbreviations": []
+ },
+ "photodermatoses": {
+  "names": [
+   "photodermatoses",
+   "photodermatosis"
+  ],
+  "abbreviations": []
+ },
+ "pilar cyst": {
+  "names": [
+   "pilar cyst",
+   "pilar cysts",
+   "trichilemmal cyst",
+   "trichilemmal cysts",
+   "isthmus catagen cyst",
+   "wen"
+  ],
+  "abbreviations": []
+ },
+ "pityriasis rosea": {
+  "names": [
+   "pityriasis rosea"
+  ],
+  "abbreviations": [
+   "PR"
+  ]
+ },
+ "pityriasis rubra pilaris": {
+  "names": [
+   "pityriasis rubra pilaris"
+  ],
+  "abbreviations": [
+   "PRP"
+  ]
+ },
+ "porokeratosis actinic": {
+  "names": [
+   "porokeratosis",
+   "actinic porokeratosis",
+   "disseminated superficial actinic porokeratosis",
+   "porokeratosis actinic"
+  ],
+  "abbreviations": [
+   "DSAP"
+  ]
+ },
+ "porphyria": {
+  "names": [
+   "porphyria",
+   "porphyrias",
+   "porphyria cutanea tarda",
+   "acute intermittent porphyria",
+   "erythropoietic protoporphyria"
+  ],
+  "abbreviations": [
+   "PCT",
+   "AIP",
+   "EPP"
+  ]
+ },
+ "prurigo nodularis": {
+  "names": [
+   "prurigo nodularis",
+   "prurigo"
+  ],
+  "abbreviations": [
+   "PN"
+  ]
+ },
+ "psoriasis": {
+  "names": [
+   "psoriasis",
+   "psoriatic",
+   "psoriasis vulgaris"
+  ],
+  "abbreviations": []
+ },
+ "sarcoidosis": {
+  "names": [
+   "sarcoidosis",
+   "sarcoid"
+  ],
+  "abbreviations": []
+ },
+ "scabies": {
+  "names": [
+   "scabies",
+   "crusted scabies",
+   "norwegian scabies"
+  ],
+  "abbreviations": []
+ },
+ "scleroderma": {
+  "names": [
+   "scleroderma",
+   "systemic sclerosis",
+   "morphea"
+  ],
+  "abbreviations": [
+   "SSc",
+   "LCSS",
+   "DCSS"
+  ]
+ },
+ "seborrheic dermatitis": {
+  "names": [
+   "seborrheic dermatitis",
+   "seborrhoeic dermatitis",
+   "seborrheic eczema"
+  ],
+  "abbreviations": []
+ },
+ "seborrheic-keratosis": {
+  "names": [
+   "seborrheic keratosis",
+   "seborrheic keratoses",
+   "seborrhoeic keratosis",
+   "senile wart"
+  ],
+  "abbreviations": [
+   "SK",
+   "SKs"
+  ]
+ },
+ "squamous cell carcinoma": {
+  "names": [
+   "squamous cell carcinoma",
+   "squamous cell carcinomas",
+   "cutaneous squamous cell carcinoma"
+  ],
+  "abbreviations": [
+   "SCC",
+   "cSCC"
+  ]
+ },
+ "squamous-cell-carcinoma-in-situ": {
+  "names": [
+   "squamous cell carcinoma in situ",
+   "bowen's disease",
+   "bowen disease",
+   "bowens disease"
+  ],
+  "abbreviations": [
+   "SCCIS"
+  ]
+ },
+ "stevens johnson syndrome": {
+  "names": [
+   "stevens johnson syndrome",
+   "stevens-johnson syndrome",
+   "toxic epidermal necrolysis"
+  ],
+  "abbreviations": [
+   "SJS",
+   "TEN"
+  ]
+ },
+ "telangiectases": {
+  "names": [
+   "telangiectases",
+   "telangiectasia",
+   "telangiectasias"
+  ],
+  "abbreviations": []
+ },
+ "tuberous sclerosis": {
+  "names": [
+   "tuberous sclerosis",
+   "tuberous sclerosis complex"
+  ],
+  "abbreviations": [
+   "TSC"
+  ]
+ },
+ "urticaria": {
+  "names": [
+   "urticaria",
+   "urticarial",
+   "hives"
+  ],
+  "abbreviations": []
+ },
+ "verruca-vulgaris": {
+  "names": [
+   "verruca vulgaris",
+   "verruca",
+   "verrucae",
+   "common wart",
+   "common warts",
+   "wart",
+   "warts"
+  ],
+  "abbreviations": []
+ },
+ "vitiligo": {
+  "names": [
+   "vitiligo"
+  ],
+  "abbreviations": []
+ }
+}

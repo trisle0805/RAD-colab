@@ -1,0 +1,240 @@
+[
+  {
+    "disease_id": "psoriasis",
+    "sourceReference": "RAD guideline (Li et al., 2025), qwen_maxtoken2k_skincap47_4sources.jsonl, disease: psoriasis",
+    "propositions": [
+      {
+        "proposition_id": "psoriasis_P001",
+        "category": "morphology",
+        "canonicalDescription": "well-demarcated red scaly plaques",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Psoriasis is a chronic, immune-mediated inflammatory skin disease characterized by the formation of sharply demarcated, scaly, erythematous plaques.",
+          "Skin Lesions: Well-delineated, red, scaly plaques that vary in extent from a few patches to generalized involvement. Commonly found on the elbows, knees, scalp, and lower back.",
+          "Psoriasis is a chronic, immune-mediated inflammatory skin disease characterized by erythematous, scaly plaques.",
+          "Clinically, psoriasis is identified by well-delineated, scaly plaques, distinctive nail changes, and joint involvement in psoriatic arthritis."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P002",
+        "category": "morphology",
+        "canonicalDescription": "guttate lesions",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Psoriasis can also present in other forms, including guttate, pustular, and erythrodermic psoriasis."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P003",
+        "category": "morphology",
+        "canonicalDescription": "pustular lesions",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Psoriasis can also present in other forms, including guttate, pustular, and erythrodermic psoriasis."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P004",
+        "category": "morphology",
+        "canonicalDescription": "erythroderma",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Psoriasis can also present in other forms, including guttate, pustular, and erythrodermic psoriasis."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P005",
+        "category": "morphology",
+        "canonicalDescription": "nail pitting",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Nail Changes: Distinctive nail changes occur in about 50% of patients, including pitting, onycholysis (separation of the nail from the nail bed), and subungual hyperkeratosis.",
+          "Pitting and Onycholysis: Characteristic nail changes."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P006",
+        "category": "morphology",
+        "canonicalDescription": "onycholysis (separation of the nail from the nail bed)",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Nail Changes: Distinctive nail changes occur in about 50% of patients, including pitting, onycholysis (separation of the nail from the nail bed), and subungual hyperkeratosis.",
+          "Pitting and Onycholysis: Characteristic nail changes."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P007",
+        "category": "morphology",
+        "canonicalDescription": "subungual hyperkeratosis",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Nail Changes: Distinctive nail changes occur in about 50% of patients, including pitting, onycholysis (separation of the nail from the nail bed), and subungual hyperkeratosis."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P008",
+        "category": "morphology",
+        "canonicalDescription": "small bleeding points when scales are scraped off (Auspitz sign)",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Auspitz Sign: Small bleeding points seen when psoriatic scales are scraped off.",
+          "The Koebner phenomenon and Auspitz sign are also important diagnostic indicators."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P009",
+        "category": "location",
+        "canonicalDescription": "extent ranging from a few patches to generalized involvement",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Skin Lesions: Well-delineated, red, scaly plaques that vary in extent from a few patches to generalized involvement. Commonly found on the elbows, knees, scalp, and lower back."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P010",
+        "category": "location",
+        "canonicalDescription": "lesions on the elbows, knees, scalp and lower back",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Skin Lesions: Well-delineated, red, scaly plaques that vary in extent from a few patches to generalized involvement. Commonly found on the elbows, knees, scalp, and lower back."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P011",
+        "category": "location",
+        "canonicalDescription": "involvement of the distal interphalangeal joints",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Joint Involvement: Psoriatic arthritis affects 10-15% of patients with psoriasis. Clinical findings include joint swelling, pain, and stiffness, particularly in the distal interphalangeal joints, and may also involve the spine (axial involvement).",
+          "Joint Symptoms: Pain, swelling, and stiffness, especially in the distal interphalangeal joints and spine."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P012",
+        "category": "location",
+        "canonicalDescription": "involvement of the spine (axial involvement)",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Joint Involvement: Psoriatic arthritis affects 10-15% of patients with psoriasis. Clinical findings include joint swelling, pain, and stiffness, particularly in the distal interphalangeal joints, and may also involve the spine (axial involvement).",
+          "Joint Symptoms: Pain, swelling, and stiffness, especially in the distal interphalangeal joints and spine."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P013",
+        "category": "symptom",
+        "canonicalDescription": "joint swelling, pain and stiffness",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Joint Involvement: Psoriatic arthritis affects 10-15% of patients with psoriasis. Clinical findings include joint swelling, pain, and stiffness, particularly in the distal interphalangeal joints, and may also involve the spine (axial involvement).",
+          "Joint Symptoms: Pain, swelling, and stiffness, especially in the distal interphalangeal joints and spine."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P014",
+        "category": "history",
+        "canonicalDescription": "chronic course",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Psoriasis is a chronic, immune-mediated inflammatory skin disease characterized by the formation of sharply demarcated, scaly, erythematous plaques.",
+          "Psoriasis is a chronic, immune-mediated inflammatory skin disease characterized by erythematous, scaly plaques."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P015",
+        "category": "history",
+        "canonicalDescription": "streptococcal infection as a trigger",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P016",
+        "category": "history",
+        "canonicalDescription": "stress as a trigger",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P017",
+        "category": "history",
+        "canonicalDescription": "smoking",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P018",
+        "category": "history",
+        "canonicalDescription": "obesity",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P019",
+        "category": "history",
+        "canonicalDescription": "alcohol consumption",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P020",
+        "category": "history",
+        "canonicalDescription": "new lesions at sites of skin trauma (Koebner phenomenon)",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Koebner Phenomenon: The appearance of new psoriatic lesions at sites of skin trauma.",
+          "The Koebner phenomenon and Auspitz sign are also important diagnostic indicators."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P021",
+        "category": "lab",
+        "canonicalDescription": "HLA-C*06:02 risk allele",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "The most common form is chronic plaque psoriasis (psoriasis vulgaris), which is associated with genetic susceptibility, particularly the HLA-C*06:02 risk allele, and environmental triggers such as streptococcal infection, stress, smoking, obesity, and alcohol consumption.",
+          "Genetic Testing: The presence of the HLA-C*06:02 allele is a significant genetic risk factor for psoriasis.",
+          "Key diagnostic features include elevated inflammatory markers (CRP, ESR), increased levels of proinflammatory cytokines (IL-17, IL-23, TNF-α), and the presence of the HLA-C*06:02 allele."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P022",
+        "category": "lab",
+        "canonicalDescription": "elevated C-reactive protein",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Inflammatory Markers: Elevated levels of C-reactive protein (CRP) and erythrocyte sedimentation rate (ESR) are often observed in active psoriasis.",
+          "Key diagnostic features include elevated inflammatory markers (CRP, ESR), increased levels of proinflammatory cytokines (IL-17, IL-23, TNF-α), and the presence of the HLA-C*06:02 allele."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P023",
+        "category": "lab",
+        "canonicalDescription": "elevated erythrocyte sedimentation rate",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Inflammatory Markers: Elevated levels of C-reactive protein (CRP) and erythrocyte sedimentation rate (ESR) are often observed in active psoriasis.",
+          "Key diagnostic features include elevated inflammatory markers (CRP, ESR), increased levels of proinflammatory cytokines (IL-17, IL-23, TNF-α), and the presence of the HLA-C*06:02 allele."
+        ]
+      },
+      {
+        "proposition_id": "psoriasis_P024",
+        "category": "lab",
+        "canonicalDescription": "increased proinflammatory cytokines (IL-17, IL-23, TNF-α)",
+        "polarity": 1,
+        "sourceExcerpt": [
+          "Cytokine Levels: Increased levels of proinflammatory cytokines such as IL-17, IL-23, and TNF-α are key in the pathogenesis of psoriasis. These cytokines can be used as markers of disease severity and response to treatment.",
+          "Key diagnostic features include elevated inflammatory markers (CRP, ESR), increased levels of proinflammatory cytokines (IL-17, IL-23, TNF-α), and the presence of the HLA-C*06:02 allele."
+        ]
+      }
+    ]
+  }
+]
