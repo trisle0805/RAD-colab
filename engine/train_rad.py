@@ -112,7 +112,7 @@ def get_text_features_bert(model,text_list,tokenizer,device,max_length):
     return text_features, text_last_hidden_state
 
 
-def train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, optimizer, epoch, warmup_steps, device, scheduler, args, config, writer, accumulation_steps, guideline_path):
+def train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, optimizer, epoch, warmup_steps, device, scheduler, args, config, writer, accumulation_steps, guideline_path, skin_label_list=None):
     clip_loss = ClipLoss()
     if 'fair' in args.dataset:
         contrast_loss_text = SupConLossPositiveOnly(temperature=args.temperature_text)
@@ -189,58 +189,9 @@ def train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenize
                 "Other dementia conditions, including neoplasms, Down syndrome, multiple systems atrophy, Huntington’s disease and seizures"
             ]
         elif 'skin' in args.dataset:
-            label_list = [
-                "acne",
-                "acne vulgaris",
-                "actinic keratosis",
-                "allergic contact dermatitis",
-                "basal cell carcinoma",
-                "basal-cell-carcinoma",
-                "dermatofibroma",
-                "dermatomyositis",
-                "drug eruption",
-                "eczema",
-                "epidermal-cyst",
-                "erythema multiforme",
-                "folliculitis",
-                "granuloma annulare",
-                "hailey hailey disease",
-                "juvenile xanthogranuloma",
-                "keloid",
-                "lichen planus",
-                "lupus erythematosus",
-                "lupus subacute",
-                "lyme disease",
-                "melanocytic-nevi",
-                "melanoma",
-                "mycosis fungoides",
-                "mycosis-fungoides",
-                "necrobiosis lipoidica",
-                "nematode infection",
-                "neutrophilic dermatoses",
-                "pediculosis lids",
-                "photodermatoses",
-                "pilar cyst",
-                "pityriasis rosea",
-                "pityriasis rubra pilaris",
-                "porokeratosis actinic",
-                "porphyria",
-                "prurigo nodularis",
-                "psoriasis",
-                "sarcoidosis",
-                "scabies",
-                "scleroderma",
-                "seborrheic dermatitis",
-                "seborrheic-keratosis",
-                "squamous cell carcinoma",
-                "squamous-cell-carcinoma-in-situ",
-                "stevens johnson syndrome",
-                "telangiectases",
-                "tuberous sclerosis",
-                "urticaria",
-                "verruca-vulgaris",
-                "vitiligo",
-            ]
+            if skin_label_list is None:
+                raise ValueError('SkinCAP label names must be supplied from the training CSV header.')
+            label_list = skin_label_list
         else:
             label_list = [
                 "abscess of lung and mediastinum, pyothorax, mediastinitis",
@@ -448,7 +399,10 @@ def train_grad_acc(model, model_guideline, image_encoder, text_encoder, tokenize
     print("Averaged stats:", metric_logger.global_avg())     
     return {k: "{:.6f}".format(meter.global_avg) for k, meter in metric_logger.meters.items()}
 
-def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, epoch, device, args, config, guideline_path):
+def valid_on_ICD(
+    model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, epoch, device,
+    args, config, guideline_path, skin_label_list=None, prediction_file_name=None,
+):
     model.eval()
     model_guideline.eval()
     image_encoder.eval()
@@ -472,58 +426,9 @@ def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer,
             "Other dementia conditions, including neoplasms, Down syndrome, multiple systems atrophy, Huntington’s disease and seizures"
         ]
     elif 'skin' in args.dataset:
-        text_list = [
-                "acne",
-                "acne vulgaris",
-                "actinic keratosis",
-                "allergic contact dermatitis",
-                "basal cell carcinoma",
-                "basal-cell-carcinoma",
-                "dermatofibroma",
-                "dermatomyositis",
-                "drug eruption",
-                "eczema",
-                "epidermal-cyst",
-                "erythema multiforme",
-                "folliculitis",
-                "granuloma annulare",
-                "hailey hailey disease",
-                "juvenile xanthogranuloma",
-                "keloid",
-                "lichen planus",
-                "lupus erythematosus",
-                "lupus subacute",
-                "lyme disease",
-                "melanocytic-nevi",
-                "melanoma",
-                "mycosis fungoides",
-                "mycosis-fungoides",
-                "necrobiosis lipoidica",
-                "nematode infection",
-                "neutrophilic dermatoses",
-                "pediculosis lids",
-                "photodermatoses",
-                "pilar cyst",
-                "pityriasis rosea",
-                "pityriasis rubra pilaris",
-                "porokeratosis actinic",
-                "porphyria",
-                "prurigo nodularis",
-                "psoriasis",
-                "sarcoidosis",
-                "scabies",
-                "scleroderma",
-                "seborrheic dermatitis",
-                "seborrheic-keratosis",
-                "squamous cell carcinoma",
-                "squamous-cell-carcinoma-in-situ",
-                "stevens johnson syndrome",
-                "telangiectases",
-                "tuberous sclerosis",
-                "urticaria",
-                "verruca-vulgaris",
-                "vitiligo",
-        ]
+        if skin_label_list is None:
+            raise ValueError('SkinCAP label names must be supplied from the training CSV header.')
+        text_list = skin_label_list
     else:
         text_list = [
                 "abscess of lung and mediastinum, pyothorax, mediastinitis",
@@ -675,7 +580,10 @@ def valid_on_ICD(model, model_guideline, image_encoder, text_encoder, tokenizer,
 
     predictions_dir = os.path.join(args.output_dir, 'predictions')
     os.makedirs(predictions_dir, exist_ok=True)
-    prediction_file_name = f"epoch_{epoch_number:03d}.npz"
+    prediction_file_name = prediction_file_name or (
+        f"val_epoch_{epoch_number:03d}.npz"
+        if 'skin' in args.dataset else f"epoch_{epoch_number:03d}.npz"
+    )
     prediction_path = os.path.join(predictions_dir, prediction_file_name)
     temporary_path = f"{prediction_path}.tmp.npz"
     np.savez_compressed(
@@ -695,8 +603,11 @@ def _multiclass_metrics(gt, pred):
     """Evaluate one-hot single-label targets using a single predicted class per sample."""
     target_classes = np.argmax(gt, axis=1)
     predicted_classes = np.argmax(pred, axis=1)
+    top_k = min(3, pred.shape[1])
+    top_classes = np.argpartition(pred, -top_k, axis=1)[:, -top_k:]
     return {
         'top1_accuracy': float(accuracy_score(target_classes, predicted_classes)),
+        'top3_accuracy': float(np.mean(np.any(top_classes == target_classes[:, None], axis=1))),
         'macro_f1': float(f1_score(target_classes, predicted_classes, average='macro', zero_division=0)),
         'balanced_accuracy': float(balanced_accuracy_score(target_classes, predicted_classes)),
     }
@@ -727,11 +638,113 @@ def _metric_summary(metrics, prefix, multiclass_metrics=None):
     summary[f'{prefix}_validation_score'] = float(validation_score)
     return summary
 
+def _legacy_metrics_summary(metrics):
+    aucs, _, mean_ap, accuracy, max_f1, precision, recall, subset_accuracy, _ = metrics
+    return {
+        'mean_auc': float(np.mean(aucs)),
+        'mean_ap': float(mean_ap),
+        'mean_accuracy': float(np.mean(accuracy)),
+        'mean_f1': float(np.mean(max_f1)),
+        'mean_precision': float(np.mean(precision)),
+        'mean_recall': float(np.mean(recall)),
+        'subset_accuracy': float(subset_accuracy),
+    }
+
+
+def _skin_final_metrics(gt, pred):
+    multiclass = _multiclass_metrics(gt, pred)
+    legacy = _legacy_metrics_summary(compute_metrics(gt, pred, gt.shape[1]))
+    return {
+        'macro_f1': multiclass['macro_f1'],
+        'top1_accuracy': multiclass['top1_accuracy'],
+        'top3_accuracy': multiclass['top3_accuracy'],
+        'balanced_accuracy': multiclass['balanced_accuracy'],
+        'macro_auc': legacy['mean_auc'],
+        'mAP': legacy['mean_ap'],
+        'rad_legacy_metrics': legacy,
+    }
+
+
+def _fit_skin_fusion_weights(gt, logits1, logits2):
+    weights = np.arange(0, 1.02, 0.1)
+    best_weights = np.ones(gt.shape[1])
+    best_macro_f1 = _multiclass_metrics(gt, logits1)['macro_f1']
+    for class_idx in range(gt.shape[1]):
+        best_weight_for_class = best_weights[class_idx]
+        for weight in weights:
+            candidate_weights = best_weights.copy()
+            candidate_weights[class_idx] = weight
+            combined_logits = (
+                logits1 * candidate_weights.reshape(1, -1)
+                + logits2 * (1 - candidate_weights).reshape(1, -1)
+            )
+            macro_f1 = _multiclass_metrics(gt, combined_logits)['macro_f1']
+            if macro_f1 > best_macro_f1:
+                best_macro_f1 = macro_f1
+                best_weight_for_class = weight
+        best_weights[class_idx] = best_weight_for_class
+        combined_logits = (
+            logits1 * best_weights.reshape(1, -1)
+            + logits2 * (1 - best_weights).reshape(1, -1)
+        )
+        best_macro_f1 = _multiclass_metrics(gt, combined_logits)['macro_f1']
+    return best_weights
+
+
+def evaluate_skin_test(
+    model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, device, args, config,
+    guideline_path, skin_label_list, best_epoch, best_validation_score,
+):
+    if best_epoch is None:
+        raise ValueError('SkinCAP final evaluation requires the epoch selected on validation.')
+    predictions_dir = os.path.join(args.output_dir, 'predictions')
+    val_prediction_path = os.path.join(predictions_dir, f'val_epoch_{int(best_epoch):03d}.npz')
+    if not os.path.isfile(val_prediction_path):
+        raise FileNotFoundError(f'Validation predictions for best epoch not found: {val_prediction_path}')
+    with np.load(val_prediction_path) as val_predictions:
+        val_gt = val_predictions['gt']
+        val_label = val_predictions['pred_label']
+        val_guideline = val_predictions['pred_guideline']
+    if val_guideline.size == 0:
+        raise ValueError('SkinCAP fusion requires guideline predictions from validation.')
+    fusion_weights = _fit_skin_fusion_weights(val_gt, val_label, val_guideline)
+
+    test_summary = valid_on_ICD(
+        model, model_guideline, image_encoder, text_encoder, tokenizer, data_loader, int(best_epoch) - 1,
+        device, args, config, guideline_path, skin_label_list, prediction_file_name='test_best.npz',
+    )
+    test_prediction_path = os.path.join(args.output_dir, test_summary['prediction_file'])
+    with np.load(test_prediction_path) as test_predictions:
+        test_gt = test_predictions['gt']
+        test_label = test_predictions['pred_label']
+        test_guideline = test_predictions['pred_guideline']
+    test_fused = (
+        test_label * fusion_weights.reshape(1, -1)
+        + test_guideline * (1 - fusion_weights).reshape(1, -1)
+    )
+    final_metrics = {
+        'best_epoch': int(best_epoch),
+        'best_validation_score': float(best_validation_score),
+        'fusion_weights': fusion_weights.tolist(),
+        'label': _skin_final_metrics(test_gt, test_label),
+        'guideline': _skin_final_metrics(test_gt, test_guideline),
+        'fused': _skin_final_metrics(test_gt, test_fused),
+    }
+    final_metrics_path = os.path.join(args.output_dir, 'final_metrics.json')
+    temporary_path = f'{final_metrics_path}.tmp'
+    with open(temporary_path, 'w', encoding='utf-8') as metrics_file:
+        json.dump(final_metrics, metrics_file, ensure_ascii=False, indent=2)
+        metrics_file.write('\n')
+    os.replace(temporary_path, final_metrics_path)
+    logging.info('Final SkinCAP test evaluation written to %s.', final_metrics_path)
+    return final_metrics
+
+
 def test_logits(args, config, max_epoch):
     if 'fair_ori' in args.dataset:
         n_class = 1
     elif 'skin' in args.dataset:
-        n_class = 50
+        n_class = None
     elif 'nacc' in args.dataset:
         n_class = 11
     else:
@@ -757,9 +770,10 @@ def test_logits(args, config, max_epoch):
             logits2 = prediction_data['pred_guideline']
         if logits2.size == 0:
             raise ValueError('Final fusion requires guideline predictions, but they are absent from the saved artifact.')
+        current_n_class = gt.shape[1] if n_class is None else n_class
 
-        current_metrics_1 = compute_metrics(gt, logits1, n_class)
-        current_metrics_2 = compute_metrics(gt, logits2, n_class)
+        current_metrics_1 = compute_metrics(gt, logits1, current_n_class)
+        current_metrics_2 = compute_metrics(gt, logits2, current_n_class)
         if 'skin' in args.dataset:
             avg_metrics_1 = _multiclass_metrics(gt, logits1)['macro_f1']
             avg_metrics_2 = _multiclass_metrics(gt, logits2)['macro_f1']
@@ -777,7 +791,8 @@ def test_logits(args, config, max_epoch):
             best_logits2 = logits2
 
         logging.info('Selected epoch %s for final label/guideline fusion (validation score %.6f).', best_epoch, best_metrics)
-    evaluate_combined_logits(best_gt, best_logits1, best_logits2, n_class, args)
+    final_n_class = best_gt.shape[1] if n_class is None else n_class
+    evaluate_combined_logits(best_gt, best_logits1, best_logits2, final_n_class, args)
 
 
 def compute_AUCs(gt, pred, n_class):
