@@ -186,12 +186,17 @@ def save_final_metrics(
     best_epoch: int,
     best_validation_score: float,
     topk: Sequence[int] = (1, 2, 3),
+    image_paths: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Persist test predictions and final metrics without branch fusion."""
 
     gt = result.gt.numpy()
     proposition = result.pred_proposition.numpy()
     arrays: dict[str, Any] = {"gt": gt, "pred_proposition": proposition}
+    if image_paths is not None:
+        if len(image_paths) != gt.shape[0]:
+            raise ValueError("image_paths length must match test predictions")
+        arrays["image_paths"] = np.asarray(image_paths, dtype=str)
     payload: dict[str, Any] = {
         "best_epoch": int(best_epoch),
         "best_validation_score": float(best_validation_score),

@@ -30,6 +30,9 @@ class EncodedBatch:
     alignment_prototypes: Tensor
     memory_padding_mask: Tensor | None = None
     label_query: Tensor | None = None
+    image_token_count: Tensor | None = None
+    caption_input_ids: Tensor | None = None
+    caption_attention_mask: Tensor | None = None
 
 
 @dataclass
