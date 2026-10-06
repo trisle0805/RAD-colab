@@ -1,0 +1,35 @@
+﻿type,id,before,after,note
+delete,pityriasis_rosea_P003,age in childhood or young adulthood,,gan trung P021 (tuoi)
+delete,pityriasis_rosea_P016,severe pruritus,,nguon: severe pruritus is rare
+delete,squamous_cell_carcinoma_P003,elevated C-reactive protein,,"CRP tang do viem/nhiem, khong dac hieu"
+delete,granuloma_annulare_P011,slightly elevated C-reactive protein,,mau thuan P010 (CRP thuong binh thuong)
+delete,dermatomyositis_P010,muscle involvement,,mau thuan P009; DM kinh dien co ton thuong co
+delete,dermatomyositis_P012,elevated creatine kinase,,mau thuan P011; CK thuong tang trong DM
+delete,erythema_multiforme_P004,mucosal involvement,,mau thuan P014 (EM major co ton thuong niem mac)
+delete,granuloma_annulare_P036,multinucleated giant cells,,trung y het dong truoc (finalize se bao DUPLICATE)
+edit,juvenile_xanthogranuloma_P031,"negative network (+1, lab)","inverse pigment network (+1, lab)","ERROR: tu ""negative"""
+delete,lupus_subacute_P024,renal involvement,,nguon: rare; mau thuan P027
+delete,lupus_subacute_P025,neurological involvement,,nguon: rare; mau thuan P027
+delete,lupus_subacute_P028,central nervous system involvement,,nguon: rarely involves CNS; mau thuan P027
+delete,lupus_subacute_P033,severe organ damage,,nguon: rarely severe organ damage; mau thuan P027
+edit,mycosis_fungoides_P012,"tumors developing from plaques or normal skin (+1, history)","tumors arising from plaques or uninvolved skin (+1, morphology)","ERROR: tu ""normal"""
+delete,necrobiosis_lipoidica_P027,sarcoidosis,,chi la ten nhan khac (sarcoidosis)
+edit,pityriasis_rubra_pilaris_P010,"sharply demarcated normal skin within affected regions (+1, morphology)","sharply demarcated islands of unaffected skin (+1, morphology)","ERROR: tu ""normal"""
+delete,seborrheic_dermatitis_P025,associated acne vulgaris,,chi la ten nhan khac (acne)
+delete,seborrheic_keratosis_P008,sex predominance,,khong phai dau hieu (khong khac biet gioi)
+edit,squamous_cell_carcinoma_in_situ_P001,"abnormal squamous cells without basement membrane invasion (+1, lab)","abnormal squamous cells confined to the epidermis (+1, lab)","ERROR: tu ""without"""
+delete,telangiectases_P038,recurrent hemorrhage,,chi dung cho 1 the (GET); mau thuan HHT co chay mau
+delete,telangiectases_P039,mucosal involvement,,chi dung cho 1 the (GET); mau thuan HHT co niem mac
+delete,telangiectases_P049,associated bleeding,,chi dung cho 1 the (GET); mau thuan P025
+delete,telangiectases_P050,systemic vascular lesions,,chi dung cho 1 the (GET); mau thuan HHT co AVM
+delete,actinic_keratosis_P022,multiple severe sunburns early in life,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,actinic_keratosis_P023,history of sun-damaged skin,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,basal_cell_carcinoma_P026,older age,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,basal_cell_carcinoma_P027,younger age,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,basal_cell_carcinoma_P028,female sex,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,basal_cell_carcinoma_P029,lesions on sun-exposed skin,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,photodermatoses_P027,light-dependent allergic reactions to chemicals or drugs,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,porokeratosis_actinic_P010,pruritus,,nguon: asymptomatic or slightly pruritic; mau thuan P011
+delete,porphyria_P037,childhood onset,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,scleroderma_P036,elevated inflammatory markers,,trung y het dong truoc (finalize se bao DUPLICATE)
+delete,seborrheic_dermatitis_P036,CD4 count of 450–550 cells/µL at onset,,trung y het dong truoc (finalize se bao DUPLICATE)

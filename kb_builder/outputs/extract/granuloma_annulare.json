@@ -1,0 +1,450 @@
+{
+  "disease": "granuloma annulare",
+  "units": [
+    {
+      "unit_id": "12-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "annular papules or plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "self-limiting course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "localized presentation",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "generalized presentation",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "subcutaneous presentation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "perforating presentation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "patch presentation",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diabetes",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "thyroid disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": -1,
+          "category": "lab"
+        },
+        {
+          "canonical": "slightly elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated blood glucose",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal thyroid function tests",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-008",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "12-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "grouped papules in an enlarging annular shape",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "flesh-colored to erythematous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the lateral or dorsal hands and feet, elbows and ankles",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "more than 10 skin lesions",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesions on the trunk and extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "firm subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "nodules on the lower legs",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "umbilicated papules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "papules on the extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous or red-brown flat or slightly palpable lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "age 30 to 70 years",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "annular papules or plaques",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cutaneous symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "childhood onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "young to middle-aged adulthood",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous resolution within 1-2 years",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diabetes",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "thyroid disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "necrobiotic areas",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "palisading histiocytes surrounding degenerated collagen",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "predominantly lymphocytic inflammatory infiltrate",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "multinucleated giant cells",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "annular papules or plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "self-limiting course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous resolution within 1-2 years",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "annular papules or plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the hands, feet and extremities",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "necrobiotic areas",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diabetes",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "thyroid disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "12-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

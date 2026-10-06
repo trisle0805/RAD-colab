@@ -1,0 +1,406 @@
+{
+  "disease": "dermatofibroma",
+  "units": [
+    {
+      "unit_id": "05-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "firm subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "slow-growing hyperpigmented nodule",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the extremities, especially the legs",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pain, bleeding, itching or ulceration",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pain, bleeding, itching or ulceration after lesion trauma",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "firm hyperpigmented nodule",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "tenderness",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "nodule diameter of 0.3 to 1 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "brownish to tan coloration",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the extremities, especially the legs",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "central depression with lateral pressure (dimple sign)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "central white patch with peripheral pigment network",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-010",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hypoechoic avascular solid dermal nodule with ill-defined margins",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pain after lesion trauma",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "tenderness after lesion trauma",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "itching after lesion trauma",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "ulceration after lesion trauma",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "multiple lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "underlying systemic disorders",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dermal atrophy involving more than 50% of the lesion",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion diameter greater than 3 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "blue, red or purple papules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pleomorphic cells with large bizarre hyperchromatic nuclei",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "keloid-like change",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dermal proliferation of spindle-shaped fibrous and histiocytoid cells with a storiform pattern",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased cellularity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pleomorphism",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "extension into subcutaneous tissue",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-031",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-032",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-033",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-034",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "firm hyperpigmented nodule",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "central depression with lateral pressure (dimple sign)",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "typical dermoscopic pattern",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "specific histopathological findings",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "05-035",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "05-036",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

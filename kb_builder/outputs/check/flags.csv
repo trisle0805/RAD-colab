@@ -1,2 +1,70 @@
 disease,unit_id,prop_index,level,code,detail,canonical,polarity
+actinic keratosis,02-008,1,WARN,OTHER_LABEL_NAME,verruca-vulgaris:wart,hard wart-like or gritty surface,1
+basal cell carcinoma,04-013,1,WARN,OTHER_LABEL_NAME,telangiectases:telangiectasias,telangiectasias,1
+dermatofibroma,05-003,0,INFO,NEGATIVE_POLARITY,,"pain, bleeding, itching or ulceration",-1
+dermatofibroma,05-005,1,INFO,NEGATIVE_POLARITY,,tenderness,-1
+dermatofibroma,05-012,0,INFO,NEGATIVE_POLARITY,,symptoms,-1
+dermatofibroma,05-019,0,WARN,OTHER_LABEL_NAME,keloid:keloid,keloid-like change,1
+dermatomyositis,06-004,2,INFO,NEGATIVE_POLARITY,,muscle involvement,-1
+dermatomyositis,06-005,1,INFO,NEGATIVE_POLARITY,,elevated creatine kinase,-1
+epidermal-cyst,09-014,0,INFO,NEGATIVE_POLARITY,,cutaneous symptoms,-1
+epidermal-cyst,09-026,0,INFO,NEGATIVE_POLARITY,,cutaneous symptoms,-1
+erythema multiforme,10-003,2,INFO,NEGATIVE_POLARITY,,mucosal involvement,-1
+folliculitis,11-014,1,INFO,NEGATIVE_POLARITY,,follicular ostia,-1
+granuloma annulare,12-004,0,INFO,NEGATIVE_POLARITY,,elevated white blood cell count,-1
+granuloma annulare,12-005,0,INFO,NEGATIVE_POLARITY,,elevated C-reactive protein,-1
+granuloma annulare,12-016,0,INFO,NEGATIVE_POLARITY,,cutaneous symptoms,-1
+hailey hailey disease,13-010,0,INFO,NEGATIVE_POLARITY,,abnormal localization of desmoplakin and desmoglein,-1
+juvenile xanthogranuloma,14-009,2,INFO,NEGATIVE_POLARITY,,S100 protein positivity,-1
+juvenile xanthogranuloma,14-010,6,ERROR,NEGATION_WORD,negative,negative network,1
+juvenile xanthogranuloma,14-024,4,INFO,NEGATIVE_POLARITY,,S100 protein positivity,-1
+keloid,15-012,1,INFO,NEGATIVE_POLARITY,,regression over time,-1
+lupus erythematosus,17-014,1,INFO,NEGATIVE_POLARITY,,joint swelling,-1
+lupus subacute,18-001,0,INFO,NEGATIVE_POLARITY,,scarring,-1
+lupus subacute,18-006,0,INFO,NEGATIVE_POLARITY,,anti-dsDNA antibody positivity,-1
+lupus subacute,18-010,2,INFO,NEGATIVE_POLARITY,,lesions on the face,-1
+lupus subacute,18-011,1,WARN,OTHER_LABEL_NAME,telangiectases:telangiectasia,telangiectasia,1
+lupus subacute,18-011,2,INFO,NEGATIVE_POLARITY,,scarring,-1
+lupus subacute,18-019,0,INFO,NEGATIVE_POLARITY,,severe organ involvement,-1
+lupus subacute,18-021,0,INFO,NEGATIVE_POLARITY,,scarring,-1
+mycosis fungoides,22-010,1,ERROR,NEGATION_WORD,normal,tumors developing from plaques or normal skin,1
+necrobiosis lipoidica,23-010,0,WARN,OTHER_LABEL_NAME,telangiectases:telangiectasias,telangiectasias in central plaque areas,1
+necrobiosis lipoidica,23-015,4,WARN,OTHER_LABEL_NAME,sarcoidosis:sarcoidosis,sarcoidosis,1
+neutrophilic dermatoses,25-002,0,INFO,NEGATIVE_POLARITY,,infection,-1
+neutrophilic dermatoses,25-019,1,INFO,NEGATIVE_POLARITY,,infection,-1
+neutrophilic dermatoses,25-019,2,INFO,NEGATIVE_POLARITY,,vasculitis,-1
+photodermatoses,27-006,0,WARN,OTHER_LABEL_NAME,urticaria:hives,hives or wheals,1
+photodermatoses,27-017,0,WARN,OTHER_LABEL_NAME,urticaria:hives,hives or wheals,1
+pilar cyst,28-004,0,INFO,NEGATIVE_POLARITY,,pain,-1
+pilar cyst,28-006,1,INFO,NEGATIVE_POLARITY,,granular cell layer,-1
+pilar cyst,28-011,0,INFO,NEGATIVE_POLARITY,,pain,-1
+pilar cyst,28-014,0,INFO,NEGATIVE_POLARITY,,systemic symptoms,-1
 pityriasis rosea,29-010,1,INFO,NEGATIVE_POLARITY,,"lesions on the face, scalp, palms and soles",-1
+pityriasis rubra pilaris,30-008,0,ERROR,NEGATION_WORD,normal,sharply demarcated normal skin within affected regions,1
+pityriasis rubra pilaris,30-013,0,INFO,NEGATIVE_POLARITY,,vitamin A deficiency,-1
+pityriasis rubra pilaris,30-017,0,ERROR,NEGATION_WORD,normal,sharply demarcated normal skin within affected regions,1
+porokeratosis actinic,31-002,1,INFO,NEGATIVE_POLARITY,,lesions on the face,-1
+porokeratosis actinic,31-007,1,INFO,NEGATIVE_POLARITY,,lesions on the face,-1
+porokeratosis actinic,31-008,0,INFO,NEGATIVE_POLARITY,,pruritus,-1
+sarcoidosis,35-017,1,WARN,OTHER_LABEL_NAME,lupus erythematosus:lupus; lupus subacute:lupus,lupus pernio,1
+sarcoidosis,35-020,1,WARN,OTHER_LABEL_NAME,lupus erythematosus:lupus; lupus subacute:lupus,lupus pernio,1
+seborrheic dermatitis,38-017,2,WARN,OTHER_LABEL_NAME,acne:acne/acne vulgaris,associated acne vulgaris,1
+seborrheic-keratosis,39-005,0,INFO,NEGATIVE_POLARITY,,sex predominance,-1
+seborrheic-keratosis,39-007,4,INFO,NEGATIVE_POLARITY,,pigment networks or globules in heavily pigmented lesions,-1
+seborrheic-keratosis,39-009,0,INFO,NEGATIVE_POLARITY,,"lesions on the palms, soles, and mucous membranes",-1
+seborrheic-keratosis,39-015,0,INFO,NEGATIVE_POLARITY,,skin symptoms,-1
+squamous-cell-carcinoma-in-situ,41-001,0,ERROR,NEGATION_WORD,without,abnormal squamous cells without basement membrane invasion,1
+squamous-cell-carcinoma-in-situ,41-005,1,INFO,NEGATIVE_POLARITY,,dermal invasion,-1
+stevens johnson syndrome,42-019,2,INFO,NEGATIVE_POLARITY,,lesions on the scalp,-1
+telangiectases,43-012,0,WARN,LENGTH,17,"small dilated blood vessels on the lips, tongue, nasal mucosa, face, ears, fingertips, nails, sclerae and skin",1
+telangiectases,43-022,0,INFO,NEGATIVE_POLARITY,,recurrent hemorrhage,-1
+telangiectases,43-022,1,INFO,NEGATIVE_POLARITY,,mucosal involvement,-1
+telangiectases,43-029,0,INFO,NEGATIVE_POLARITY,,associated bleeding,-1
+telangiectases,43-029,1,INFO,NEGATIVE_POLARITY,,systemic vascular lesions,-1
+telangiectases,43-032,5,INFO,NEGATIVE_POLARITY,,associated bleeding,-1
+telangiectases,43-032,6,INFO,NEGATIVE_POLARITY,,systemic vascular lesions,-1
+verruca-vulgaris,46-009,1,INFO,NEGATIVE_POLARITY,,tenderness,-1
+verruca-vulgaris,46-010,0,INFO,NEGATIVE_POLARITY,,tenderness,-1
+vitiligo,47-011,0,INFO,NEGATIVE_POLARITY,,epidermal melanocytes,-1
+vitiligo,47-011,1,INFO,NEGATIVE_POLARITY,,dermal abnormalities,-1
+vitiligo,47-021,0,INFO,NEGATIVE_POLARITY,,epidermal melanocytes,-1

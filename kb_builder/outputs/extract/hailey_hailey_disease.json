@@ -1,0 +1,332 @@
+{
+  "disease": "hailey hailey disease",
+  "units": [
+    {
+      "unit_id": "13-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autosomal dominant inheritance",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "recurrent blisters and erosions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "painful lesions",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesions in intertriginous areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset between the second and fourth decades of life",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic relapsing course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ATP2C1 gene defect",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "impaired keratinocyte adhesion",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "acantholysis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "recurrent blisters and erosions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "painful lesions",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "erythematous plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "fissures",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the neck, axillae, inguinal folds and submammary areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "friction as an exacerbating trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "heat as an exacerbating trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "sweating as an exacerbating trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "physical trauma as an exacerbating trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "asymptomatic longitudinal white bands in fingernails",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions in non-intertriginous regions",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lichenoid plaques",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dilapidated brick wall appearance",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "suprabasal acantholysis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "intraepidermal bullae",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal localization of desmoplakin and desmoglein",
+          "polarity": -1,
+          "category": "lab"
+        },
+        {
+          "canonical": "altered actin filaments in involved epidermis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ATP2C1 gene mutations",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "glomerular and linear-looped vessels within a pink-whitish background",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wide suprabasilar partial acantholysis and clefting",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "crusts on reflectance confocal microscopy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dilated vessels on reflectance confocal microscopy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "recurrent blisters and erosions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "painful lesions",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesions in intertriginous areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "positive family history",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "suprabasal acantholysis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dilapidated brick wall appearance",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ATP2C1 gene mutations",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "13-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "13-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "13-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

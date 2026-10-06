@@ -1,0 +1,389 @@
+{
+  "disease": "basal cell carcinoma",
+  "units": [
+    {
+      "unit_id": "04-001",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cumulative ultraviolet radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nodular lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "superficial lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "morpheaform lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "infiltrating lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "fibroepithelioma of Pinkus",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-005",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-006",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pearly translucent papules or nodules with rolled borders and central ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "flat erythematous scaly patches with a fine telangiectatic network",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sclerotic white to yellow plaques with indistinct borders",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "irregular indurated plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "deep tissue infiltration",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small flesh-colored papillomatous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the face, neck and trunk",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "papules or plaques with central ulceration and rolled borders",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "telangiectasias",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arborizing vessels on dermoscopy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "blue-gray ovoid nests on dermoscopy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "structureless blue-gray areas on dermoscopy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "significant ultraviolet radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "light-colored eyes",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "history of sunburns",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pearly translucent papules or nodules with rolled borders and central ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "easy lesion bleeding",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesion crusting",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cumulative ultraviolet radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "PTCH1, PTCH2, SMO or SUFU gene mutations",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunosuppression",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "older age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "younger age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on sun-exposed skin",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pearly translucent papules or nodules with rolled borders and central ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "flat erythematous scaly patches with a fine telangiectatic network",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "sclerotic white to yellow plaques with indistinct borders",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "04-027",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "significant ultraviolet radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "PTCH1, PTCH2, SMO or SUFU gene mutations",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "immunosuppression",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "04-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

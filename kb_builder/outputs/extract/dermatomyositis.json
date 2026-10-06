@@ -1,0 +1,488 @@
+{
+  "disease": "dermatomyositis",
+  "units": [
+    {
+      "unit_id": "06-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin inflammation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "muscle inflammation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset in children or adults",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "classic presentation",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "amyopathic presentation",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "hypomyopathic presentation",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin involvement",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "muscle involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "muscle involvement",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated creatine kinase",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated creatine kinase",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated erythrocyte sedimentation rate",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "myositis-specific autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anti-Jo-1 autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anti-Mi-2 autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anti-TIF1-γ autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anti-NXP2 autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "myopathic changes on electromyography",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "inflammatory infiltrates on muscle biopsy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "perifascicular atrophy on muscle biopsy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous scaly knuckle papules (Gottron's papules)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "violet eyelid rash (heliotrope rash)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "violet discoloration on the neck (V sign)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous rash on the shoulders and upper back (shawl sign)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cracked hyperkeratotic skin on the palms and fingers (mechanics' hands)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetrical proximal muscle weakness",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "weakness affecting the neck, shoulders, hips and back",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "interstitial lung disease on high-resolution CT",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cardiac involvement on echocardiography",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "myocarditis on echocardiography",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pericarditis on echocardiography",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased malignancy risk",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "adult age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "male sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "elderly age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lung malignancy",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "breast malignancy",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "ovarian malignancy",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetrical proximal muscle weakness",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "difficulty raising the arms, climbing stairs or rising from a chair",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous scaly knuckle papules (Gottron's papules)",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "violet eyelid rash (heliotrope rash)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pharyngeal, respiratory, cardiac and neck muscle involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased malignancy risk",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin inflammation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "muscle inflammation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated creatine kinase",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated erythrocyte sedimentation rate",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "myositis-specific autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "erythematous scaly knuckle papules (Gottron's papules)",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "violet eyelid rash (heliotrope rash)",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "symmetrical proximal muscle weakness",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "interstitial lung disease on high-resolution CT",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "cardiac involvement on echocardiography",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased malignancy risk",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "adult age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "06-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

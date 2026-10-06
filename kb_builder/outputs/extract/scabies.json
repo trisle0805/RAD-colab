@@ -1,0 +1,333 @@
+{
+  "disease": "scabies",
+  "units": [
+    {
+      "unit_id": "36-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Sarcoptes scabiei var. hominis infestation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense nocturnal itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "small red itchy lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "childhood",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "elderly age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "immunocompromised status",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mite burrows in the upper skin layer",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mites in skin scrapings",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "mite eggs in skin scrapings",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "mite fecal matter in skin scrapings",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "burrows on dermoscopy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "mites on dermoscopy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "36-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small red itchy lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions in finger web spaces, wrists, elbows, axillae, buttocks and groin",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "thin pencil-like skin burrows 2-10 mm long",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunocompromised status",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "thick crusty skin",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "high mite burden",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "severe itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense nocturnal itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "close contact with an infected individual",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "exposure in crowded settings",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "family members or close contacts with similar symptoms",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the head, neck, palms and soles in infants",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "immunocompromised status",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "widespread thick crusty lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "living in high-risk areas",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "poor hygiene",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "immunocompromised status",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "crowded living conditions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-016",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "36-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Sarcoptes scabiei var. hominis infestation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense nocturnal itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "small red itchy lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions in finger web spaces, wrists, elbows, axillae, buttocks and groin",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "36-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunocompromised status",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "thick crusty skin",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "high mite burden",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "36-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

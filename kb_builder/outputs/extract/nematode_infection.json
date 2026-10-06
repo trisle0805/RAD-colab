@@ -1,0 +1,445 @@
+{
+  "disease": "nematode infection",
+  "units": [
+    {
+      "unit_id": "24-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "parasitic worm infection of the gastrointestinal tract, lungs or other tissues",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "24-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Ascaris infection",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Trichuris infection",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "hookworm infection",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Strongyloides infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "24-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "eosinophilia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-006",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "24-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "eggs in stool",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "parasites in stool",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated serum IgE",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "specific antibodies against nematode antigens",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nematode DNA in stool or tissue samples",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diarrhea",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iron-deficiency anemia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "larval migration through the lungs",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "cough",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "respiratory distress",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pulmonary opacities or infiltrates",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pleural effusion",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rapidly moving linear erythematous rash (larva currens)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "vomiting",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "cough",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "wheezing",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "larvae in sputum",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "larvae in stool",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "diarrhea",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "rectal prolapse",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "eggs in stool",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "diarrhea",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "anemia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "eosinophilia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "larvae in stool",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "diarrhea",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "rapidly moving linear erythematous rash (larva currens)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "eosinophilia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "larvae in stool",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dissemination to other organs",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-027",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "poor sanitation",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "low socioeconomic status",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-028",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "exposure to contaminated soil",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "poor hygiene",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "low educational attainment",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "24-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "24-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

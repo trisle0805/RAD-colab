@@ -1,0 +1,323 @@
+{
+  "disease": "pityriasis rubra pilaris",
+  "units": [
+    {
+      "unit_id": "30-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "reddish-orange scaling plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "keratotic follicular papules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset at any age with peaks in the first and fifth to sixth decades",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "adult onset",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fine scaling and erythema on the scalp",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "grid-like arrays of follicular papules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "orange-red scaly plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "coalescence of papules into plaques",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "cephalocaudal spread of plaques",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sharply demarcated normal skin within affected regions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "thickened skin on the palms and soles",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "generalized erythroderma",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild anemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "vitamin A deficiency",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "CARD14 gene mutations in familial cases",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hyperkeratosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "parakeratosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "acanthosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "acantholysis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-016",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sharply demarcated normal skin within affected regions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "extensive hyperkeratosis",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "keratotic follicular papules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "associated autoimmune diseases",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "associated infections",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "associated malignancies",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "30-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "30-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "n_diseases": 47,
+  "n_source_units": 1257,
+  "n_units_kept": 981,
+  "units_excluded_by_reason": {
+    "NOT_DIAGNOSTIC": 114,
+    "PROGNOSIS": 30,
+    "MANAGEMENT": 55,
+    "EPIDEMIOLOGY": 13,
+    "OTHER_DISEASE": 64
+  },
+  "n_propositions": 1436,
+  "propositions_per_disease": {
+    "min": 15,
+    "median": 29,
+    "max": 51
+  },
+  "n_negative_polarity": 31,
+  "category_counts": {
+    "morphology": 321,
+    "location": 181,
+    "symptom": 157,
+    "history": 392,
+    "lab": 385
+  },
+  "n_unique_canonical": 1283,
+  "n_canonical_shared_by_2plus_diseases": 84,
+  "human_review": {
+    "delete": 30,
+    "edit": 4
+  }
+}

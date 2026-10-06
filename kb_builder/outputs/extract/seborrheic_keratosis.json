@@ -1,0 +1,302 @@
+{
+  "disease": "seborrheic-keratosis",
+  "units": [
+    {
+      "unit_id": "39-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "benign skin tumor",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "proliferation of immature keratinocytes",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "well-demarcated round or oval flat macules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "slow lesion growth",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "increasing lesion thickness over time",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "middle-aged and older age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "younger adulthood",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sex predominance",
+          "polarity": -1,
+          "category": "history"
+        },
+        {
+          "canonical": "lighter skin tones",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "proliferation of keratinocytes",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "keratin-filled cysts",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lymphocytic infiltration",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "hyperkeratosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "acanthosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "inflammation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "comedo-like openings",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "milia-like cysts",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "gyri and sulci",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "hairpin vessels",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pigment networks or globules in heavily pigmented lesions",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dull waxy verrucous surface with a stuck-on appearance",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "light to dark brown, yellow, or grey color",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "isolated or numerous lesions",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the palms, soles, and mucous membranes",
+          "polarity": -1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the face, scalp, trunk, inframammary folds, arms, and legs",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "pedunculated lesions in skin folds",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "Christmas tree pattern on the back along Blaschko lines",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus or mild pain in inflamed or irritated lesions",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "clothing friction",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-011",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "39-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sudden appearance of multiple lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "39-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "benign skin tumor",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "middle-aged and older age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesion irritation",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "39-016",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "39-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "39-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sudden appearance of multiple lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    }
+  ]
+}

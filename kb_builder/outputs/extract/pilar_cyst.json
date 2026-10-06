@@ -1,0 +1,267 @@
+{
+  "disease": "pilar cyst",
+  "units": [
+    {
+      "unit_id": "28-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "origin from the outer root sheath of a hair follicle",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the scalp",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "multiple lesions",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "slow growth",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "firm smooth nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "mobile beneath the skin",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pain",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "inflammation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "rupture",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-005",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "28-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "trichilemmal keratinization",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "granular cell layer",
+          "polarity": -1,
+          "category": "lab"
+        },
+        {
+          "canonical": "compact keratin within the cyst",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "purulent drainage",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "marked surrounding erythema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the scalp",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions in other hair-bearing areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "well-circumscribed round or oval skin-colored firm dermal or subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mobile beneath the skin",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pain",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "tenderness",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "redness",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "drainage",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "multiple lesions",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "family history",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "gradual enlargement over months to years",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "systemic symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "28-015",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "28-016",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "28-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "28-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "28-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

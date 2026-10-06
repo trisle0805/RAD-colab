@@ -1,0 +1,407 @@
+{
+  "disease": "lupus subacute",
+  "units": [
+    {
+      "unit_id": "18-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "scarring",
+          "polarity": -1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "white women aged 15 to 40 years",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "mild systemic involvement",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sun-sensitizing medications as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "rheumatoid arthritis",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Sjögren's syndrome",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "anti-Ro (SS-A) antibodies",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "antinuclear antibody positivity",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "anti-dsDNA antibody positivity",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "HLA-DR3",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "annular lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "annular lesions with raised red borders and central clearing",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "scaly plaques",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions on the neckline, forearms and upper back",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the face",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hypopigmentation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "telangiectasia",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "scarring",
+          "polarity": -1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arthritis",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "arthralgia",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "myalgia",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild disease course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "musculoskeletal complaints",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "serologic abnormalities",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "renal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "neurological involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arthritis",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "arthralgia",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "myalgia",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe organ involvement",
+          "polarity": -1,
+          "category": "location"
+        },
+        {
+          "canonical": "central nervous system involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "renal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "interface dermatitis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "vacuolation of the basal layer",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "perivascular and perifollicular inflammatory infiltrates",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "scarring",
+          "polarity": -1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "anti-Ro (SS-A) antibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "antinuclear antibody positivity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lesions in sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild systemic involvement",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "musculoskeletal symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "severe organ damage",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "18-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

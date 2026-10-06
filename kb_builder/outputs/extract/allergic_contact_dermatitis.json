@@ -1,0 +1,470 @@
+{
+  "disease": "allergic contact dermatitis",
+  "units": [
+    {
+      "unit_id": "03-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "delayed hypersensitivity reaction to a specific allergen",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "any age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "history of atopy or other allergies",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "red swollen oozing crusted or blistering rash",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash localized to the site of allergen contact",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "rash spreading to other areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset 24-48 hours after allergen exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash persisting for weeks with continued allergen exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "positive patch test reaction to an allergen",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-010",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-011",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "potential allergen exposure from occupational or personal products",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nickel exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "cobalt exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chromium exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fragrance exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "methylisothiazolinone exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "formaldehyde exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "quaternium-15 exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "topical antibiotic exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "topical corticosteroid exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "topical treatment exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rubber chemical exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "textile dye exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "disperse dye exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash on the hands",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "preservative exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fragrance exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "metal exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "rubber chemical exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash on the face",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "gold exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "makeup use",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "moisturizer use",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wrinkle cream use",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "topical medication exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash on the eyelids and neck",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "shampoo or conditioner exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rash in the axillary area",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "fragranced deodorant use",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "history of atopy",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "occupational allergen exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "adolescent or adult age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "childhood age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-028",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "red swollen oozing crusted or blistering rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "onset 24-48 hours after allergen exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-029",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "metal exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fragrance exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "preservative exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "rubber chemical exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "03-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "03-031",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

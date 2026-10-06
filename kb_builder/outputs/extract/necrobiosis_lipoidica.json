@@ -1,0 +1,394 @@
+{
+  "disease": "necrobiosis lipoidica",
+  "units": [
+    {
+      "unit_id": "23-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "collagen degeneration",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "granuloma formation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diabetes mellitus",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "type 1 diabetes mellitus",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions on the lower extremities, especially the shins",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the upper extremities, face, trunk, nipple or penis",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diabetes mellitus",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "collagen degeneration",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "granuloma formation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "fat deposition",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small firm 1- to 3-mm reddish-brown papules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "gradual enlargement and coalescence of lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "yellowish or reddish-brown plaques with indurated borders and waxy centers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "atrophic shiny plaques",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the lower extremities, especially the shins",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the upper extremities, face, trunk or other atypical sites",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "ulceration following minor trauma",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "painful ulcerations",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "infected ulcerations",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "scarring after ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "telangiectasias in central plaque areas",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "central plaque atrophy with waxy yellowish appearance",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bruise-like erythema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spreading lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "open sores",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "thyroid disorders",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Crohn's disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "ulcerative colitis",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "rheumatoid arthritis",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "sarcoidosis",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-016",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "microangiopathic changes",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "immune complex deposition",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "collagen degeneration",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated lysyl oxidase levels",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "increased collagen cross-linking",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "thickened basement membrane",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "recurrent course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "variable progression",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ulceration",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "23-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "23-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

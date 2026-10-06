@@ -1,0 +1,328 @@
+{
+  "disease": "prurigo nodularis",
+  "units": [
+    {
+      "unit_id": "33-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "severe persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "firm hyperkeratotic nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetric distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on extensor surfaces of the extremities",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the trunk",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated blood eosinophil count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased Th2 cytokines including IL-31",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "firm hyperkeratotic nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "nodules greater than 0.5 cm in width and depth",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the arms, legs and trunk",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "flat, umbilicated or crusted excoriated lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetric distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on extensor surfaces of the extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nodules arising from hair follicles",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "high tissue eosinophil level",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "increased dermal nerve proliferation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "itching lasting more than 6 weeks",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "repeated scratching, picking or rubbing of lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "33-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "atopic inflammatory skin disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic kidney disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "liver disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "depression",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "anxiety",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "severe persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "firm hyperkeratotic nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nodules greater than 0.5 cm in width and depth",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "severe persistent itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "repeated scratching, picking or rubbing of lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated blood eosinophil count",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "high tissue eosinophil level",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dermatological, systemic and psychiatric comorbidities",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "33-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

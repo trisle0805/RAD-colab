@@ -1,0 +1,236 @@
+{
+  "disease": "squamous-cell-carcinoma-in-situ",
+  "units": [
+    {
+      "unit_id": "41-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal squamous cells without basement membrane invasion",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "involvement of the skin, cervix or oropharynx",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "atypical squamous cells throughout the full thickness of the epidermis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dermal invasion",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cytokeratin 5/6 and AE1/AE3 positivity",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "human papillomavirus infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "red scaly or crusty patch",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed lower legs, head or neck",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal squamous cells on Pap smear",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "cervical involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-010",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "persistent non-healing scaly or crusty lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions unresponsive to routine treatments",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "high-grade squamous intraepithelial lesions on Pap smear",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "persistent red or white patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "patches in the mouth, throat or tonsillar areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "patches unresponsive to standard treatments",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "long-term ultraviolet radiation exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "immunosuppression",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "human papillomavirus infection",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-015",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "familial clustering",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "genetic predisposition",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "41-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-018",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "41-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

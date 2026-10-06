@@ -1,0 +1,377 @@
+{
+  "disease": "epidermal-cyst",
+  "units": [
+    {
+      "unit_id": "09-001",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "09-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "encapsulated subepidermal nodules filled with keratin",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the face, scalp, neck, back and scrotum",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "subepidermal nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "visible central punctum",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diameter ranging from a few millimeters to several centimeters",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "stable lesion size",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "progressive enlargement over time",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "09-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cyst wall derived from the hair follicle infundibulum",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "cavity filled with laminated keratin",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "discrete freely movable subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "visible central punctum",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "diameter ranging from a few millimeters to several centimeters",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the face, scalp, neck, back and scrotum",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "enlarged erythematous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "fluctuant subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ruptured lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "erythema",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "swelling",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "foreign body reaction to keratin",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cutaneous symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fluctuant subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "visible central punctum",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "keratin expression from the central punctum",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "09-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "multiple lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the extremities, trunk or posterior ears",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "familial adenomatous polyposis",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "encapsulated subepidermal nodules filled with keratin",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "discrete freely movable subcutaneous nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "visible central punctum",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "09-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "inflamed lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "ruptured lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "09-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "09-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cutaneous symptoms",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "inflamed lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "ruptured lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    }
+  ]
+}

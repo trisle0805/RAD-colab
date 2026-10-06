@@ -1,0 +1,337 @@
+{
+  "disease": "melanocytic-nevi",
+  "units": [
+    {
+      "unit_id": "20-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "benign melanocytic proliferation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "congenital onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "acquired onset later in life",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "benign melanocytic proliferation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "BRAF mutation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "NRAS mutation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "HRAS mutation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "kinase rearrangement",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dermal melanocytic cells",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "arrangement of dermal melanocytic cells",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "degree of cytologic atypia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion size",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion diameter less than 1.5 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion diameter of 1.5 to 20 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion diameter greater than 20 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "large lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "hypertrichosis",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "variable color and texture",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the head and neck",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions anywhere on the body",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-012",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "20-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small dark flat or raised lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "evolution from junctional to compound to intradermal growth pattern",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "changes in color and texture",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "more than 50 acquired pigmented lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "atypical acquired pigmented lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "irregular lesion borders",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "varied lesion colors",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "large lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "proliferative nodules",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "melanocytic cells in the central nervous system",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "neurological symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "20-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "benign melanocytic proliferation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "congenital onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "acquired onset later in life",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "20-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "20-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "20-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "20-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

@@ -1,0 +1,431 @@
+{
+  "disease": "porphyria",
+  "units": [
+    {
+      "unit_id": "32-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "genetic defects in heme biosynthesis enzymes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "accumulation of porphyrins or their precursors",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acute hepatic manifestations",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "cutaneous manifestations",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "combined acute hepatic and cutaneous manifestations",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "32-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated urinary porphobilinogen",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated urinary delta-aminolevulinic acid",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "acute attacks",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased porphyrins in blood, urine or feces",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "32-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mutations in heme biosynthesis enzyme genes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "muscle weakness",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "seizures",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "anxiety and hallucinations",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nausea, vomiting, diarrhea and constipation",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "tachycardia",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "hypertension",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "sweating",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "skin blisters, erosions and hyperpigmentation",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin fragility",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "easy bruising",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "scarring",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "excessive hair growth",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "excessive hair growth on the face and extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acute neurovisceral attacks with cutaneous manifestations",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "neurological symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "gastrointestinal disturbances",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "medications as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "hormonal changes as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fasting as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "stress as a trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "young adult onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "female sex",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin blisters, erosions and hyperpigmentation",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic liver disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "iron overload",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "alcohol use",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "childhood onset",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "32-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "genetic defects in heme biosynthesis enzymes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "32-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "accumulation of porphyrins or their precursors",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-027",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe abdominal pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "neurological symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "photosensitivity",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "32-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

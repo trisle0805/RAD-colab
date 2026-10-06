@@ -1,0 +1,419 @@
+{
+  "disease": "photodermatoses",
+  "units": [
+    {
+      "unit_id": "27-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal skin reactions to ultraviolet radiation",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunologically mediated skin reactions",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "chemical- or drug-induced photosensitivity",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "photoaggravated skin reactions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "defective DNA repair mechanisms",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "red blistering rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed face, neck and arms",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "onset within minutes to hours after sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "resolution within a few days",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "middle-aged or elderly age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "eczematous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "exacerbation by ultraviolet and visible light",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hives or wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "onset within minutes of sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "anaphylaxis",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "vesicles and crusts",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "scarring",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "skin pitting",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "childhood or adolescence",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "scaly lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "history of atopy",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "skin of color",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ultraviolet wavelength-specific reaction",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "light-dependent allergic reactions to chemicals or drugs",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-011",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-012",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "red blistering rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "eczematous lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hives or wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "vesicles and crusts",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "scarring",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "itch",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "scaly lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal skin reactions to ultraviolet radiation",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "27-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "27-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

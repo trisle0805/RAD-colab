@@ -1,0 +1,406 @@
+{
+  "disease": "stevens johnson syndrome",
+  "units": [
+    {
+      "unit_id": "42-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mucocutaneous reactions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "medication exposure as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "infection as a trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "less extensive skin involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin involvement below 10% body surface area",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin involvement of 10-30% body surface area",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated neutrophil count",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "anemia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal liver function tests",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "liver involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated creatinine",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated blood urea nitrogen",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "renal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hyponatremia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "hypokalemia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated serum IL-15",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous or purpuric macules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "bullae",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "epidermal detachment",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "skin sloughing with gentle pressure (Nikolsky sign)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mucosal involvement of the oral, ocular and genital regions",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "painful oral ulcers",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "conjunctivitis",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever, malaise and anorexia",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pleural effusion",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "interstitial lung disease",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "corneal ulcers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "conjunctival scarring",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever, sore throat and malaise",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "round lesions about an inch across",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the face, trunk, arms and legs",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the scalp",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "painful oral ulcers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "ulcers of other mucous membranes",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "difficulty eating or drinking",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin sloughing with gentle pressure (Nikolsky sign)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "liver, kidney and lung involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "sepsis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "organ failure",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "42-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "42-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

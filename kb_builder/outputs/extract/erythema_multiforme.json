@@ -1,0 +1,486 @@
+{
+  "disease": "erythema multiforme",
+  "units": [
+    {
+      "unit_id": "10-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acute course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "self-limiting course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "target or iris lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the extremities and trunk",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "severe mucosal damage",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated erythrocyte sedimentation rate",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "recurrent course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "positive herpes simplex virus serology",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "positive Mycoplasma pneumoniae serology",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "target or iris lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "central sores surrounded by pale red rings",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "symmetrical lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the extremities and trunk",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "oral, conjunctival and genital mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetrical lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "centripetal spread of lesions",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "individual lesions persisting for at least 7 days",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "blisters and vesicles",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "general ill feeling",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "skin itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "joint aches",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mouth sores",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bloodshot eyes",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "dry eyes",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "eye burning",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "eye itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "eye discharge",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "vision problems",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the hands, feet and extensor limb surfaces",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "malaise preceding the eruption",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "myalgia preceding the eruption",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "upper respiratory symptoms preceding the eruption",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "herpes simplex virus infection as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Mycoplasma pneumoniae infection as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "childhood age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nonsteroidal anti-inflammatory drug exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "antibiotic exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "anticonvulsant exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "vaccination as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "autoimmune disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "emotional stress as a trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "10-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "10-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "10-030",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "self-limiting course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "target or iris lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-031",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "herpes simplex virus infection as a trigger",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Mycoplasma pneumoniae infection as a trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "10-032",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "10-033",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

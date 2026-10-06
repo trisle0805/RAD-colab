@@ -1,0 +1,353 @@
+{
+  "disease": "vitiligo",
+  "units": [
+    {
+      "unit_id": "47-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "loss of melanocytes",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "well-demarcated depigmented macules or patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "depigmentation of the skin, mucous membranes and hair",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "47-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset at any age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "onset in the second decade of life",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "generalized lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "unilateral lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoantibodies against melanocyte antigens",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoimmune thyroid disorders",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mild anemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "leukocytosis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "well-demarcated chalk-white macules or patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "symmetric lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bright white depigmented areas under Wood's lamp",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "polarized hair in affected areas",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "white hair in affected areas",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "epidermal melanocytes",
+          "polarity": -1,
+          "category": "lab"
+        },
+        {
+          "canonical": "dermal abnormalities",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "gradual onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "progressive lesion enlargement",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "increasing number of lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "symmetric lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sun sensitivity with sunburn in affected areas",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoimmune thyroid disorders",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "patchy autoimmune hair loss",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "pernicious anemia",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "family history of depigmenting disorder",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "47-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "loss of melanocytes",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "depigmented skin patches",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "well-demarcated chalk-white macules or patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "symmetric lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "bright white depigmented areas under Wood's lamp",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "thyroid dysfunction",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "epidermal melanocytes",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "gradual onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "associated autoimmune conditions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "47-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

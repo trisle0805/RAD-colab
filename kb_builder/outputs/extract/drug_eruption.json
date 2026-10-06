@@ -1,0 +1,382 @@
+{
+  "disease": "drug eruption",
+  "units": [
+    {
+      "unit_id": "07-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "medication exposure preceding a cutaneous reaction",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "self-limiting rash",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "severe cutaneous reaction",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "morbilliform rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "transient wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "fixed lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "07-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "eosinophilia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "abnormal liver function tests",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated creatinine",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated blood urea nitrogen",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous maculopapular morbilliform rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "rash beginning on the trunk and spreading to the extremities",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "onset 2-14 days after medication initiation",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "raised red pruritic well-demarcated lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "rapid appearance and resolution of lesions",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "angioedema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "well-circumscribed erythematous or hyperpigmented lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "recurrent lesions at the same site after re-exposure to medication",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions on the lips, genitalia and extremities",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "widespread skin detachment",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "onset 7-21 days after medication exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "rash",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lymphadenopathy",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "multiorgan involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "onset 15-40 days after medication exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sudden sterile pustules on an erythematous base",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "onset within 4 days of medication exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset 2-14 days after medication initiation",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "onset within 4 days of medication exposure",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lymphadenopathy",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "multiorgan involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "well-circumscribed erythematous or hyperpigmented lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "widespread skin detachment",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "exposure to prescription, over-the-counter, or herbal medications",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "07-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "HLA-B*5701 polymorphism",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "herpesvirus reactivation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "07-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "07-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

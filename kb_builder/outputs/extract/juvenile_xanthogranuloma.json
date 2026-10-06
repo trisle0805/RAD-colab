@@ -1,0 +1,526 @@
+{
+  "disease": "juvenile xanthogranuloma",
+  "units": [
+    {
+      "unit_id": "14-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "self-healing course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "infancy and young childhood",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "solitary or multiple yellow-red skin nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the face, neck and upper torso",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "non-Langerhans-cell histiocytic proliferation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "skin-limited involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "involvement of the eyes, lungs, liver and central nervous system",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "yellow-red to brown papules or nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions measuring 2-5 mm",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "nodules measuring 1-2 cm",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the face, neck and upper torso",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the trunk and extremities",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on the oral mucosa",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions larger than 2 cm",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "atrophic plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "cutaneous horns",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "subcutaneous masses",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset during the first year of life",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions present at birth",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "histiocytic accumulation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "multinucleated Touton giant cells",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lymphocytic infiltrate",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "eosinophilic infiltrate",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "CD68 positivity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "CD163 positivity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "S100 protein positivity",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "setting sun pattern",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "yellow-orange or pink-red structureless areas",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "yellow globules",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "shiny white streaks",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "brown globules",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pale-brown network",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "negative network",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iso-hypodense mass on CT",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "mild or marked enhancement on CT",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "slight T1 hyperintensity on MRI",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "slight T2 hypointensity on MRI",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "decreased diffusivity on MRI",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "homogeneous enhancement on MRI",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pulmonary nodules or masses",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iso-hypodense liver mass with enhancement",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iso-hypodense kidney mass with enhancement",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "intense central nervous system enhancement on MRI",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "high central nervous system perfusion on MRI",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iris involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "hyphema",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "glaucoma",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "blindness",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pulmonary nodules or masses",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "liver nodules or masses",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "kidney nodules or masses",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "central nervous system involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "involvement of the nose, pancreas, greater omentum or testis",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "yellow-red to brown papules or nodules",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the face, neck and upper torso",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "histiocytic accumulation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "multinucleated Touton giant cells",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "CD68 positivity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "CD163 positivity",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "S100 protein positivity",
+          "polarity": -1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "setting sun pattern",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "yellow-orange or pink-red structureless areas",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "14-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "14-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "14-029",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous regression over 3-6 years",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "14-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

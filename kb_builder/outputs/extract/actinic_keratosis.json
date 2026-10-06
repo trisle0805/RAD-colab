@@ -1,0 +1,330 @@
+{
+  "disease": "actinic keratosis",
+  "units": [
+    {
+      "unit_id": "02-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on sun-exposed skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "atypical epidermal keratinocytes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "older age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "immunosuppression",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "large or thick lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "epidermal dysplasia with atypical keratinocytes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunohistochemical markers of cellular atypia and dysplasia",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rough scaly or crusty lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "palpable lesions before visibility",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesion size of 2 to 6 millimeters",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "gray pink red or skin-colored lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the face, scalp, backs of the hands and chest",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "lesions on sun-exposed skin",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "sandpaper-like texture",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "hard wart-like or gritty surface",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesion induration",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesion bleeding",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "multiple widespread subclinical lesions in chronically sun-damaged skin",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "blue or green eyes",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "blond or red hair",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "history of kidney or other solid organ transplant",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "multiple severe sunburns early in life",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "older age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "persistent roughness or scaliness",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on sun-exposed skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "history of sun-damaged skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "02-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "02-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on sun-exposed skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "rough scaly or crusty lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "sandpaper-like texture",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions on the face, scalp, backs of the hands and chest",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "02-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fair skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "older age",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "02-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "02-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

@@ -1,0 +1,461 @@
+{
+  "disease": "seborrheic dermatitis",
+  "units": [
+    {
+      "unit_id": "38-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic relapsing course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "lesions in sebaceous gland-rich areas",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "scalp, face and chest involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous scaly patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "age under 3 months",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "adolescent age",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "age 30–60 years",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunocompromised state",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "Parkinson's disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "neurological conditions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Malassezia yeasts on the skin surface",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased sebum production",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated inflammatory cytokines and chemokines in the skin",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "yellowish greasy scales",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "scalp involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "erythema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous scaly patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions in the nasolabial folds, eyebrows and behind the ears",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous scaly patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "mid-chest involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "involvement of flexural creases of the arms, legs and groin",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythema",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "yellowish greasy scales",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions in sebaceous gland-rich areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cold weather as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "stress as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "associated rosacea",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "associated blepharitis",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "associated acne vulgaris",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "family history",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "stress as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "fatigue as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "weather extremes as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "oily skin",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "infrequent skin cleaning as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "alcohol-containing lotions as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "underlying skin disorders",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Parkinson's disease",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "head injury",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "stroke",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "HIV infection",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "CD4 count of 450–550 cells/µL at onset",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic relapsing course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "erythematous scaly patches",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesions in sebaceous gland-rich areas",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "yellowish greasy scales",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "erythema",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Malassezia yeasts on the skin surface",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "stress as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "cold weather as an exacerbating factor",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "immunocompromised state",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "38-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

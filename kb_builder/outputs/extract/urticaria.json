@@ -1,0 +1,402 @@
+{
+  "disease": "urticaria",
+  "units": [
+    {
+      "unit_id": "45-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itchy raised red or skin-colored wheals of variable size and shape",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acute course lasting less than 6 weeks",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "chronic course lasting more than 6 weeks",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "induction by triggers",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "swelling of deeper skin layers",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated eosinophil count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated erythrocyte sedimentation rate",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoantibodies against FcεRI or IgE",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itchy raised red or skin-colored wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "wheals appearing and disappearing within hours",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "swelling of deeper skin layers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "swelling of the lips, eyelids, hands and feet",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals after scratching or rubbing the skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals induced by cold",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wheals induced by heat",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wheals induced by pressure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wheals induced by sunlight",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itching",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals lasting less than 24 hours",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wheals changing in size and location",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "food triggers",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "medication triggers",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "physical stimulus triggers",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "stress as a trigger",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "joint pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "respiratory symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoantibodies against FcεRI or IgE",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous onset",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "swelling of deeper skin layers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "chronic course lasting more than 6 weeks",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals induced by physical stimuli",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "swelling of deeper skin layers induced by physical stimuli",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals after contact with specific substances",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "45-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autoantibodies",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "wheals",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "swelling of deeper skin layers",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "symptom duration and pattern",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "45-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

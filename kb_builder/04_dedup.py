@@ -7,10 +7,14 @@
 Đầu ra:
   outputs/dedup/<slug>.response.txt, <slug>.meta.json   (nếu dùng LLM)
   outputs/props_dedup.jsonl                             mệnh đề sau gộp, đã có proposition_id
+
+Không có --only: xử lý tất cả bệnh đã extract.
+Có --only: chỉ dedup các bệnh nêu ra, giữ nguyên kết quả đã có của bệnh khác.
 """
 import argparse
 import datetime
 import json
+from collections import defaultdict
 
 from common import extract_json, load_config, load_prompt, norm_text, read_jsonl, slug, write_jsonl
 from llm_client import call_llm
@@ -89,17 +93,27 @@ def llm_dedup(disease, props, cfg, out_dir):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--only", nargs="+", help="chỉ dedup các bệnh này; giữ nguyên kết quả bệnh khác")
     ap.add_argument("--no-llm", action="store_true", help="chỉ gộp trùng chữ, không gọi LLM")
     args = ap.parse_args()
     cfg = load_config()
     units = read_jsonl(cfg["_out"] / "units.jsonl")
     units_by_id = {u["unit_id"]: u for u in units}
     diseases = list(dict.fromkeys(u["disease"] for u in units))
+    requested = list(dict.fromkeys(args.only)) if args.only else diseases
+    unknown = sorted(set(requested) - set(diseases))
+    if unknown:
+        ap.error(f"Không có bệnh trong guideline: {unknown}")
     out_dir = cfg["_out"] / "dedup"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    rows = []
-    for d in diseases:
+    props_path = cfg["_out"] / "props_dedup.jsonl"
+    existing_rows = read_jsonl(props_path) if args.only and props_path.exists() else []
+    rows_by_disease = defaultdict(list)
+    for row in existing_rows:
+        rows_by_disease[row["disease_id"]].append(row)
+
+    for d in requested:
         path = cfg["_out"] / "extract" / f"{slug(d)}.json"
         if not path.exists():
             print(f"skip {d}: chưa có kết quả trích")
@@ -111,8 +125,9 @@ def main():
         if not args.no_llm and len(props) > 1:
             props = llm_dedup(d, props, cfg, out_dir)
         print(f"{d:<35} {n0:>4} -> {n1:>4} (trùng chữ) -> {len(props):>4} (sau gộp)")
+        disease_rows = []
         for i, p in enumerate(props, start=1):
-            rows.append({
+            disease_rows.append({
                 "proposition_id": f"{slug(d)}_P{i:03d}",
                 "disease_id": d,
                 "canonicalDescription": p["canonical"],
@@ -122,6 +137,9 @@ def main():
                 "sourceExcerpt": [units_by_id[u]["text"] for u in p["unit_ids"]],
                 "mergedFrom": p["merged_from"],
             })
+        rows_by_disease[d] = disease_rows
+
+    rows = [row for disease in diseases for row in rows_by_disease[disease]]
     write_jsonl(cfg["_out"] / "props_dedup.jsonl", rows)
     print(f"Tổng: {len(rows)} mệnh đề -> {cfg['_out'] / 'props_dedup.jsonl'}")
 

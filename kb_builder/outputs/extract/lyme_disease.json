@@ -1,0 +1,388 @@
+{
+  "disease": "lyme disease",
+  "units": [
+    {
+      "unit_id": "19-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Borrelia burgdorferi infection",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "tick-borne transmission",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "involvement of the skin, joints, heart and nervous system",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bull's-eye rash with central red spot, central clearing and outer red ring",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "rash at the tick bite site",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "rash onset 3 to 30 days after a tick bite",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fever",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "chills",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "fatigue",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "headache",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "muscle and joint aches",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "swollen lymph nodes",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "facial palsy",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "meningitis",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "radiculopathy",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "encephalitis",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "heart block",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "myocarditis",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "migratory joint pain and swelling",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic joint inflammation",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "knee involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic neuropathy",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "cognitive dysfunction",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "mood disorders",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "acrodermatitis chronica atrophicans",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-012",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-014",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-015",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "Borrelia burgdorferi DNA in cerebrospinal fluid, synovial fluid or skin biopsy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "brain and spinal cord abnormalities on MRI",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "heart block",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "cardiac abnormalities on ECG",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "synovial fluid inflammation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "Borrelia burgdorferi DNA in synovial fluid",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "tick exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "travel to endemic areas",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "tick bite",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bull's-eye rash with central red spot, central clearing and outer red ring",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "neurological deficits",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "joint inflammation",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-023",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    },
+    {
+      "unit_id": "19-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bull's-eye rash with central red spot, central clearing and outer red ring",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "flu-like symptoms",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "neurological manifestations",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "cardiac manifestations",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "musculoskeletal manifestations",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "19-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

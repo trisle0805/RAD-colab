@@ -1,0 +1,463 @@
+{
+  "disease": "sarcoidosis",
+  "units": [
+    {
+      "unit_id": "35-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "noncaseating granulomas",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "involvement of the lungs, lymph nodes, skin and eyes",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "idiopathic etiology",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated white blood cell count",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated serum angiotensin-converting enzyme",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated erythrocyte sedimentation rate",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased bronchoalveolar lavage lymphocytes, particularly CD4+ T cells",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "hypercalcemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "hypercalciuria",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "increased 1,25-dihydroxyvitamin D production by activated macrophages",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bilateral hilar lymphadenopathy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pulmonary infiltrates",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pulmonary nodules",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "pulmonary fibrosis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nodular or reticular pulmonary opacities on high-resolution computed tomography",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "bronchovascular thickening on high-resolution computed tomography",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lymphadenopathy on high-resolution computed tomography",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "active granulomatous inflammation on positron emission tomography",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "noncaseating granulomas",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "noncaseating granulomas in lymph nodes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "restrictive lung disease",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "decreased diffusing capacity for carbon monoxide",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "airflow obstruction",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "uveitis",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "conjunctivitis",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "ocular manifestations",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythema nodosum",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lupus pernio",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "granulomatous skin lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "noncaseating granulomas",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cough, shortness of breath and chest pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "fatigue, weight loss, fever and night sweats",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythema nodosum",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lupus pernio",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "granulomatous skin lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "blurred vision, eye pain and redness",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arrhythmias, heart failure and conduction abnormalities",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cranial nerve palsies",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "peripheral neuropathy",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "seizures",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arthralgia and myalgia",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-025",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-026",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-027",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-028",
+      "decision": "EXCLUDE",
+      "exclude_reason": "OTHER_DISEASE",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-029",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-030",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "bilateral hilar lymphadenopathy",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "noncaseating granulomas",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "elevated serum angiotensin-converting enzyme",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-031",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "nodular or reticular pulmonary opacities on high-resolution computed tomography",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "increased bronchoalveolar lavage lymphocytes, particularly CD4+ T cells",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "35-032",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "35-033",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}

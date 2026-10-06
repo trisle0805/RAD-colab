@@ -35,6 +35,31 @@ def _backup_review_file(path):
     backup.write_bytes(path.read_bytes())
     print(f"Đã sao lưu {path.name} -> {backup.name}")
 
+def _restore_review_actions(old_props, new_props):
+    """Chuyển các quyết định duyệt sang dòng mới có cùng nội dung nguồn."""
+    lookup = defaultdict(list)
+    for row in new_props:
+        key = (
+            row["disease_id"], row["canonicalDescription"], str(row["polarity"]),
+            row["category"], row["sourceUnitIds"],
+        )
+        lookup[key].append(row)
+    restored = 0
+    for old in old_props:
+        action = (old.get("action") or "").strip()
+        if not action:
+            continue
+        key = (
+            old["disease_id"], old["canonicalDescription"], str(old["polarity"]),
+            old["category"], old["sourceUnitIds"],
+        )
+        matches = lookup[key]
+        if len(matches) == 1 and not (matches[0].get("action") or "").strip():
+            for column in ("action", "new_canonical", "new_polarity", "new_category", "note"):
+                matches[0][column] = old.get(column, "")
+            restored += 1
+    return restored
+
 
 def _preserved_rows(path, disease_column, refreshed_diseases):
     if not path.exists():
@@ -50,26 +75,31 @@ def review(cfg, synonyms, refreshed_diseases=None):
     out.mkdir(parents=True, exist_ok=True)
     props_path = out / "review_propositions.csv"
     excluded_path = out / "review_excluded_units.csv"
+    previous_props = _read_csv(props_path) if props_path.exists() else []
     old_props = _preserved_rows(props_path, "disease_id", refreshed_diseases)
     old_excluded = _preserved_rows(excluded_path, "disease", refreshed_diseases)
     _backup_review_file(props_path)
     _backup_review_file(excluded_path)
 
+    new_props = list(old_props)
+    for p in props:
+        if p["disease_id"] not in refreshed_diseases and any(
+            row["proposition_id"] == p["proposition_id"] for row in old_props
+        ):
+            continue
+        flags = check_proposition(p["canonicalDescription"], p["polarity"], p["category"], p["disease_id"], synonyms)
+        new_props.append({"proposition_id": p["proposition_id"], "disease_id": p["disease_id"],
+                          "category": p["category"], "polarity": p["polarity"],
+                          "canonicalDescription": p["canonicalDescription"],
+                          "sourceExcerpt": " || ".join(p["sourceExcerpt"]),
+                          "sourceUnitIds": ";".join(p["sourceUnitIds"]), "flags": format_flags(flags)})
+    restored = _restore_review_actions(previous_props, new_props)
+    if restored:
+        print(f"Đã giữ {restored} quyết định duyệt trên mệnh đề có cùng nội dung nguồn.")
     with open(props_path, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=PROP_COLS)
         w.writeheader()
-        w.writerows(old_props)
-        for p in props:
-            if p["disease_id"] not in refreshed_diseases and any(
-                row["proposition_id"] == p["proposition_id"] for row in old_props
-            ):
-                continue
-            flags = check_proposition(p["canonicalDescription"], p["polarity"], p["category"], p["disease_id"], synonyms)
-            w.writerow({"proposition_id": p["proposition_id"], "disease_id": p["disease_id"],
-                        "category": p["category"], "polarity": p["polarity"],
-                        "canonicalDescription": p["canonicalDescription"],
-                        "sourceExcerpt": " || ".join(p["sourceExcerpt"]),
-                        "sourceUnitIds": ";".join(p["sourceUnitIds"]), "flags": format_flags(flags)})
+        w.writerows(new_props)
 
     unit_by_id = {u["unit_id"]: u for u in units}
     with open(excluded_path, "w", newline="", encoding="utf-8-sig") as f:
@@ -98,10 +128,18 @@ def _read_csv(path):
 
 def apply_review(cfg):
     units = {u["unit_id"]: u for u in read_jsonl(cfg["_out"] / "units.jsonl")}
-    props = {p["proposition_id"]: p for p in read_jsonl(cfg["_out"] / "props_dedup.jsonl")}
+    review_rows = _read_csv(cfg["_out"] / "review" / "review_propositions.csv")
     log, final = [], []
-    for r in _read_csv(cfg["_out"] / "review" / "review_propositions.csv"):
-        p = dict(props[r["proposition_id"]])
+    for r in review_rows:
+        p = {
+            "proposition_id": r["proposition_id"],
+            "disease_id": r["disease_id"],
+            "canonicalDescription": r["canonicalDescription"].strip(),
+            "polarity": int(r["polarity"]),
+            "category": r["category"].strip(),
+            "sourceUnitIds": [unit_id for unit_id in r["sourceUnitIds"].split(";") if unit_id],
+            "sourceExcerpt": r["sourceExcerpt"].split(" || ") if r["sourceExcerpt"] else [],
+        }
         action = (r.get("action") or "").strip().lower()
         if action == "delete":
             log.append({"type": "delete", "id": r["proposition_id"], "before": p["canonicalDescription"],
@@ -159,13 +197,14 @@ def finalize(cfg, synonyms, partial=False):
         print("\n".join(errors[:50]))
         raise SystemExit(f"Còn {len(errors)} lỗi. Sửa trong bảng duyệt rồi chạy lại finalize.")
 
-    labels = list(csv.reader(open(resolve(cfg, "label_csv"), encoding="utf-8-sig")))[0][2:]
     by_d = defaultdict(list)
     for p in final:
         by_d[p["disease_id"]].append(p)
     if partial:
-        labels = [l for l in labels if by_d.get(l)]
+        # Xuất phần KB đang có mà không cần file label CSV của bộ dữ liệu huấn luyện.
+        labels = sorted(by_d)
     else:
+        labels = list(csv.reader(open(resolve(cfg, "label_csv"), encoding="utf-8-sig")))[0][2:]
         missing = [l for l in labels if not by_d.get(l)]
         unknown = sorted(set(by_d) - set(labels))
         if missing or unknown:

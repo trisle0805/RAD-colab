@@ -24,10 +24,17 @@ Dùng `00_run.py` để chạy từ segment đến tạo CSV review (script **kh
 ```bash
 python 00_run.py --only psoriasis acne
 python 00_run.py --random 3 --seed 42
+python 00_run.py --random 3 --seed 42 --force
+python 00_run.py --only psoriasis --dedup
 ```
 
-- `--only`: chạy chính xác các bệnh đã nêu. Nếu bệnh đã có kết quả, kết quả trích được chạy lại và ghi đè; trạng thái duyệt cũ của bệnh đó bị xóa để duyệt lại.
+- Mặc định, chỉ các bệnh chưa có `outputs/extract/<disease>.json` mới được chạy; kết quả và trạng thái duyệt của bệnh cũ được giữ nguyên.
+- `--only`: giới hạn lựa chọn vào đúng các bệnh đã nêu. Nếu một bệnh trong danh sách đã có kết quả, bệnh đó bị bỏ qua.
 - `--random N`: chọn ngẫu nhiên `N` bệnh chưa có kết quả trích. Dùng `--seed` nếu cần tái lập tập bệnh đã chọn.
+- `--force`: cho phép chọn cả bệnh đã có kết quả và ghi đè kết quả trích của các bệnh được chọn. Kết hợp với `--random N` để lấy ngẫu nhiên từ toàn bộ guideline; kết hợp với `--only` để chạy lại chính xác các bệnh đã nêu. Trạng thái duyệt cũ của bệnh được ghi đè sẽ bị xóa để duyệt lại.
+- `--dedup`: chỉ chạy lại bước 4 cho các bệnh được chọn, không chạy segment, extract hoặc check. Cờ này cho phép chọn cả bệnh đã có kết quả dù không dùng `--force`; chỉ kết quả dedup và các dòng review của bệnh được chọn được cập nhật. Có thể dùng độc lập, ví dụ `python 00_run.py --only psoriasis --dedup`.
+- Khi chạy pipeline bình thường, bước 4 chỉ dedup lại các bệnh vừa extract thành công; kết quả dedup của bệnh cũ khác được giữ nguyên.
+- `review_propositions.csv` là snapshot để duyệt: khi `finalize`, hệ thống dùng toàn bộ các dòng hiện có trong CSV và áp dụng `action`/`new_*` trực tiếp trên những dòng đó. Mã `proposition_id` chỉ là định danh để theo dõi; thay đổi dedup ở lần chạy khác không tự xóa hay bỏ các dòng review cũ.
 - Mỗi lần cập nhật review, script sao lưu hai CSV hiện có thành `*.bak_YYYYMMDD_HHMMSS.csv`. Các bệnh không chạy lại giữ nguyên các cột `action`, `new_*`, `restore_*` và `note`.
 - Thêm `--no-llm-dedup` để chỉ gộp trùng chữ ở bước dedup.
 

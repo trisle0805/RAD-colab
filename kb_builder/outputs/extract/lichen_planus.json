@@ -1,0 +1,394 @@
+{
+  "disease": "lichen planus",
+  "units": [
+    {
+      "unit_id": "16-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "skin involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "nail involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "hair involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "oral mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "16-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "middle-aged female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "reticular oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "papular oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "plaque-like oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "erosive oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "atrophic oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "bullous oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "band-like dermal lymphocytic infiltrate",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "hyperkeratosis",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "saw-tooth rete ridges",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "IgM and C3 deposits at the dermo-epidermal junction",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-007",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "16-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lesions on the buccal mucosa, tongue and gingiva",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "white lacy reticular oral lesions (Wickham striae)",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "erythematous oral areas",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "erosive oral ulcers",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "polygonal violaceous flat-topped papules and plaques",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "linear lesion distribution",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "longitudinal nail ridging",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "nail thinning",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "nail loss",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "genital mucosal involvement",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "erosive genital lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pain and discomfort",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "burning",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "sensitivity to spicy or acidic foods",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "white lacy reticular oral lesions (Wickham striae)",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "erythematous ulcers with a white border",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "thin atrophic smooth shiny mucosa",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "vesicles and bullae on skin or mucosa",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-017",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "16-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "chronic course",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-019",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "16-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "middle-aged female sex",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "reticular oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "erosive oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "atrophic oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "bullous oral lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pruritus",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "burning",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "pain",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "16-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    }
+  ]
+}

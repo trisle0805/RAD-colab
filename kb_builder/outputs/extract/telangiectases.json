@@ -1,0 +1,547 @@
+{
+  "disease": "telangiectases",
+  "units": [
+    {
+      "unit_id": "43-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small dilated blood vessels",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "blood vessels on the skin, mucous membranes and internal organs",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-002",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "HHT",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "ataxia syndrome",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "generalized essential vascular dilation disorder",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-003",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "inherited vascular disorder",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "abnormal blood vessels",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "excessive bleeding",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-004",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "autosomal recessive inheritance",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "progressive cerebellar ataxia",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "oculocutaneous small dilated blood vessels",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "immunodeficiency",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "progressive development of small dilated blood vessels on the skin",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ENG gene mutation",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "ALK-1 gene mutation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "iron deficiency anemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "decreased blood oxygen levels",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arteriovenous malformations",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "cardiac involvement",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "ATM gene mutation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "low IgA and IgG2 levels",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "lymphoma",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "leukemia",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "cerebellar atrophy on MRI",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "neurological abnormalities on MRI",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small dilated blood vessels on the lips, tongue, nasal mucosa, face, ears, fingertips, nails, sclerae and skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "easy bleeding from small dilated blood vessels",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-013",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "arteriovenous malformations",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous recurrent epistaxis",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "dark black stools",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "blood in the stool",
+          "polarity": 1,
+          "category": "symptom"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "seizures",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "small strokes",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "bleeding into the brain",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small dilated blood vessels on the cheeks, lips, tongue, fingers, mouth and toes",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "progressive cerebellar ataxia",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "ataxic speech disorders",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "cerebellar atrophy",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "recurrent sinopulmonary infections",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "bronchiectasis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-020",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "small dilated blood vessels on the conjunctivae",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-021",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "widespread small dilated blood vessels on the skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "small dilated blood vessels on the lower extremities, trunk, arms and face",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-022",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "recurrent hemorrhage",
+          "polarity": -1,
+          "category": "history"
+        },
+        {
+          "canonical": "mucosal involvement",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "spontaneous recurrent epistaxis",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "multiple small dilated blood vessels",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "visceral arteriovenous malformations",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "first-degree relative with HHT",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-024",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset in adolescence or adulthood",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "cutaneous small dilated blood vessels in older children and adolescents",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-025",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "progressive cerebellar ataxia beginning in infancy",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-026",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "development at age 3 to 6 years",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-027",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "increased susceptibility to respiratory infections",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-028",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "onset on the lower extremities with spread to other areas",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-029",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "associated bleeding",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "systemic vascular lesions",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "43-030",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "43-031",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "43-032",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "mucocutaneous small dilated blood vessels",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "arteriovenous malformations",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "progressive cerebellar ataxia",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "oculocutaneous small dilated blood vessels",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "widespread small dilated blood vessels on the skin",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "associated bleeding",
+          "polarity": -1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "systemic vascular lesions",
+          "polarity": -1,
+          "category": "location"
+        }
+      ]
+    }
+  ]
+}

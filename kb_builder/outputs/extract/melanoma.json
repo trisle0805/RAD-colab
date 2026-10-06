@@ -1,0 +1,335 @@
+{
+  "disease": "melanoma",
+  "units": [
+    {
+      "unit_id": "21-001",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "malignant proliferation of melanocytes",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-002",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-003",
+      "decision": "EXCLUDE",
+      "exclude_reason": "EPIDEMIOLOGY",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-004",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-005",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "BRAF V600E mutation",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-006",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated lactate dehydrogenase",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-007",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "anemia",
+          "polarity": 1,
+          "category": "lab"
+        },
+        {
+          "canonical": "thrombocytosis",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-008",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "elevated C-reactive protein",
+          "polarity": 1,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-009",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "asymmetric lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "irregular lesion borders",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "color variation within lesions",
+          "polarity": 1,
+          "category": "morphology"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-010",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "regional lymph node involvement",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-011",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "lung metastases",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "liver metastases",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "brain metastases",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-012",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "brain metastases",
+          "polarity": 1,
+          "category": "location"
+        },
+        {
+          "canonical": "soft tissue metastases",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-013",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-014",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "asymmetric lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "irregular lesion borders",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "color variation within lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "lesion diameter greater than 6 mm",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "change in lesion size, shape, or color",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-015",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pigmented skin lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "new or changing lesions",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-016",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesion bleeding",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "failure of lesions to heal",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-017",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "enlarged lymph nodes",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-018",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "significant sun exposure",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "sunburns",
+          "polarity": 1,
+          "category": "history"
+        },
+        {
+          "canonical": "tanning bed use",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-019",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "family history of cutaneous pigment-cell malignancy",
+          "polarity": 1,
+          "category": "history"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-020",
+      "decision": "EXCLUDE",
+      "exclude_reason": "PROGNOSIS",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-021",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-022",
+      "decision": "EXCLUDE",
+      "exclude_reason": "NOT_DIAGNOSTIC",
+      "propositions": []
+    },
+    {
+      "unit_id": "21-023",
+      "decision": "KEEP",
+      "exclude_reason": null,
+      "propositions": [
+        {
+          "canonical": "pigmented skin lesions",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "itching",
+          "polarity": 1,
+          "category": "symptom"
+        },
+        {
+          "canonical": "lesion bleeding",
+          "polarity": 1,
+          "category": "morphology"
+        },
+        {
+          "canonical": "enlarged lymph nodes",
+          "polarity": 1,
+          "category": "location"
+        }
+      ]
+    },
+    {
+      "unit_id": "21-024",
+      "decision": "EXCLUDE",
+      "exclude_reason": "MANAGEMENT",
+      "propositions": []
+    }
+  ]
+}
