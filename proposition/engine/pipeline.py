@@ -140,7 +140,9 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
             unique_pooled, _ = self.text_encoder.encode_text(
                 _to_device(self.knowledge_tokens.unique, self.device)
             )
-            alignment_pooled = unique_pooled[self.kb.align_text_index.to(self.device)]
+            align_to_unique = torch.empty(len(self.kb.unique_alignment_texts), dtype=torch.long)
+            align_to_unique[self.kb.align_unique_index] = self.kb.align_text_index
+            alignment_pooled = unique_pooled[align_to_unique.to(self.device)]
             if self.query_level == "proposition":
                 query = unique_pooled[self.kb.query_text_index.to(self.device)]
             elif self.query_level == "disease":

@@ -150,13 +150,13 @@ def render(
                     record = kb[proposition_index]
                     overlay = sample_dir / f"d{disease_position:02d}_p{proposition_index:04d}.png"
                     _heatmap_overlay(
-                        image_paths[sample_index], attention[sample_index, proposition_index, :image_token_count], overlay, alpha
+                        image_paths[sample_index], attention[proposition_index, :image_token_count], overlay, alpha
                     )
                     caption = _caption_html(_caption_tokens(
                         tokenizer,
                         input_ids[sample_index],
                         masks[sample_index],
-                        attention[sample_index, proposition_index, image_token_count:],
+                        attention[proposition_index, image_token_count:],
                     ))
                     polarity = "positive" if record["polarity"] == 1 else "negative"
                     rows.append(f"""
