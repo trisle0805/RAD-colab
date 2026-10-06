@@ -12,16 +12,9 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import torch
 from numpy.typing import NDArray
-from sklearn.metrics import (
-    accuracy_score,
-    average_precision_score,
-    balanced_accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
+from sklearn.metrics import balanced_accuracy_score, f1_score
 
+from engine.train_rad import _skin_final_metrics
 from proposition.engine.trainer import EpochResult
 
 
@@ -80,46 +73,9 @@ def final_metrics(
     pred: NDArray[np.floating],
     topk: Sequence[int] = (1, 2, 3),
 ) -> dict[str, Any]:
-    """Compute rank metrics and RAD-compatible aggregate multilabel metrics."""
+    """Combine proposition rank metrics with the exact RAD legacy metrics."""
 
-    result: dict[str, Any] = multiclass_metrics(gt, pred, topk)
-    predicted_binary = np.zeros_like(gt, dtype=np.int64)
-    predicted_binary[np.arange(gt.shape[0]), np.argmax(pred, axis=1)] = 1
-    per_class_auc = []
-    per_class_ap = []
-    for class_index in range(gt.shape[1]):
-        target = gt[:, class_index]
-        per_class_ap.append(float(average_precision_score(target, pred[:, class_index])))
-        per_class_auc.append(
-            float(roc_auc_score(target, pred[:, class_index]))
-            if np.unique(target).size == 2
-            else float("nan")
-        )
-    result.update(
-        {
-            "macro_auc": float(np.nanmean(per_class_auc)),
-            "mAP": float(np.mean(per_class_ap)),
-            "rad_legacy_metrics": {
-                "mean_auc": float(np.nanmean(per_class_auc)),
-                "mean_ap": float(np.mean(per_class_ap)),
-                "mean_accuracy": float(
-                    np.mean([
-                        accuracy_score(gt[:, c], predicted_binary[:, c])
-                        for c in range(gt.shape[1])
-                    ])
-                ),
-                "mean_f1": float(f1_score(gt, predicted_binary, average="macro", zero_division=0)),
-                "mean_precision": float(
-                    precision_score(gt, predicted_binary, average="macro", zero_division=0)
-                ),
-                "mean_recall": float(
-                    recall_score(gt, predicted_binary, average="macro", zero_division=0)
-                ),
-                "subset_accuracy": float(accuracy_score(gt, predicted_binary)),
-            },
-        }
-    )
-    return result
+    return _skin_final_metrics(gt, pred, topk)
 
 
 def save_validation_artifacts(

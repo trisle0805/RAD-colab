@@ -15,7 +15,6 @@ from typing import Any
 
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.cm as cm
 import numpy as np
 from PIL import Image
 from transformers import AutoTokenizer
@@ -47,7 +46,9 @@ def _heatmap_overlay(image_path: str, patch_attention: np.ndarray, output_path: 
         raise ValueError(f"image patch count {patch_count} is not a square grid")
     heat = Image.fromarray(np.uint8(_normalize(patch_attention).reshape(side, side) * 255))
     heat = heat.resize((width, height), Image.Resampling.BICUBIC)
-    color = Image.fromarray(np.uint8(cm.get_cmap("jet")(np.asarray(heat) / 255.0)[..., :3] * 255))
+    color = Image.fromarray(
+        np.uint8(matplotlib.colormaps["jet"](np.asarray(heat) / 255.0)[..., :3] * 255)
+    )
     Image.blend(image, color, alpha).save(output_path)
 
 
@@ -112,17 +113,28 @@ def render(
         ground_truth = values["gt"]
         support = values["support"]
         compatibility = values["compatibility"]
-        attention = values["attention"]
+        full_attention = values["full_attention"]
+        full_attention_indices = values["full_attention_sample_indices"]
+        attention_by_sample = {
+            int(sample): full_attention[position]
+            for position, sample in enumerate(full_attention_indices)
+        }
         entropy = values["attention_entropy"]
         input_ids = values["caption_input_ids"]
         masks = values["caption_attention_mask"]
         image_token_count = int(values["image_token_count"][0])
 
         if sample_indices is None:
-            sample_indices = list(range(len(image_paths)))
+            sample_indices = sorted(attention_by_sample)
         for sample_index in sample_indices:
             if not 0 <= sample_index < len(image_paths):
                 raise IndexError(f"sample index out of range: {sample_index}")
+            if sample_index not in attention_by_sample:
+                raise ValueError(
+                    f"sample {sample_index} has no stored full attention; choose one of "
+                    f"{sorted(attention_by_sample)}"
+                )
+            attention = attention_by_sample[sample_index]
             sample_dir = output_dir / f"sample_{sample_index:04d}"
             sample_dir.mkdir(parents=True, exist_ok=True)
             disease_order = np.argsort(-predictions[sample_index])[:diseases_per_sample]

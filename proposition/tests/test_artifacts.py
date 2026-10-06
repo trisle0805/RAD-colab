@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 import torch
 
+from engine.train_rad import _skin_final_metrics
 from proposition.engine.artifacts import (
     append_metrics_history,
     capture_rng_state,
@@ -47,6 +48,9 @@ def test_final_metrics_contains_both_metric_tiers() -> None:
         "mean_auc", "mean_ap", "mean_accuracy", "mean_f1",
         "mean_precision", "mean_recall", "subset_accuracy",
     }
+    assert metrics == _skin_final_metrics(
+        result.gt.numpy(), result.pred_proposition.numpy(), (1, 2, 3)
+    )
 
 
 def test_validation_uses_only_proposition_macro_f1_and_writes_optional_label(tmp_path) -> None:

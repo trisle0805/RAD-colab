@@ -99,6 +99,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
         caption_max_length: int = 512,
         query_level: str = "proposition",
         use_label_branch: bool = True,
+        apply_fourier_augmentation: bool = False,
     ) -> None:
         self.raw_batches = raw_batches
         self.image_encoder = image_encoder
@@ -110,10 +111,15 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
         self.caption_max_length = caption_max_length
         self.query_level = query_level
         self.use_label_branch = use_label_branch
+        self.apply_fourier_augmentation = apply_fourier_augmentation
 
     def __iter__(self) -> Iterator[EncodedBatch]:
         for raw in self.raw_batches:
             images = raw["image"].to(self.device, non_blocking=True)
+            if self.apply_fourier_augmentation:
+                # RAD applies this augmentation only to training batches.
+                from engine.train_rad import fourier_aug
+                images = fourier_aug(images)
             labels = torch.as_tensor(raw["label"], device=self.device, dtype=torch.float32)
             captions = self.tokenizer(
                 list(raw["entity"]),
@@ -134,9 +140,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
             unique_pooled, _ = self.text_encoder.encode_text(
                 _to_device(self.knowledge_tokens.unique, self.device)
             )
-            alignment_pooled, _ = self.text_encoder.encode_text(
-                _to_device(self.knowledge_tokens.alignment, self.device)
-            )
+            alignment_pooled = unique_pooled[self.kb.align_text_index.to(self.device)]
             if self.query_level == "proposition":
                 query = unique_pooled[self.kb.query_text_index.to(self.device)]
             elif self.query_level == "disease":

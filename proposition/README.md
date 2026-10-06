@@ -17,9 +17,10 @@ It also performs one extra **test-only** pass from the selected `best.pt` checkp
 and writes UI-ready explanation data under `<output_dir>/checklist/`:
 
 - `test_proposition_evidence.npz`: disease probabilities, raw support,
-	polarity-aware compatibility, pre-calibration disease scores, full proposition
-	attention, attention entropy, top attention positions, caption tokens, labels,
-	and image paths;
+	polarity-aware compatibility, pre-calibration disease scores, attention entropy,
+	top attention positions for every test sample, caption tokens, labels, and image
+	paths. Full proposition attention is retained as float16 only for 20
+	deterministically selected samples, together with their dataset indices;
 - `proposition_index.json` and `disease_index.json`: stable IDs and evidence
 	provenance needed to interpret tensors;
 - `test_proposition_evidence.schema.json`: array shapes, memory layout, and
@@ -40,6 +41,9 @@ python proposition/visualization/render_attention.py \
 	--bert_model_name <the same ClinicalBERT path or Hugging Face ID> \
 	--samples 0 1 2
 ```
+
+When `--samples` is omitted, it renders every sample for which full attention was
+stored. Explicit sample IDs must be among those selected samples.
 
 It creates `<output_dir>/checklist/rendered_attention/sample_XXXX/report.html`.
 Each report contains the top predicted diseases, the strongest propositions for

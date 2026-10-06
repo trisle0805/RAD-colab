@@ -28,7 +28,11 @@ class ChecklistResult:
     support: Tensor
     compatibility: Tensor
     disease_scores: Tensor
-    attention: Tensor
+    attention_top_indices: Tensor
+    attention_top_weights: Tensor
+    attention_entropy: Tensor
+    full_attention_sample_indices: Tensor
+    full_attention: Tensor
     image_token_count: Tensor
     caption_input_ids: Tensor
     caption_attention_mask: Tensor
@@ -72,6 +76,8 @@ def collect_checklist(
     beta_pecl: float = 1.0,
     pecl_generator: torch.Generator | None = None,
     query_chunk_size: int | None = None,
+    top_evidence: int = 10,
+    full_attention_sample_indices: Tensor | None = None,
 ) -> ChecklistResult:
     """Collect every test sample's prediction and explicit main-path attention."""
 
@@ -82,12 +88,17 @@ def collect_checklist(
         "support": [],
         "compatibility": [],
         "disease_scores": [],
-        "attention": [],
+        "attention_top_indices": [],
+        "attention_top_weights": [],
+        "attention_entropy": [],
         "image_token_count": [],
         "caption_input_ids": [],
         "caption_attention_mask": [],
     }
+    full_attention: list[Tensor] = []
+    full_attention_indices: list[Tensor] = []
     label_predictions: list[Tensor] = []
+    sample_offset = 0
 
     for batch in encoded_batches:
         breakdown = compute_objective(
@@ -114,8 +125,22 @@ def collect_checklist(
         collected["pred_proposition"].append(output.probabilities.detach().cpu())
         collected["support"].append(output.support.detach().cpu())
         collected["compatibility"].append(output.compatibility.detach().cpu())
+        attention = output.attention
+        k = min(top_evidence, attention.shape[-1])
+        top_weights, top_indices = torch.topk(attention, k=k, dim=-1)
         collected["disease_scores"].append(output.disease_scores.detach().cpu())
-        collected["attention"].append(output.attention.detach().cpu())
+        collected["attention_top_indices"].append(top_indices.to(torch.int32).detach().cpu())
+        collected["attention_top_weights"].append(top_weights.detach().cpu())
+        collected["attention_entropy"].append(attention_entropy(attention).detach().cpu())
+        if full_attention_sample_indices is not None:
+            batch_indices = torch.arange(
+                sample_offset, sample_offset + attention.shape[0], device=attention.device
+            )
+            selected = torch.isin(batch_indices, full_attention_sample_indices.to(attention.device))
+            if selected.any():
+                full_attention.append(attention[selected].to(torch.float16).detach().cpu())
+                full_attention_indices.append(batch_indices[selected].to(torch.int64).detach().cpu())
+        sample_offset += attention.shape[0]
         collected["image_token_count"].append(batch.image_token_count.detach().cpu())
         collected["caption_input_ids"].append(batch.caption_input_ids.detach().cpu())
         collected["caption_attention_mask"].append(batch.caption_attention_mask.detach().cpu())
@@ -131,7 +156,19 @@ def collect_checklist(
         support=torch.cat(collected["support"], dim=0),
         compatibility=torch.cat(collected["compatibility"], dim=0),
         disease_scores=torch.cat(collected["disease_scores"], dim=0),
-        attention=torch.cat(collected["attention"], dim=0),
+        attention_top_indices=torch.cat(collected["attention_top_indices"], dim=0),
+        attention_top_weights=torch.cat(collected["attention_top_weights"], dim=0),
+        attention_entropy=torch.cat(collected["attention_entropy"], dim=0),
+        full_attention_sample_indices=(
+            torch.cat(full_attention_indices, dim=0)
+            if full_attention_indices
+            else torch.empty(0, dtype=torch.int64)
+        ),
+        full_attention=(
+            torch.cat(full_attention, dim=0)
+            if full_attention
+            else torch.empty((0, 0, 0), dtype=torch.float16)
+        ),
         image_token_count=torch.cat(collected["image_token_count"], dim=0),
         caption_input_ids=torch.cat(collected["caption_input_ids"], dim=0),
         caption_attention_mask=torch.cat(collected["caption_attention_mask"], dim=0),
@@ -152,7 +189,8 @@ def save_checklist_artifacts(
     if top_evidence <= 0:
         raise ValueError("top_evidence must be positive")
     output = Path(output_dir) / "checklist"
-    sample_count, query_count, memory_length = result.attention.shape
+    sample_count, query_count = result.support.shape
+    memory_length = result.caption_input_ids.shape[1] + int(result.image_token_count[0])
     if len(image_paths) != sample_count:
         raise ValueError("image_paths length must match checklist sample count")
     if result.image_token_count.shape != (sample_count,):
@@ -169,13 +207,9 @@ def save_checklist_artifacts(
     if not is_proposition_level and query_count != kb.num_diseases:
         raise ValueError("attention query count matches neither propositions nor diseases")
 
-    attention = result.attention.numpy().astype(np.float32, copy=False)
-    k = min(top_evidence, memory_length)
-    top_indices = np.argpartition(attention, memory_length - k, axis=-1)[..., -k:]
-    top_weights = np.take_along_axis(attention, top_indices, axis=-1)
-    order = np.argsort(-top_weights, axis=-1)
-    top_indices = np.take_along_axis(top_indices, order, axis=-1).astype(np.int32, copy=False)
-    top_weights = np.take_along_axis(top_weights, order, axis=-1).astype(np.float32, copy=False)
+    top_indices = result.attention_top_indices.numpy().astype(np.int32, copy=False)
+    top_weights = result.attention_top_weights.numpy().astype(np.float32, copy=False)
+    entropy = result.attention_entropy.numpy().astype(np.float32, copy=False)
 
     arrays: dict[str, Any] = {
         "gt": result.gt.numpy().astype(np.float32, copy=False),
@@ -183,14 +217,15 @@ def save_checklist_artifacts(
         "support": result.support.numpy().astype(np.float32, copy=False),
         "compatibility": result.compatibility.numpy().astype(np.float32, copy=False),
         "disease_scores": result.disease_scores.numpy().astype(np.float32, copy=False),
-        "attention": attention,
-        "attention_entropy": attention_entropy(result.attention).numpy().astype(np.float32, copy=False),
+        "attention_entropy": entropy,
         "attention_top_indices": top_indices,
         "attention_top_weights": top_weights,
         "image_token_count": result.image_token_count.numpy().astype(np.int32, copy=False),
         "caption_input_ids": result.caption_input_ids.numpy().astype(np.int64, copy=False),
         "caption_attention_mask": result.caption_attention_mask.numpy().astype(np.int8, copy=False),
         "image_paths": np.asarray(image_paths, dtype=str),
+        "full_attention_sample_indices": result.full_attention_sample_indices.numpy().astype(np.int64, copy=False),
+        "full_attention": result.full_attention.numpy().astype(np.float16, copy=False),
     }
     if result.pred_label is not None:
         arrays["pred_label"] = result.pred_label.numpy().astype(np.float32, copy=False)
@@ -217,7 +252,8 @@ def save_checklist_artifacts(
         "memory_length": memory_length,
         "image_token_count": image_token_count,
         "caption_token_count": caption_length,
-        "top_evidence_per_query": k,
+        "top_evidence_per_query": top_indices.shape[-1],
+        "full_attention_sample_count": int(result.full_attention_sample_indices.numel()),
         "attention_axes": ["sample", "query", "memory_token"],
         "memory_layout": {
             "image": [0, image_token_count],
@@ -234,7 +270,8 @@ def save_checklist_artifacts(
             "support": "raw query support s (N, Q)",
             "compatibility": "polarity-aware proposition compatibility or disease support (N, Q)",
             "disease_scores": "pre-calibration disease scores z (N, C)",
-            "attention": "cosine cross-attention (N, J, L)",
+            "full_attention": "full cosine cross-attention for selected samples (K, J, L), float16",
+            "full_attention_sample_indices": "dataset sample indices corresponding to full_attention (K)",
             "attention_entropy": "normalized entropy per proposition (N, J)",
             "attention_top_indices": "top memory positions per proposition (N, J, K)",
             "attention_top_weights": "weights for attention_top_indices (N, J, K)",

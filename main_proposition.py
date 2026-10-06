@@ -103,7 +103,7 @@ def _dataset_image_paths(dataset: Any) -> list[str]:
     return paths
 
 
-def _make_stream(loader, image_encoder, text_encoder, tokenizer, kb, tokens, device, args):
+def _make_stream(loader, image_encoder, text_encoder, tokenizer, kb, tokens, device, args, *, training: bool = False):
     return EncodedBatchStream(
         loader,
         image_encoder,
@@ -115,6 +115,7 @@ def _make_stream(loader, image_encoder, text_encoder, tokenizer, kb, tokens, dev
         caption_max_length=args.max_length,
         query_level=args.query_level,
         use_label_branch=not args.no_label_branch,
+        apply_fourier_augmentation=training,
     )
 
 
@@ -212,14 +213,19 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         text_weight=args.contrast_ratio_text,
         image_weight=args.contrast_ratio_vision,
     ).to(device)
-    parameters = [
-        parameter for module in (model, image_encoder, text_encoder)
-        for parameter in module.parameters() if parameter.requires_grad
-    ]
     optimizer_config = config["optimizer"]
+    decay, no_decay = [], []
+    for module in (model, image_encoder, text_encoder):
+        for name, parameter in module.named_parameters():
+            if not parameter.requires_grad:
+                continue
+            (no_decay if parameter.ndim == 1 or name.endswith(".bias") else decay).append(parameter)
     optimizer = torch.optim.AdamW(
-        parameters, lr=float(optimizer_config["lr"]),
-        weight_decay=float(optimizer_config.get("weight_decay", 0.0)),
+        [
+            {"params": decay, "weight_decay": float(optimizer_config.get("weight_decay", 0.0))},
+            {"params": no_decay, "weight_decay": 0.0},
+        ],
+        lr=float(optimizer_config["lr"]),
     )
     scheduler, _ = create_scheduler(utils.AttrDict(config["schedular"]), optimizer)
     generator = torch.Generator(device=device.type).manual_seed(args.seed + 1)
@@ -250,13 +256,16 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         text_encoder.train()
         train_result = train_one_epoch(
             model, pecl,
-            _make_stream(train_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args),
+            _make_stream(train_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args, training=True),
             optimizer,
             accumulation_steps=int(config.get("grad_accumulation_steps", 1)),
             lambda_label=0.0 if args.no_label_branch else args.lambda_label,
             beta_pecl=0.0 if args.no_pecl else args.beta_pecl,
             pecl_generator=generator,
             query_chunk_size=args.query_chunk_size,
+            scheduler=scheduler,
+            epoch=epoch,
+            warmup_iterations=int(config["schedular"].get("warmup_epochs", 0)),
         )
         image_encoder.eval()
         text_encoder.eval()
@@ -322,6 +331,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         best_validation_score=float(best["best_validation_score"]), topk=args.topk,
         image_paths=test_image_paths,
     )
+    checklist_generator = torch.Generator().manual_seed(args.seed)
+    selected_attention_samples = torch.randperm(
+        len(test_dataset), generator=checklist_generator
+    )[: min(args.full_attention_samples, len(test_dataset))].sort().values
     checklist_result = collect_checklist(
         model,
         pecl,
@@ -330,6 +343,8 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         beta_pecl=0.0 if args.no_pecl else args.beta_pecl,
         pecl_generator=generator,
         query_chunk_size=args.query_chunk_size,
+        top_evidence=args.attention_topk,
+        full_attention_sample_indices=selected_attention_samples,
     )
     checklist_paths = save_checklist_artifacts(
         checklist_result,
@@ -397,6 +412,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--query_level", choices=("proposition", "disease"), default="proposition")
     parser.add_argument("--query_chunk_size", type=int)
     parser.add_argument("--attention_topk", type=int, default=10)
+    parser.add_argument("--full_attention_samples", type=int, default=20)
     parser.add_argument("--lambda_label", type=float, default=1.0)
     parser.add_argument("--beta_pecl", type=float, default=1.0)
     parser.add_argument("--no_label_branch", action="store_true")

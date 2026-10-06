@@ -171,6 +171,10 @@ def train_one_epoch(
     beta_pecl: float = 1.0,
     pecl_generator: torch.Generator | None = None,
     query_chunk_size: int | None = None,
+    scheduler: torch.optim.lr_scheduler.LRScheduler | None = None,
+    epoch: int | None = None,
+    warmup_iterations: int = 0,
+    warmup_interval: int = 100,
 ) -> EpochResult:
     """Train for one epoch over encoded batches with gradient accumulation."""
 
@@ -185,7 +189,7 @@ def train_one_epoch(
     pred_label: list[Tensor] = []
     pending_steps = 0
 
-    for batch in encoded_batches:
+    for batch_index, batch in enumerate(encoded_batches):
         breakdown = compute_objective(
             model,
             pecl_loss,
@@ -199,6 +203,8 @@ def train_one_epoch(
         pending_steps += 1
         if pending_steps == accumulation_steps:
             optimizer.step()
+            if epoch == 0 and scheduler is not None and batch_index % warmup_interval == 0 and batch_index <= warmup_iterations:
+                scheduler.step(batch_index // warmup_interval)
             optimizer.zero_grad(set_to_none=True)
             pending_steps = 0
 
@@ -215,10 +221,13 @@ def train_one_epoch(
     if pending_steps:
         # Correct the final short accumulation window to preserve mean gradients.
         correction = accumulation_steps / pending_steps
-        for parameter in model.parameters():
-            if parameter.grad is not None:
-                parameter.grad.mul_(correction)
+        for group in optimizer.param_groups:
+            for parameter in group["params"]:
+                if parameter.grad is not None:
+                    parameter.grad.mul_(correction)
         optimizer.step()
+        if epoch == 0 and scheduler is not None and batch_index % warmup_interval == 0 and batch_index <= warmup_iterations:
+            scheduler.step(batch_index // warmup_interval)
         optimizer.zero_grad(set_to_none=True)
 
     return _finalize_epoch(sums, sample_count, gt, pred_proposition, pred_label)
