@@ -22,7 +22,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from engine.train_proposition import EpochResult
+from proposition.engine.trainer import EpochResult
 
 
 def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:

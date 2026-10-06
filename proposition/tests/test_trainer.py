@@ -2,9 +2,9 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from engine.train_proposition import EncodedBatch, compute_objective, evaluate, train_one_epoch
-from factory.pecl_loss import PECLLoss
-from models.proposition_model import PropositionModel
+from proposition.engine.trainer import EncodedBatch, compute_objective, evaluate, train_one_epoch
+from proposition.losses.pecl import PECLLoss
+from proposition.models.proposition_model import PropositionModel
 
 
 def _components(*, label_branch: bool = True):

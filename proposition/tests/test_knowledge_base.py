@@ -4,10 +4,10 @@ from pathlib import Path
 import pytest
 import torch
 
-from dataset.kb import CATEGORY_ORDER, load_proposition_kb
+from proposition.data.knowledge_base import CATEGORY_ORDER, load_proposition_kb
 
 
-RAD_ROOT = Path(__file__).resolve().parents[1]
+RAD_ROOT = Path(__file__).resolve().parents[2]
 FINAL_KB_PATH = RAD_ROOT / "kb_builder" / "outputs" / "final" / "kb_propositions.json"
 
 

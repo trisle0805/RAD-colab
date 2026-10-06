@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from engine.proposition_artifacts import (
+from proposition.engine.artifacts import (
     append_metrics_history,
     capture_rng_state,
     final_metrics,
@@ -15,7 +15,7 @@ from engine.proposition_artifacts import (
     save_final_metrics,
     save_validation_artifacts,
 )
-from engine.train_proposition import EpochResult
+from proposition.engine.trainer import EpochResult
 
 
 def _result(with_label: bool = True) -> EpochResult:

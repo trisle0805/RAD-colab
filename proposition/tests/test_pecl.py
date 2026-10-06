@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from factory.pecl_loss import PECLLoss
+from proposition.losses.pecl import PECLLoss
 
 
 def _loss(negative_ratio: int = 5) -> PECLLoss:

@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from models.proposition_model import (
+from proposition.models.proposition_model import (
     CosineCrossAttention,
     DiseaseAggregator,
     PositiveCalibration,

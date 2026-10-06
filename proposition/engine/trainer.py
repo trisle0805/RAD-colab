@@ -14,8 +14,8 @@ import torch
 from torch import Tensor, nn
 import torch.nn.functional as F
 
-from factory.pecl_loss import PECLLoss, PECLLossOutput
-from models.proposition_model import ModelOutput, PropositionModel
+from proposition.losses.pecl import PECLLoss, PECLLossOutput
+from proposition.models.proposition_model import ModelOutput, PropositionModel
 
 
 @dataclass
