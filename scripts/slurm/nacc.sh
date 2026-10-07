@@ -1,5 +1,6 @@
 #!/bin/bash
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 echo "NODELIST="${SLURM_NODELIST}
 master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
@@ -12,13 +13,13 @@ echo "Rendezvous Endpoint: $MASTER_ADDR:$MASTER_PORT"
 
 srun -p medai_llm --quotatype=spot \
 --cpus-per-task=4 \
---gres=gpu:1 python main_rad.py \
---config ./configs/nacc.yaml \
+--gres=gpu:1 python "$ROOT_DIR/main_rad.py" \
+--config "$ROOT_DIR/configs/nacc.yaml" \
 --dataset nacc \
 --output_dir /your_path/RAD_clean/outputs/nacc11-rad-topk10-vision_res50-text_cbert \
 --loss_ratio 0.1 \
 --bert_model_name /your_path/huggingface/ClinicalBERT \
---guideline_path ./guideline/qwen_maxtoken2k_nacc11_4sources.jsonl \
+--guideline_path "$ROOT_DIR/guideline/qwen_maxtoken2k_nacc11_4sources.jsonl" \
 --max_length 512 \
 --embed_dim 768 \
 --contrast_ratio_text 0.1 \

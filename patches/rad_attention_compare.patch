@@ -1,0 +1,561 @@
+diff --git a/notebooks/K34_Proposition_clean.ipynb b/notebooks/K34_Proposition_clean.ipynb
+index 0ef7404..f6fc182 100644
+--- a/notebooks/K34_Proposition_clean.ipynb
++++ b/notebooks/K34_Proposition_clean.ipynb
+@@ -18,6 +18,7 @@
+     "5. Khởi chạy hoặc tiếp tục đúng thư mục chạy đó.\n",
+     "6. Kiểm tra checkpoint và metrics đã lưu trên Drive.\n",
+     "7. So sánh metrics với RAD gốc.\n",
++    "8. So sánh attention với RAD gốc.\n",
+     "\n",
+     "**Trước khi chạy:** chọn **Runtime → Change runtime type → GPU**.\n",
+     "\n",
+@@ -665,6 +666,66 @@
+     "display(table)\n",
+     "print(\"Best epoch — RAD:\", rad.get(\"best_epoch\"), \"| Mệnh đề:\", prop.get(\"best_epoch\"))\n"
+    ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 9. So sánh attention với RAD gốc\n",
++    "\n",
++    "Chạy sau khi lần chạy mệnh đề đã xong (đã có `checklist/test_proposition_evidence.npz`). `RUN_ID` ở ô 3 phải là lần chạy mệnh đề cần so.\n",
++    "\n",
++    "- `export_rad_attention.py` nạp `best.pt` của RAD, chạy lại đúng lượt test của RAD với `return_atten=True` và ghi `checklist/rad_attention_evidence.npz` vào thư mục lần chạy RAD. Không train, không sửa file nào của RAD. Script tự so xác suất chạy lại với `predictions/test_best.npz` của RAD; lệch là dừng.\n",
++    "- `compare_attention.py` chỉ đọc hai file evidence, ghi `attention_comparison/attention_comparison.json` (thống kê trên query của bệnh đúng) và `sample_XXXX/report.html` (ba heatmap cạnh nhau) vào `checklist/` của lần chạy mệnh đề.\n"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "execution_count": null,
++   "metadata": {},
++   "outputs": [],
++   "source": [
++    "import json\n",
++    "import os\n",
++    "import subprocess\n",
++    "import sys\n",
++    "import pandas as pd\n",
++    "\n",
++    "os.chdir(REPO_DIR)\n",
++    "RAD_RUN_DIR = Path(\"/content/drive/MyDrive/Cao học/RAD-outputs/skin-full-30ep/20261005_091021\")\n",
++    "RAD_CONFIG = RAD_RUN_DIR / \"skin-full-30ep.yaml\"   # config đã dùng cho lần chạy RAD (test_batch_size = 4)\n",
++    "PROP_EVIDENCE = RUN_DIR / \"checklist\" / \"test_proposition_evidence.npz\"\n",
++    "RAD_EVIDENCE = RAD_RUN_DIR / \"checklist\" / \"rad_attention_evidence.npz\"\n",
++    "for path in (RAD_RUN_DIR / \"checkpoints\" / \"best.pt\", RAD_CONFIG, PROP_EVIDENCE):\n",
++    "    assert path.is_file(), f\"Không tìm thấy {path}\"\n",
++    "\n",
++    "subprocess.run([\n",
++    "    sys.executable, \"proposition/visualization/export_rad_attention.py\",\n",
++    "    \"--rad_run_dir\", str(RAD_RUN_DIR),\n",
++    "    \"--rad_config\", str(RAD_CONFIG),\n",
++    "    \"--test_csv\", str(TEST_CSV),\n",
++    "    \"--image_root\", str(IMAGE_ROOT),\n",
++    "    \"--bert_model_name\", str(BERT_DIR),\n",
++    "    \"--guideline_path\", \"guideline/qwen_maxtoken2k_skincap47_4sources.jsonl\",\n",
++    "    \"--proposition_evidence\", str(PROP_EVIDENCE),\n",
++    "    \"--embed_dim\", \"768\",\n",
++    "    \"--max_length\", \"512\",\n",
++    "], check=True)\n",
++    "\n",
++    "subprocess.run([\n",
++    "    sys.executable, \"proposition/visualization/compare_attention.py\",\n",
++    "    \"--proposition_evidence\", str(PROP_EVIDENCE),\n",
++    "    \"--rad_evidence\", str(RAD_EVIDENCE),\n",
++    "    \"--bert_model_name\", str(BERT_DIR),\n",
++    "], check=True)\n",
++    "\n",
++    "OUT = RUN_DIR / \"checklist\" / \"attention_comparison\"\n",
++    "summary = json.loads((OUT / \"attention_comparison.json\").read_text(encoding=\"utf-8\"))\n",
++    "display(pd.DataFrame({k: summary[k] for k in (\"rad_guideline\", \"rad_label\", \"proposition\")}).round(4))\n",
++    "print(\"Báo cáo từng ca (mở trên Drive):\")\n",
++    "for report in sorted(OUT.glob(\"sample_*/report.html\")):\n",
++    "    print(\" \", report)\n"
++   ]
+   }
+  ],
+  "metadata": {
+diff --git a/proposition/visualization/compare_attention.py b/proposition/visualization/compare_attention.py
+new file mode 100644
+index 0000000..72ddff2
+--- /dev/null
++++ b/proposition/visualization/compare_attention.py
+@@ -0,0 +1,198 @@
++"""Compare attention of original RAD and the proposition model on the same test cases.
++
++Inputs are saved artifacts only (no model is loaded):
++- ``test_proposition_evidence.npz`` (+ ``proposition_index.json``, ``disease_index.json``)
++  written by ``main_proposition.py``;
++- ``rad_attention_evidence.npz`` written by ``export_rad_attention.py``.
++
++Outputs (default ``<proposition checklist dir>/attention_comparison/``):
++- ``attention_comparison.json``: summary statistics for RAD guideline, RAD label and the
++  proposition model, computed on the query of each sample's TRUE disease;
++- ``sample_XXXX/report.html``: side-by-side image heatmaps and caption highlighting for
++  the true disease, for every test case whose full attention was stored by both models.
++
++The proposition model has one query per proposition; its disease-level map is the
++uniform mean of the attention of that disease's propositions, mirroring the uniform
++mean used to build the disease score.
++"""
++
++from __future__ import annotations
++
++import argparse
++import html
++import json
++import math
++import sys
++from pathlib import Path
++from typing import Any
++
++import numpy as np
++from transformers import AutoTokenizer
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import render_attention as ra  # noqa: E402
++
++STREAMS = ("rad_guideline", "rad_label", "proposition")
++
++
++def _edge_positions(n_img: int) -> tuple[set[int], set[int]]:
++    side = math.isqrt(n_img)
++    bottom = set(range(n_img - side, n_img))
++    border = {r * side + c for r in range(side) for c in range(side)
++              if r in (0, side - 1) or c in (0, side - 1)}
++    return bottom, border
++
++
++def _top_shares(top_indices: np.ndarray, caption_mask: np.ndarray, n_img: int) -> dict[str, float]:
++    """Share of top-K positions on image / caption / PAD / bottom image row / image border."""
++
++    bottom, border = _edge_positions(n_img)
++    flat = top_indices.reshape(top_indices.shape[0], -1)
++    total = flat.size
++    is_image = flat < n_img
++    caption_pos = np.clip(flat - n_img, 0, caption_mask.shape[1] - 1)
++    is_real_caption = (~is_image) & (np.take_along_axis(caption_mask, caption_pos, axis=1) > 0)
++    return {
++        "top_k_on_image": float(is_image.sum() / total),
++        "top_k_on_caption": float(is_real_caption.sum() / total),
++        "top_k_on_pad": float(((~is_image) & ~is_real_caption).sum() / total),
++        "top_k_on_bottom_image_row": float(np.isin(flat, list(bottom)).sum() / total),
++        "top_k_on_image_border": float(np.isin(flat, list(border)).sum() / total),
++    }
++
++
++def _masses(attention: np.ndarray, caption_mask: np.ndarray, n_img: int) -> dict[str, float]:
++    """Mean attention mass on image / caption / PAD for full maps (K, L)."""
++
++    image = attention[:, :n_img].sum(-1)
++    caption = (attention[:, n_img:] * caption_mask).sum(-1)
++    return {"mass_image": float(image.mean()), "mass_caption": float(caption.mean()),
++            "mass_pad": float(np.clip(1.0 - image - caption, 0.0, None).mean())}
++
++
++def compare(args: argparse.Namespace) -> Path:
++    prop_path = Path(args.proposition_evidence)
++    checklist = prop_path.parent
++    kb = ra._read_json(checklist / "proposition_index.json")
++    diseases = [d["disease_id"] for d in ra._read_json(checklist / "disease_index.json")]
++    prop_disease = np.asarray([record["disease_index"] for record in kb])
++
++    prop = dict(np.load(prop_path, allow_pickle=False))
++    rad = dict(np.load(args.rad_evidence, allow_pickle=False))
++    if not np.array_equal(prop["image_paths"], rad["image_paths"]):
++        raise ValueError("the two artifacts do not list the same test images in the same order")
++    if not np.array_equal(prop["gt"], rad["gt"]):
++        raise ValueError("the two artifacts have different ground truth")
++
++    n_img = int(prop["image_token_count"][0])
++    caption_mask = prop["caption_attention_mask"].astype(np.float32)
++    truth = prop["gt"].argmax(1)
++    n = truth.shape[0]
++
++    # Summary statistics on the true-disease query of every test case.
++    summary: dict[str, Any] = {"test_cases": int(n), "image_tokens": n_img,
++                               "computed_on": "query of the true disease of each test case"}
++    for branch in ("guideline", "label"):
++        top = rad[f"{branch}_top_indices"][np.arange(n), truth]
++        summary[f"rad_{branch}"] = {
++            "mean_entropy": float(rad[f"{branch}_entropy"][np.arange(n), truth].mean()),
++            "mass_image": float(rad[f"{branch}_image_mass"][np.arange(n), truth].mean()),
++            "mass_caption": float(rad[f"{branch}_caption_mass"][np.arange(n), truth].mean()),
++            "mass_pad": float(rad[f"{branch}_pad_mass"][np.arange(n), truth].mean()),
++            **_top_shares(top, caption_mask, n_img),
++        }
++    prop_rows = [np.where(prop_disease == truth[i])[0] for i in range(n)]
++    entropies = [prop["attention_entropy"][i, rows].mean() for i, rows in enumerate(prop_rows)]
++    # Per-sample shares over all propositions of the true disease, then averaged so every case counts once.
++    per_sample = [_top_shares(prop["attention_top_indices"][i, prop_rows[i]].reshape(1, -1),
++                              caption_mask[i:i + 1], n_img) for i in range(n)]
++    summary["proposition"] = {"mean_entropy": float(np.mean(entropies)),
++                              **{key: float(np.mean([s[key] for s in per_sample])) for key in per_sample[0]}}
++
++    common = sorted(set(prop["full_attention_sample_indices"].tolist())
++                    & set(rad["full_attention_sample_indices"].tolist()))
++    position_prop = {int(s): k for k, s in enumerate(prop["full_attention_sample_indices"])}
++    position_rad = {int(s): k for k, s in enumerate(rad["full_attention_sample_indices"])}
++    if common:
++        full_prop = np.stack([prop["full_attention"][position_prop[s]][prop_disease == truth[s]].astype(np.float32).mean(0)
++                              for s in common])
++        masks_common = caption_mask[common]
++        summary["proposition"].update(_masses(full_prop, masks_common, n_img))
++        summary["full_attention_cases"] = common
++
++    output = Path(args.output_dir or checklist / "attention_comparison")
++    output.mkdir(parents=True, exist_ok=True)
++    (output / "attention_comparison.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
++
++    tokenizer = AutoTokenizer.from_pretrained(args.bert_model_name, do_lower_case=True)
++    samples = args.samples or common
++    for sample in samples:
++        if sample not in position_prop or sample not in position_rad:
++            raise ValueError(f"sample {sample} has no full attention in both artifacts; choose from {common}")
++        d = int(truth[sample])
++        maps = {
++            "rad_guideline": rad["guideline_full_attention"][position_rad[sample], d].astype(np.float32),
++            "rad_label": rad["label_full_attention"][position_rad[sample], d].astype(np.float32),
++            "proposition": prop["full_attention"][position_prop[sample]][prop_disease == d].astype(np.float32).mean(0),
++        }
++        probabilities = {
++            "rad_guideline": float(rad["guideline_pred"][sample, d]),
++            "rad_label": float(rad["label_pred"][sample, d]),
++            "proposition": float(prop["pred_proposition"][sample, d]),
++        }
++        top1 = {
++            "rad_guideline": diseases[int(rad["guideline_pred"][sample].argmax())],
++            "rad_label": diseases[int(rad["label_pred"][sample].argmax())],
++            "proposition": diseases[int(prop["pred_proposition"][sample].argmax())],
++        }
++        sample_dir = output / f"sample_{sample:04d}"
++        sample_dir.mkdir(parents=True, exist_ok=True)
++        cards = []
++        for stream in STREAMS:
++            attention = maps[stream]
++            image_file = sample_dir / f"{stream}.png"
++            ra._heatmap_overlay(str(prop["image_paths"][sample]), attention[:n_img], image_file, args.alpha)
++            caption_attention = attention[n_img:]
++            tokens = ra._caption_tokens(tokenizer, prop["caption_input_ids"][sample],
++                                        prop["caption_attention_mask"][sample], caption_attention)
++            mass = _masses(attention[None], caption_mask[sample:sample + 1], n_img)
++            note = ""
++            if stream.startswith("rad"):
++                note = f"<br><b>RAD query token position:</b> {int(rad['query_token_position'][sample])}"
++            else:
++                note = f"<br><b>Mean of {int((prop_disease == d).sum())} proposition maps</b>"
++            cards.append(f"""
++            <article class="card"><h3>{stream}</h3>
++              <p><b>P({html.escape(diseases[d])})</b> = {probabilities[stream]:.4f}; <b>top-1:</b> {html.escape(top1[stream])}
++              <br><b>attention mass</b> image {mass['mass_image']:.2f} · caption {mass['mass_caption']:.2f} · PAD {mass['mass_pad']:.2f}{note}</p>
++              <img src="{image_file.name}" alt="{stream} image attention">
++              <p class="caption">{ra._caption_html(tokens)}</p>
++            </article>""")
++        (sample_dir / "report.html").write_text(f"""<!doctype html><html><head><meta charset="utf-8">
++<title>Attention comparison {sample}</title><style>
++body {{ font-family: Arial, sans-serif; margin: 24px; color: #1f2937; }}
++.card {{ display:inline-block; vertical-align:top; width:32%; min-width:320px; margin:0 1% 16px 0; padding:12px;
++        box-sizing:border-box; border:1px solid #cbd5e1; border-radius:8px; background:#f8fafc; }}
++.card img {{ width:100%; border-radius:5px; }} .caption {{ line-height:2.1; background:white; padding:8px; }}
++</style></head><body>
++<h1>Sample {sample} — true disease: {html.escape(diseases[d])}</h1>
++<p>Image heatmaps and caption colours are min–max normalized within each map; compare the printed attention masses for absolute values.</p>
++{''.join(cards)}
++</body></html>""", encoding="utf-8")
++    print(f"Attention comparison written to {output}")
++    return output
++
++
++def build_parser() -> argparse.ArgumentParser:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--proposition_evidence", required=True, type=Path)
++    parser.add_argument("--rad_evidence", required=True, type=Path)
++    parser.add_argument("--bert_model_name", required=True)
++    parser.add_argument("--output_dir", type=Path)
++    parser.add_argument("--samples", nargs="+", type=int)
++    parser.add_argument("--alpha", type=float, default=0.45)
++    return parser
++
++
++if __name__ == "__main__":
++    compare(build_parser().parse_args())
+diff --git a/proposition/visualization/export_rad_attention.py b/proposition/visualization/export_rad_attention.py
+new file mode 100644
+index 0000000..9c8e9e1
+--- /dev/null
++++ b/proposition/visualization/export_rad_attention.py
+@@ -0,0 +1,253 @@
++"""Export test-set cross-attention of a trained *original* RAD checkpoint.
++
++This script is read-only with respect to RAD: it imports RAD classes and
++functions unchanged, loads ``checkpoints/best.pt`` from a finished ``main_rad.py``
++run, and replays the exact RAD test forward pass (``engine.train_rad.valid_on_ICD``)
++with ``return_atten=True`` on both decoders. Nothing is trained.
++
++What RAD's attention is (documented in the output schema):
++- the cross-attention of the LAST of the 4 decoder layers, averaged over its 4 heads,
++  shape (N, C, L) where L = image patches + caption tokens;
++- caption PAD tokens are NOT masked by RAD, so part of the mass may fall on PAD;
++- RAD reads the 16-token query slab in batch-position order: sample at batch
++  position b uses query token (b mod 16). The batch size must therefore equal the
++  ``test_batch_size`` of the RAD run; the token position is stored per sample.
++
++The script checks that the replayed probabilities equal ``predictions/test_best.npz``
++written by RAD; if they do not, it stops rather than export a different model.
++"""
++
++from __future__ import annotations
++
++import argparse
++import json
++import os
++from pathlib import Path
++from typing import Any
++
++import numpy as np
++import pandas as pd
++import torch
++import yaml
++from torch.utils.data import DataLoader, SequentialSampler
++from transformers import AutoTokenizer
++
++from dataset.test_dataset import Skin_Test_Dataset
++from engine.train_rad import get_text_features_bert
++from models.clip_tqn import ModelRes, TQN_Model_fusion, Text_Encoder_Bert
++
++# Constants copied from engine/train_rad.py::valid_on_ICD for the skin dataset.
++LABEL_SEQUENCE_LENGTH = 16
++GUIDELINE_SEQUENCE_LENGTH = 16
++TEXT_SEQUENCE_LENGTH = 512
++BRANCHES = ("guideline", "label")
++
++
++def _labels(csv_path: str) -> list[str]:
++    return list(pd.read_csv(csv_path, nrows=0).columns[2:])
++
++
++def _guidelines(path: str, labels: list[str]) -> list[str]:
++    texts: list[str] = []
++    with open(path, "r", encoding="utf-8") as handle:
++        for index, line in enumerate(handle):
++            record = json.loads(line)
++            if record["query"] != labels[index]:
++                raise RuntimeError(f"guideline {index} ({record['query']!r}) does not match label {labels[index]!r}")
++            texts.append(record["guideline_1_content"])
++    if len(texts) != len(labels):
++        raise RuntimeError("guideline count does not match label count")
++    return texts
++
++
++def _entropy(attention: torch.Tensor) -> torch.Tensor:
++    safe = attention.clamp_min(torch.finfo(attention.dtype).tiny)
++    return -(safe * safe.log()).sum(-1) / float(np.log(attention.shape[-1]))
++
++
++def _image_paths(dataset: Any) -> list[str]:
++    root = Path(dataset.image_root) if getattr(dataset, "image_root", None) else None
++    return [
++        str(Path(str(p)) if Path(str(p)).is_absolute() or root is None else root / str(p))
++        for p in dataset.img_path_list
++    ]
++
++
++@torch.no_grad()
++def export(args: argparse.Namespace) -> Path:
++    run_dir = Path(args.rad_run_dir)
++    device = torch.device(args.device)
++    config = yaml.safe_load(Path(args.rad_config).read_text(encoding="utf-8"))
++    batch_size = int(args.batch_size or config["test_batch_size"])
++
++    labels = _labels(args.test_csv)
++    guideline_texts = _guidelines(args.guideline_path, labels)
++    tokenizer = AutoTokenizer.from_pretrained(args.bert_model_name, do_lower_case=True)
++
++    image_encoder = ModelRes(res_base_model=args.image_encoder_name, embed_dim=args.embed_dim).to(device)
++    text_encoder = Text_Encoder_Bert(bert_model_name=args.bert_model_name, embed_dim=args.embed_dim).to(device)
++    model = TQN_Model_fusion(embed_dim=args.embed_dim).to(device)
++    model_guideline = TQN_Model_fusion(embed_dim=args.embed_dim).to(device)
++    state = torch.load(run_dir / "checkpoints" / "best.pt", map_location="cpu", weights_only=False)
++    model.load_state_dict(state["model"])
++    model_guideline.load_state_dict(state["model_guideline"])
++    image_encoder.load_state_dict(state["image_encoder"])
++    text_encoder.load_state_dict(state["text_encoder"])
++    for module in (model, model_guideline, image_encoder, text_encoder):
++        module.eval()
++
++    dataset = Skin_Test_Dataset(args.test_csv, config["image_res"], args.image_root)
++    loader = DataLoader(dataset, batch_size=batch_size, sampler=SequentialSampler(dataset),
++                        num_workers=int(config.get("test_num_workers", 0)), drop_last=False)
++
++    # Static queries, computed once exactly as in valid_on_ICD.
++    _, label_hidden = get_text_features_bert(text_encoder, labels, tokenizer, device, max_length=args.max_length)
++    _, guideline_hidden = get_text_features_bert(text_encoder, guideline_texts, tokenizer, device, max_length=args.max_length)
++    queries = {
++        "label": (model, label_hidden[:, :LABEL_SEQUENCE_LENGTH, :]),
++        "guideline": (model_guideline, guideline_hidden[:, :GUIDELINE_SEQUENCE_LENGTH, :]),
++    }
++
++    full_indices = np.asarray([], dtype=np.int64)
++    if args.proposition_evidence:
++        with np.load(args.proposition_evidence) as values:
++            full_indices = values["full_attention_sample_indices"].astype(np.int64)
++    full_set = set(full_indices.tolist())
++
++    collected: dict[str, list[np.ndarray]] = {"gt": [], "caption_input_ids": [], "caption_attention_mask": [],
++                                              "query_token_position": []}
++    for branch in BRANCHES:
++        for key in ("pred", "top_indices", "top_weights", "entropy", "image_mass", "caption_mass", "pad_mass"):
++            collected[f"{branch}_{key}"] = []
++    full_attention = {branch: [] for branch in BRANCHES}
++    image_token_count = None
++    offset = 0
++
++    for sample in loader:
++        image = sample["image"].to(device, non_blocking=True)
++        gt = sample["label"].float()
++        image_features, _ = image_encoder(image)
++        tokens = tokenizer(list(sample["entity"]), add_special_tokens=True, padding="max_length",
++                           truncation=True, max_length=args.max_length, return_tensors="pt").to(device)
++        _, text_hidden = text_encoder.encode_text(tokens)
++        fusion = torch.cat((image_features, text_hidden[:, :TEXT_SEQUENCE_LENGTH, :]), dim=1)
++        n_img = image_features.shape[1]
++        image_token_count = n_img
++        caption_mask = tokens["attention_mask"][:, :TEXT_SEQUENCE_LENGTH].bool()
++        current = image.shape[0]
++
++        for branch, (decoder, query) in queries.items():
++            logits, attention = decoder(query, fusion, return_atten=True)
++            attention = attention.float()  # (B, C, L): last layer, head-averaged
++            probabilities = torch.sigmoid(logits)[:, :, 0]
++            k = min(args.attention_topk, attention.shape[-1])
++            top_w, top_i = torch.topk(attention, k=k, dim=-1)
++            image_mass = attention[..., :n_img].sum(-1)
++            caption_part = attention[..., n_img:]
++            caption_mass = (caption_part * caption_mask[:, None, :]).sum(-1)
++            collected[f"{branch}_pred"].append(probabilities.cpu().numpy())
++            collected[f"{branch}_top_indices"].append(top_i.to(torch.int32).cpu().numpy())
++            collected[f"{branch}_top_weights"].append(top_w.cpu().numpy())
++            collected[f"{branch}_entropy"].append(_entropy(attention).cpu().numpy())
++            collected[f"{branch}_image_mass"].append(image_mass.cpu().numpy())
++            collected[f"{branch}_caption_mass"].append(caption_mass.cpu().numpy())
++            collected[f"{branch}_pad_mass"].append((1.0 - image_mass - caption_mass).cpu().numpy())
++            for local in range(current):
++                if offset + local in full_set:
++                    full_attention[branch].append(attention[local].to(torch.float16).cpu().numpy())
++
++        collected["gt"].append(gt.numpy())
++        collected["caption_input_ids"].append(tokens["input_ids"].cpu().numpy())
++        collected["caption_attention_mask"].append(tokens["attention_mask"].to(torch.int8).cpu().numpy())
++        collected["query_token_position"].append(
++            (np.arange(current) % LABEL_SEQUENCE_LENGTH).astype(np.int16))
++        offset += current
++
++    arrays = {key: np.concatenate(value, axis=0) for key, value in collected.items()}
++
++    # Replay check against the predictions RAD saved after its own test pass.
++    saved_path = run_dir / "predictions" / "test_best.npz"
++    if saved_path.is_file():
++        with np.load(saved_path) as saved:
++            for branch, saved_key in (("label", "pred_label"), ("guideline", "pred_guideline")):
++                difference = float(np.abs(saved[saved_key] - arrays[f"{branch}_pred"]).max())
++                if difference > args.replay_tolerance:
++                    raise RuntimeError(
++                        f"replayed {branch} probabilities differ from {saved_path} by {difference:.2e}; "
++                        "check checkpoint, config, test CSV and batch size"
++                    )
++            replay_note = f"matched {saved_path.name} within {args.replay_tolerance}"
++    else:
++        replay_note = "predictions/test_best.npz not found; replay not verified"
++
++    final_metrics_path = run_dir / "final_metrics.json"
++    if final_metrics_path.is_file():
++        weights = np.asarray(json.loads(final_metrics_path.read_text(encoding="utf-8"))["fusion_weights"], dtype=np.float32)
++        arrays["fused_pred"] = arrays["label_pred"] * weights[None, :] + arrays["guideline_pred"] * (1 - weights[None, :])
++        arrays["fusion_weights"] = weights
++
++    present = sorted(full_set)
++    arrays["full_attention_sample_indices"] = np.asarray([i for i in present if i < offset], dtype=np.int64)
++    for branch in BRANCHES:
++        arrays[f"{branch}_full_attention"] = (
++            np.stack(full_attention[branch]) if full_attention[branch] else np.zeros((0, 0, 0), np.float16)
++        )
++    arrays["image_token_count"] = np.full(offset, image_token_count, dtype=np.int32)
++    arrays["image_paths"] = np.asarray(_image_paths(dataset), dtype=str)
++
++    output_dir = Path(args.output_dir or run_dir / "checklist")
++    output_dir.mkdir(parents=True, exist_ok=True)
++    output = output_dir / "rad_attention_evidence.npz"
++    temporary = output.with_suffix(".tmp.npz")
++    np.savez_compressed(temporary, **arrays)
++    os.replace(temporary, output)
++
++    schema = {
++        "artifact": output.name,
++        "model": "original RAD (main_rad.py), unchanged",
++        "attention_definition": "cross-attention of the last decoder layer, averaged over 4 heads",
++        "branches": list(BRANCHES),
++        "query_count": len(labels),
++        "disease_ids": labels,
++        "memory_layout": {"image": [0, image_token_count],
++                          "caption": [image_token_count, image_token_count + TEXT_SEQUENCE_LENGTH]},
++        "caption_pad_masked": False,
++        "query_token_position": "RAD query token used for each sample = batch position mod 16",
++        "test_batch_size": batch_size,
++        "replay_check": replay_note,
++        "fields": {
++            "{branch}_pred": "sigmoid probability per disease (N, C)",
++            "{branch}_top_indices / _top_weights": "top memory positions per disease query (N, C, K)",
++            "{branch}_entropy": "normalized attention entropy over all L positions (N, C)",
++            "{branch}_image_mass / _caption_mass / _pad_mass": "attention mass on image patches, real caption tokens, caption PAD (N, C)",
++            "{branch}_full_attention": "full attention for full_attention_sample_indices (K, C, L), float16",
++            "fused_pred": "RAD fused probability using fusion_weights from final_metrics.json (N, C)",
++        },
++    }
++    output.with_suffix(".schema.json").write_text(json.dumps(schema, ensure_ascii=False, indent=2), encoding="utf-8")
++    print(f"RAD attention exported to {output} ({replay_note})")
++    return output
++
++
++def build_parser() -> argparse.ArgumentParser:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--rad_run_dir", required=True, help="finished main_rad.py output directory")
++    parser.add_argument("--rad_config", required=True, help="the YAML config used by that RAD run")
++    parser.add_argument("--test_csv", required=True)
++    parser.add_argument("--image_root", required=True)
++    parser.add_argument("--bert_model_name", required=True)
++    parser.add_argument("--guideline_path", default="guideline/qwen_maxtoken2k_skincap47_4sources.jsonl")
++    parser.add_argument("--proposition_evidence", help="test_proposition_evidence.npz; reuses its full-attention samples")
++    parser.add_argument("--output_dir", help="default: <rad_run_dir>/checklist")
++    parser.add_argument("--batch_size", type=int, help="default: test_batch_size of the RAD config")
++    parser.add_argument("--image_encoder_name", default="resnet50")
++    parser.add_argument("--embed_dim", type=int, default=768)
++    parser.add_argument("--max_length", type=int, default=512)
++    parser.add_argument("--attention_topk", type=int, default=10)
++    parser.add_argument("--replay_tolerance", type=float, default=1e-4)
++    parser.add_argument("--device", default="cuda")
++    return parser
++
++
++if __name__ == "__main__":
++    export(build_parser().parse_args())
+diff --git a/proposition/visualization/render_attention.py b/proposition/visualization/render_attention.py
+index 18bb743..8b52a97 100644
+--- a/proposition/visualization/render_attention.py
++++ b/proposition/visualization/render_attention.py
+@@ -58,7 +58,13 @@ def _caption_tokens(tokenizer: Any, ids: np.ndarray, mask: np.ndarray, attention
+     special = set(tokenizer.all_special_tokens)
+     result: list[tuple[str, float]] = []
+     for token, weight in zip(raw_tokens, attention[:valid], strict=True):
+-        if token not in special:
++        if token in special:
++            continue
++        # Merge WordPiece continuations ("##oll") into the preceding word for display.
++        if token.startswith("##") and result:
++            previous_token, previous_weight = result[-1]
++            result[-1] = (previous_token + token[2:], previous_weight + float(weight))
++        else:
+             result.append((token, float(weight)))
+     return result
+ 

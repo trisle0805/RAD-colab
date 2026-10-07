@@ -83,12 +83,22 @@ Due to licensing restrictions, we cannot redistribute the datasets directly. Bel
 
 - S3. The retrieved and refined guidelines for each dataset are provided in the `guideline` directory. To construct your own retrieval knowledge corpus, please refer to the details in our paper.
 
-- S4. Run the sample scripts in the main directory. Taking the MIMIC-ICD53 dataset as an example, use the following command:
+- S4. Run the sample Slurm scripts in `scripts/slurm`. Taking the MIMIC-ICD53 dataset as an example, use the following command:
     ```
     cd /your_path/RAD
-    sh icd.sh
+    bash scripts/slurm/icd.sh
     ```
     Note that our experiments are conducted on the `slurm` system; you can also run the Python file directly. And the `batch size` in `configs` should be adjusted according to the computing resources.
+
+## Repository layout
+
+- `main_rad.py`, `main_rad_icd.py`, `main_proposition.py`: training and evaluation entry points.
+- `configs/`, `dataset/`, `engine/`, `models/`, `proposition/`: active experiment code and configuration.
+- `notebooks/`: Colab workflows.
+- `scripts/slurm/`: original Slurm launch scripts.
+- `requirements/`: focused environment files, including the Colab SkinCAP dependencies.
+- `docs/`: guides, design notes, metrics documentation, and archived result tables.
+- `patches/`: historical development patches.
 
 # Citation
 If you find our work useful for your research or project, please consider giving a star ⭐ or a citation.
