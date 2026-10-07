@@ -181,7 +181,12 @@ def capture_rng_state(pecl_generator: torch.Generator) -> dict[str, Any]:
 
 
 def restore_rng_state(state: Mapping[str, Any], pecl_generator: torch.Generator) -> None:
-    """Restore all RNG streams captured by :func:`capture_rng_state`."""
+    """Restore all RNG streams captured by :func:`capture_rng_state`.
+
+    RNG tensors can be deserialized as non-``uint8`` tensors when a
+    checkpoint is moved between PyTorch/Colab environments. Normalize them
+    before passing them to PyTorch's RNG APIs, which require byte tensors.
+    """
 
     required = {"python", "numpy", "torch_cpu", "torch_cuda", "pecl_generator"}
     missing = required.difference(state)
@@ -189,10 +194,18 @@ def restore_rng_state(state: Mapping[str, Any], pecl_generator: torch.Generator)
         raise ValueError(f"checkpoint RNG state is missing: {sorted(missing)}")
     random.setstate(state["python"])
     np.random.set_state(state["numpy"])
-    torch.set_rng_state(state["torch_cpu"])
+
+    torch_cpu_state = torch.as_tensor(state["torch_cpu"], dtype=torch.uint8, device="cpu")
+    torch.set_rng_state(torch_cpu_state)
     if torch.cuda.is_available() and state["torch_cuda"]:
-        torch.cuda.set_rng_state_all(state["torch_cuda"])
-    pecl_generator.set_state(state["pecl_generator"])
+        cuda_states = [
+            torch.as_tensor(cuda_state, dtype=torch.uint8, device="cpu")
+            for cuda_state in state["torch_cuda"]
+        ]
+        torch.cuda.set_rng_state_all(cuda_states)
+
+    pecl_state = torch.as_tensor(state["pecl_generator"], dtype=torch.uint8, device="cpu")
+    pecl_generator.set_state(pecl_state)
 
 
 def save_checkpoint(path: str | Path, state: Mapping[str, Any]) -> None:
