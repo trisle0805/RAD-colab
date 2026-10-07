@@ -148,10 +148,27 @@ def export(args: argparse.Namespace) -> Path:
         "guideline": (model_guideline, guideline_hidden[:, :GUIDELINE_SEQUENCE_LENGTH, :]),
     }
 
-    selected_full_indices = np.empty(0, dtype=np.int64)
+    selected_index_sources: list[np.ndarray] = []
     if args.proposition_evidence:
         with np.load(args.proposition_evidence, allow_pickle=False) as evidence:
-            selected_full_indices = evidence["full_attention_sample_indices"].astype(np.int64)
+            if "full_attention_sample_indices" not in evidence:
+                raise KeyError(
+                    f"{args.proposition_evidence} does not contain full_attention_sample_indices."
+                )
+            selected_index_sources.append(evidence["full_attention_sample_indices"].astype(np.int64))
+    if args.full_attention_indices:
+        selected_index_sources.append(np.asarray(args.full_attention_indices, dtype=np.int64))
+    if args.full_attention_first_n:
+        selected_index_sources.append(
+            np.arange(min(args.full_attention_first_n, len(dataset)), dtype=np.int64)
+        )
+    selected_full_indices = (
+        np.unique(np.concatenate(selected_index_sources))
+        if selected_index_sources
+        else np.empty(0, dtype=np.int64)
+    )
+    if np.any(selected_full_indices < 0) or np.any(selected_full_indices >= len(dataset)):
+        raise IndexError("A requested full-attention sample index is outside the RAD test set.")
     selected_full_set = set(selected_full_indices.tolist())
 
     collected: dict[str, list[np.ndarray]] = {
@@ -249,11 +266,7 @@ def export(args: argparse.Namespace) -> Path:
         )
         arrays["fusion_weights"] = fusion_weights
 
-    saved_full_indices = np.asarray(
-        [index for index in sorted(selected_full_set) if 0 <= index < offset], dtype=np.int64
-    )
-    if len(saved_full_indices) != len(selected_full_set):
-        raise IndexError("A requested proposition evidence sample index is outside the RAD test set.")
+    saved_full_indices = np.asarray(sorted(selected_full_set), dtype=np.int64)
     arrays["full_attention_sample_indices"] = saved_full_indices
     for branch in BRANCHES:
         arrays[f"{branch}_full_attention"] = (
@@ -310,7 +323,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--image_root", required=True, type=Path)
     parser.add_argument("--bert_model_name", required=True)
     parser.add_argument("--guideline_path", default="guideline/qwen_maxtoken2k_skincap47_4sources.jsonl")
-    parser.add_argument("--proposition_evidence", type=Path)
+    parser.add_argument(
+        "--proposition_evidence",
+        type=Path,
+        help="Optional proposition artifact whose selected full-attention samples are aligned to RAD.",
+    )
+    parser.add_argument(
+        "--full_attention_indices",
+        nargs="+",
+        type=int,
+        help="Test-set indices for which to store complete RAD attention maps.",
+    )
+    parser.add_argument(
+        "--full_attention_first_n",
+        type=int,
+        default=0,
+        help="Store complete maps for the first N test samples (combined with explicit indices).",
+    )
     parser.add_argument("--output_dir", type=Path)
     parser.add_argument("--batch_size", type=int)
     parser.add_argument("--image_encoder_name", default="resnet50")
