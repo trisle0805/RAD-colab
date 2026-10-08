@@ -23,7 +23,7 @@ def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
     os.replace(temporary, path)
 
 
-    def _load_proposition_index(path: Path, query_count: int) -> tuple[np.ndarray, np.ndarray, dict[int, str]]:
+def _load_proposition_index(path: Path, query_count: int) -> tuple[np.ndarray, np.ndarray, dict[int, str]]:
     with path.open(encoding="utf-8") as handle:
         index = json.load(handle)
     if not isinstance(index, list) or len(index) != query_count:
@@ -32,14 +32,14 @@ def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
             f"(expected {query_count}, found {len(index) if isinstance(index, list) else 'non-list'})"
         )
     try:
-            diseases = np.asarray([int(entry["disease_index"]) for entry in index], dtype=np.int64)
-            polarities = np.asarray([int(entry["polarity"]) for entry in index], dtype=np.int8)
-            if not np.all((polarities == 1) | (polarities == -1)):
-                raise ValueError("each proposition index polarity must be 1 or -1")
-            disease_ids = {int(entry["disease_index"]): str(entry["disease_id"]) for entry in index}
-            return diseases, polarities, disease_ids
+        diseases = np.asarray([int(entry["disease_index"]) for entry in index], dtype=np.int64)
+        polarities = np.asarray([int(entry["polarity"]) for entry in index], dtype=np.int8)
+        disease_ids = {int(entry["disease_index"]): str(entry["disease_id"]) for entry in index}
     except (KeyError, TypeError, ValueError) as exc:
-        raise ValueError("each proposition index entry needs an integer disease_index") from exc
+        raise ValueError("each proposition index entry needs disease_index, disease_id and polarity") from exc
+    if not np.all((polarities == 1) | (polarities == -1)):
+        raise ValueError("each proposition index polarity must be 1 or -1")
+    return diseases, polarities, disease_ids
 
 
 def _share_above(values: np.ndarray, threshold: float) -> float | None:
@@ -62,7 +62,7 @@ def compute_proposition_discrimination_from_evidence(
     support = np.asarray(evidence["support"])
     pred = np.asarray(evidence["pred_proposition"])
     diseases = np.asarray(proposition_diseases, dtype=np.int64)
-        polarities = np.asarray(proposition_polarities, dtype=np.int8)
+    polarities = np.asarray(proposition_polarities, dtype=np.int8)
     compatibility = np.asarray(evidence["compatibility"])
     if support.ndim != 2 or compatibility.shape != support.shape:
         raise ValueError("support and compatibility must have matching shape (N, J)")
@@ -70,8 +70,8 @@ def compute_proposition_discrimination_from_evidence(
         raise ValueError("pred_proposition must have shape (N, C) matching support")
     if diseases.shape != (support.shape[1],):
         raise ValueError("proposition disease indices must align with the support axis")
-        if polarities.shape != (support.shape[1],) or not np.all((polarities == 1) | (polarities == -1)):
-            raise ValueError("proposition polarities must align with support and be 1 or -1")
+    if polarities.shape != (support.shape[1],) or not np.all((polarities == 1) | (polarities == -1)):
+        raise ValueError("proposition polarities must align with support and be 1 or -1")
     if support.shape[0] == 0:
         raise ValueError("evidence contains no test cases")
     if diseases.min() < 0 or diseases.max() >= pred.shape[1]:
@@ -89,7 +89,7 @@ def compute_proposition_discrimination_from_evidence(
         own_support = support[case_index, own]
         if own_support.size:
             within_stds.append(float(np.std(own_support)))
-                positive = polarities[own] == 1
+            positive = polarities[own] == 1
             top1_positive.append(own_support[positive])
             top1_negative.append(own_support[~positive])
         other.append(support[case_index, ~own])

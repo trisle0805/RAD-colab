@@ -113,7 +113,14 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
         self.query_level = query_level
         self.use_label_branch = use_label_branch
         self.apply_fourier_augmentation = apply_fourier_augmentation
-        self.frozen_unique_pooled = frozen_unique_pooled
+        if frozen_unique_pooled is not None and frozen_unique_pooled.shape[0] != len(kb.unique_texts):
+            raise ValueError(
+                "frozen_unique_pooled must have one row per KB unique text "
+                f"({len(kb.unique_texts)}), got {frozen_unique_pooled.shape[0]}"
+            )
+        self.frozen_unique_pooled = (
+            None if frozen_unique_pooled is None else frozen_unique_pooled.detach().to(device)
+        )
 
     def __iter__(self) -> Iterator[EncodedBatch]:
         for raw in self.raw_batches:
@@ -144,7 +151,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
                     _to_device(self.knowledge_tokens.unique, self.device)
                 )
             else:
-                unique_pooled = self.frozen_unique_pooled.to(self.device)
+                unique_pooled = self.frozen_unique_pooled
             align_to_unique = torch.empty(len(self.kb.unique_alignment_texts), dtype=torch.long)
             align_to_unique[self.kb.align_unique_index] = self.kb.align_text_index
             alignment_pooled = unique_pooled[align_to_unique.to(self.device)]

@@ -109,30 +109,30 @@ def test_encoded_batch_stream_builds_memory_mask_and_keeps_gradients(tmp_path) -
     assert text_encoder.scale.grad is not None
 
 
-    def test_none_frozen_queries_preserves_default_stream_outputs(tmp_path) -> None:
-        kb = _kb(tmp_path)
-        tokenizer = FakeTokenizer()
-        prepared = prepare_knowledge_tokens(tokenizer, kb)
-        image_encoder = FakeImageEncoder(4)
-        text_encoder = FakeTextEncoder(4)
-        raw = [{
-            "image": torch.zeros(2, 3, 4, 4),
-            "label": torch.tensor([[1, 0], [0, 1]]),
-            "entity": ["short", "two words"],
-        }]
+def test_none_frozen_queries_preserves_default_stream_outputs(tmp_path) -> None:
+    kb = _kb(tmp_path)
+    tokenizer = FakeTokenizer()
+    prepared = prepare_knowledge_tokens(tokenizer, kb)
+    image_encoder = FakeImageEncoder(4)
+    text_encoder = FakeTextEncoder(4)
+    raw = [{
+        "image": torch.zeros(2, 3, 4, 4),
+        "label": torch.tensor([[1, 0], [0, 1]]),
+        "entity": ["short", "two words"],
+    }]
 
-        default_batch = next(iter(EncodedBatchStream(
-            raw, image_encoder, text_encoder, tokenizer, kb, prepared,
-            torch.device("cpu"), caption_max_length=5,
-        )))
-        explicit_none_batch = next(iter(EncodedBatchStream(
-            raw, image_encoder, text_encoder, tokenizer, kb, prepared,
-            torch.device("cpu"), caption_max_length=5, frozen_unique_pooled=None,
-        )))
+    default_batch = next(iter(EncodedBatchStream(
+        raw, image_encoder, text_encoder, tokenizer, kb, prepared,
+        torch.device("cpu"), caption_max_length=5,
+    )))
+    explicit_none_batch = next(iter(EncodedBatchStream(
+        raw, image_encoder, text_encoder, tokenizer, kb, prepared,
+        torch.device("cpu"), caption_max_length=5, frozen_unique_pooled=None,
+    )))
 
-        assert torch.equal(default_batch.query, explicit_none_batch.query)
-        assert torch.equal(default_batch.alignment_prototypes, explicit_none_batch.alignment_prototypes)
-        assert torch.equal(default_batch.memory, explicit_none_batch.memory)
+    assert torch.equal(default_batch.query, explicit_none_batch.query)
+    assert torch.equal(default_batch.alignment_prototypes, explicit_none_batch.alignment_prototypes)
+    assert torch.equal(default_batch.memory, explicit_none_batch.memory)
 
 
 def test_frozen_unique_queries_remain_identical_after_caption_encoder_update(tmp_path) -> None:
@@ -141,7 +141,7 @@ def test_frozen_unique_queries_remain_identical_after_caption_encoder_update(tmp
     prepared = prepare_knowledge_tokens(tokenizer, kb)
     image_encoder = FakeImageEncoder(4)
     text_encoder = FakeTextEncoder(4)
-    frozen = torch.tensor([[1.0, 2.0, 3.0, 4.0], [-1.0, -2.0, -3.0, -4.0]])
+    frozen = torch.arange(len(kb.unique_texts) * 4, dtype=torch.float32).reshape(-1, 4)
     raw = [
         {
             "image": torch.zeros(1, 3, 4, 4),
@@ -169,4 +169,7 @@ def test_frozen_unique_queries_remain_identical_after_caption_encoder_update(tmp
 
     assert torch.equal(first.query, frozen[kb.query_text_index])
     assert torch.equal(first.query, second.query)
-    assert torch.equal(first.alignment_prototypes, frozen[kb.align_text_index])
+    align_to_unique = torch.empty(len(kb.unique_alignment_texts), dtype=torch.long)
+    align_to_unique[kb.align_unique_index] = kb.align_text_index
+    assert torch.equal(first.alignment_prototypes, frozen[align_to_unique])
+    assert not first.query.requires_grad
