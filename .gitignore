@@ -7,6 +7,9 @@
 __pycache__/
 *.py[cod]
 
+# Training and evaluation results
+result/
+
 # Regenerable KB-pipeline artifacts
 kb_builder/outputs/units.jsonl
 kb_builder/outputs/extract/*.prompt.txt
