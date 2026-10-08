@@ -114,6 +114,24 @@ def test_forward_weights_modalities_and_detaches_only_image_prototypes() -> None
     assert prototypes_image_only.grad is None
 
 
+def test_forward_can_detach_text_prototypes() -> None:
+    module = PECLLoss(
+        (torch.tensor([0, 1]), torch.tensor([1, 2]), torch.tensor([3])),
+        4,
+        detach_text_prototypes=True,
+    )
+    text = torch.randn(2, 5, requires_grad=True)
+    image = torch.randn(2, 5, requires_grad=True)
+    prototypes = torch.randn(4, 5, requires_grad=True)
+    labels = torch.tensor([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+
+    module(text, image, prototypes, labels).total.backward()
+
+    assert text.grad is not None and torch.count_nonzero(text.grad) > 0
+    assert image.grad is not None and torch.count_nonzero(image.grad) > 0
+    assert prototypes.grad is None
+
+
 def test_zero_valid_samples_returns_differentiable_zero() -> None:
     module = _loss()
     features = torch.randn(2, 4, requires_grad=True)

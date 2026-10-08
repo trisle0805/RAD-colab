@@ -23,7 +23,7 @@ import pandas as pd
 import torch
 import yaml
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from transformers import AutoTokenizer
+from transformers import AutoModel, AutoTokenizer
 
 from dataset.dataset_entity import Skin_Train_Dataset
 from dataset.test_dataset import Skin_Test_Dataset
@@ -103,7 +103,10 @@ def _dataset_image_paths(dataset: Any) -> list[str]:
     return paths
 
 
-def _make_stream(loader, image_encoder, text_encoder, tokenizer, kb, tokens, device, args, *, training: bool = False):
+def _make_stream(
+    loader, image_encoder, text_encoder, tokenizer, kb, tokens, device, args, *,
+    training: bool = False, frozen_unique_pooled: torch.Tensor | None = None,
+):
     return EncodedBatchStream(
         loader,
         image_encoder,
@@ -116,14 +119,64 @@ def _make_stream(loader, image_encoder, text_encoder, tokenizer, kb, tokens, dev
         query_level=args.query_level,
         use_label_branch=not args.no_label_branch,
         apply_fourier_augmentation=training,
+        frozen_unique_pooled=frozen_unique_pooled,
     )
+
+
+def _build_frozen_proposition_queries(
+    bert_model_name: str,
+    unique_tokens: Any,
+    *,
+    embed_dim: int,
+    device: torch.device,
+) -> torch.Tensor:
+    """Encode static proposition texts once with the original ClinicalBERT CLS vectors."""
+
+    frozen_encoder = AutoModel.from_pretrained(bert_model_name).to(device)
+    frozen_encoder.eval()
+    try:
+        with torch.no_grad():
+            encoded = frozen_encoder(**{
+                name: value.to(device) for name, value in unique_tokens.items()
+            })
+            frozen = encoded.last_hidden_state[:, 0, :]
+            frozen = frozen - frozen.mean(dim=0, keepdim=True)
+        if frozen.shape[1] != embed_dim:
+            raise ValueError(
+                "frozen proposition query dimension "
+                f"{frozen.shape[1]} does not match --embed_dim {embed_dim}"
+            )
+        return frozen.detach().cpu()
+    finally:
+        del frozen_encoder
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+
+
+def _validate_resume_freeze_config(
+    checkpoint: dict[str, Any], freeze_proposition_queries: bool,
+) -> None:
+    """Reject resumes that would change the static proposition-query regime."""
+
+    if "freeze_proposition_queries" not in checkpoint:
+        saved = False
+    else:
+        saved = bool(checkpoint["freeze_proposition_queries"])
+    if saved != freeze_proposition_queries:
+        raise ValueError(
+            "--freeze_proposition_queries differs from the checkpoint setting "
+            f"(checkpoint={saved}, requested={freeze_proposition_queries})"
+        )
+    if saved and "frozen_proposition_queries" not in checkpoint:
+        raise ValueError("checkpoint enables frozen proposition queries but has no saved tensor")
 
 
 def _checkpoint_state(
     model, image_encoder, text_encoder, optimizer, scheduler, epoch, metrics,
-    best_epoch, best_score, generator, config,
+    best_epoch, best_score, generator, config, *,
+    freeze_proposition_queries: bool, frozen_proposition_queries: torch.Tensor | None,
 ):
-    return {
+    state = {
         "model": model.state_dict(),
         "image_encoder": image_encoder.state_dict(),
         "text_encoder": text_encoder.state_dict(),
@@ -135,7 +188,11 @@ def _checkpoint_state(
         "best_validation_score": best_score,
         "rng_state": capture_rng_state(generator),
         "config": config,
+        "freeze_proposition_queries": freeze_proposition_queries,
     }
+    if frozen_proposition_queries is not None:
+        state["frozen_proposition_queries"] = frozen_proposition_queries.detach().cpu()
+    return state
 
 
 def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
@@ -145,6 +202,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         raise RuntimeError("CUDA was requested but is unavailable")
     if args.clip_ratio != 0:
         raise NotImplementedError("ClipLoss is reserved for a later explicit ablation")
+    if args.freeze_proposition_queries and args.query_level == "disease":
+        raise NotImplementedError(
+            "--freeze_proposition_queries is not supported with --query_level disease"
+        )
 
     seed_everything(args.seed)
     device = torch.device(args.device)
@@ -212,6 +273,7 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         image_temperature=args.temperature_vision,
         text_weight=args.contrast_ratio_text,
         image_weight=args.contrast_ratio_vision,
+        detach_text_prototypes=args.pecl_detach_text_prototypes,
     ).to(device)
     optimizer_config = config["optimizer"]
     decay, no_decay = [], []
@@ -234,17 +296,32 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
     best_epoch = None
     best_score = -math.inf
     latest = checkpoints / "latest.pt"
+    resume_state = None
     if latest.is_file():
-        state = torch.load(latest, map_location=device, weights_only=False)
-        model.load_state_dict(state["model"])
-        image_encoder.load_state_dict(state["image_encoder"])
-        text_encoder.load_state_dict(state["text_encoder"])
-        optimizer.load_state_dict(state["optimizer"])
-        scheduler.load_state_dict(state["lr_scheduler"])
-        start_epoch = int(state["epoch"]) + 1
-        best_epoch = state.get("best_epoch")
-        best_score = float(state.get("best_validation_score", -math.inf))
-        restore_rng_state(state["rng_state"], generator)
+        resume_state = torch.load(latest, map_location=device, weights_only=False)
+        _validate_resume_freeze_config(resume_state, args.freeze_proposition_queries)
+
+    frozen_unique_pooled = None
+    if args.freeze_proposition_queries:
+        if resume_state is not None:
+            frozen_unique_pooled = resume_state["frozen_proposition_queries"].detach().cpu()
+        else:
+            frozen_unique_pooled = _build_frozen_proposition_queries(
+                args.bert_model_name,
+                knowledge_tokens.unique,
+                embed_dim=args.embed_dim,
+                device=device,
+            )
+    if resume_state is not None:
+        model.load_state_dict(resume_state["model"])
+        image_encoder.load_state_dict(resume_state["image_encoder"])
+        text_encoder.load_state_dict(resume_state["text_encoder"])
+        optimizer.load_state_dict(resume_state["optimizer"])
+        scheduler.load_state_dict(resume_state["lr_scheduler"])
+        start_epoch = int(resume_state["epoch"]) + 1
+        best_epoch = resume_state.get("best_epoch")
+        best_score = float(resume_state.get("best_validation_score", -math.inf))
+        restore_rng_state(resume_state["rng_state"], generator)
 
     max_epoch = int(config["schedular"]["epochs"])
     epoch_times: list[float] = []
@@ -256,7 +333,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         text_encoder.train()
         train_result = train_one_epoch(
             model, pecl,
-            _make_stream(train_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args, training=True),
+            _make_stream(
+                train_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens,
+                device, args, training=True, frozen_unique_pooled=frozen_unique_pooled,
+            ),
             optimizer,
             accumulation_steps=int(config.get("grad_accumulation_steps", 1)),
             lambda_label=0.0 if args.no_label_branch else args.lambda_label,
@@ -271,7 +351,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         text_encoder.eval()
         validation = evaluate(
             model, pecl,
-            _make_stream(val_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args),
+            _make_stream(
+                val_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens,
+                device, args, frozen_unique_pooled=frozen_unique_pooled,
+            ),
             lambda_label=0.0 if args.no_label_branch else args.lambda_label,
             beta_pecl=0.0 if args.no_pecl else args.beta_pecl,
             pecl_generator=generator,
@@ -298,6 +381,8 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         checkpoint = _checkpoint_state(
             model, image_encoder, text_encoder, optimizer, scheduler, epoch, record,
             best_epoch, best_score, generator, config,
+            freeze_proposition_queries=args.freeze_proposition_queries,
+            frozen_proposition_queries=frozen_unique_pooled,
         )
         save_checkpoint(latest, checkpoint)
         if is_best:
@@ -318,7 +403,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
     inference_started = time.perf_counter()
     test_result = evaluate(
         model, pecl,
-        _make_stream(test_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args),
+        _make_stream(
+            test_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens,
+            device, args, frozen_unique_pooled=frozen_unique_pooled,
+        ),
         lambda_label=0.0 if args.no_label_branch else args.lambda_label,
         beta_pecl=0.0 if args.no_pecl else args.beta_pecl,
         pecl_generator=generator,
@@ -338,7 +426,10 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
     checklist_result = collect_checklist(
         model,
         pecl,
-        _make_stream(test_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens, device, args),
+        _make_stream(
+            test_loader, image_encoder, text_encoder, tokenizer, kb, knowledge_tokens,
+            device, args, frozen_unique_pooled=frozen_unique_pooled,
+        ),
         lambda_label=0.0 if args.no_label_branch else args.lambda_label,
         beta_pecl=0.0 if args.no_pecl else args.beta_pecl,
         pecl_generator=generator,
@@ -381,6 +472,8 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         },
         "best_epoch": int(best["best_epoch"]),
         "best_validation_score": float(best["best_validation_score"]),
+        "freeze_proposition_queries": args.freeze_proposition_queries,
+        "pecl_detach_text_prototypes": args.pecl_detach_text_prototypes,
         "disease_level_prediction_uses_proposition_level_pecl": args.query_level == "disease" and not args.no_pecl,
         "checklist_artifacts": checklist_paths,
     }
@@ -417,6 +510,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--beta_pecl", type=float, default=1.0)
     parser.add_argument("--no_label_branch", action="store_true")
     parser.add_argument("--no_pecl", action="store_true")
+    parser.add_argument("--freeze_proposition_queries", action="store_true")
+    parser.add_argument("--pecl_detach_text_prototypes", action="store_true")
     parser.add_argument("--negative_ratio", type=int, default=5)
     parser.add_argument("--temperature_text", type=float, default=0.5)
     parser.add_argument("--temperature_vision", type=float, default=2.0)

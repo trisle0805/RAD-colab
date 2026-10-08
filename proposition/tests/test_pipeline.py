@@ -107,3 +107,66 @@ def test_encoded_batch_stream_builds_memory_mask_and_keeps_gradients(tmp_path) -
     assert batch.caption_attention_mask.shape == (2, 5)
     batch.query.sum().backward()
     assert text_encoder.scale.grad is not None
+
+
+    def test_none_frozen_queries_preserves_default_stream_outputs(tmp_path) -> None:
+        kb = _kb(tmp_path)
+        tokenizer = FakeTokenizer()
+        prepared = prepare_knowledge_tokens(tokenizer, kb)
+        image_encoder = FakeImageEncoder(4)
+        text_encoder = FakeTextEncoder(4)
+        raw = [{
+            "image": torch.zeros(2, 3, 4, 4),
+            "label": torch.tensor([[1, 0], [0, 1]]),
+            "entity": ["short", "two words"],
+        }]
+
+        default_batch = next(iter(EncodedBatchStream(
+            raw, image_encoder, text_encoder, tokenizer, kb, prepared,
+            torch.device("cpu"), caption_max_length=5,
+        )))
+        explicit_none_batch = next(iter(EncodedBatchStream(
+            raw, image_encoder, text_encoder, tokenizer, kb, prepared,
+            torch.device("cpu"), caption_max_length=5, frozen_unique_pooled=None,
+        )))
+
+        assert torch.equal(default_batch.query, explicit_none_batch.query)
+        assert torch.equal(default_batch.alignment_prototypes, explicit_none_batch.alignment_prototypes)
+        assert torch.equal(default_batch.memory, explicit_none_batch.memory)
+
+
+def test_frozen_unique_queries_remain_identical_after_caption_encoder_update(tmp_path) -> None:
+    kb = _kb(tmp_path)
+    tokenizer = FakeTokenizer()
+    prepared = prepare_knowledge_tokens(tokenizer, kb)
+    image_encoder = FakeImageEncoder(4)
+    text_encoder = FakeTextEncoder(4)
+    frozen = torch.tensor([[1.0, 2.0, 3.0, 4.0], [-1.0, -2.0, -3.0, -4.0]])
+    raw = [
+        {
+            "image": torch.zeros(1, 3, 4, 4),
+            "label": torch.tensor([[1, 0]]),
+            "entity": ["first caption"],
+        },
+        {
+            "image": torch.zeros(1, 3, 4, 4),
+            "label": torch.tensor([[0, 1]]),
+            "entity": ["second caption"],
+        },
+    ]
+    stream = EncodedBatchStream(
+        raw, image_encoder, text_encoder, tokenizer, kb, prepared, torch.device("cpu"),
+        caption_max_length=5, frozen_unique_pooled=frozen,
+    )
+    iterator = iter(stream)
+    first = next(iterator)
+    optimizer = torch.optim.SGD(text_encoder.parameters(), lr=0.1)
+    optimizer.zero_grad()
+    first.text_pooled.sum().backward()
+    assert text_encoder.scale.grad is not None and text_encoder.scale.grad.abs() > 0
+    optimizer.step()
+    second = next(iterator)
+
+    assert torch.equal(first.query, frozen[kb.query_text_index])
+    assert torch.equal(first.query, second.query)
+    assert torch.equal(first.alignment_prototypes, frozen[kb.align_text_index])

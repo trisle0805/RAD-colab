@@ -100,6 +100,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
         query_level: str = "proposition",
         use_label_branch: bool = True,
         apply_fourier_augmentation: bool = False,
+        frozen_unique_pooled: Tensor | None = None,
     ) -> None:
         self.raw_batches = raw_batches
         self.image_encoder = image_encoder
@@ -112,6 +113,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
         self.query_level = query_level
         self.use_label_branch = use_label_branch
         self.apply_fourier_augmentation = apply_fourier_augmentation
+        self.frozen_unique_pooled = frozen_unique_pooled
 
     def __iter__(self) -> Iterator[EncodedBatch]:
         for raw in self.raw_batches:
@@ -137,9 +139,12 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
             )
             memory_mask = torch.cat((image_mask, captions["attention_mask"].eq(0)), dim=1)
 
-            unique_pooled, _ = self.text_encoder.encode_text(
-                _to_device(self.knowledge_tokens.unique, self.device)
-            )
+            if self.frozen_unique_pooled is None:
+                unique_pooled, _ = self.text_encoder.encode_text(
+                    _to_device(self.knowledge_tokens.unique, self.device)
+                )
+            else:
+                unique_pooled = self.frozen_unique_pooled.to(self.device)
             align_to_unique = torch.empty(len(self.kb.unique_alignment_texts), dtype=torch.long)
             align_to_unique[self.kb.align_unique_index] = self.kb.align_text_index
             alignment_pooled = unique_pooled[align_to_unique.to(self.device)]

@@ -36,6 +36,7 @@ class PECLLoss(nn.Module):
         image_temperature: float = 2.0,
         text_weight: float = 0.1,
         image_weight: float = 0.001,
+        detach_text_prototypes: bool = False,
     ) -> None:
         super().__init__()
         if not disease_to_prototypes:
@@ -71,6 +72,7 @@ class PECLLoss(nn.Module):
         self.image_temperature = float(image_temperature)
         self.text_weight = float(text_weight)
         self.image_weight = float(image_weight)
+        self.detach_text_prototypes = bool(detach_text_prototypes)
         self.register_buffer("disease_prototype_membership", membership)
 
     def _validate_common(self, features: Tensor, prototypes: Tensor, labels: Tensor) -> None:
@@ -162,8 +164,9 @@ class PECLLoss(nn.Module):
     ) -> PECLLossOutput:
         """Compute text PECL, image PECL, and the weighted total.
 
-        Text prototypes preserve gradients. Image prototypes are detached while
-        image features continue to receive gradients.
+        Image prototypes are always detached while image features continue to
+        receive gradients. Text prototypes preserve gradients by default and
+        can be detached for the PECL ablation.
         """
 
         text_loss = self.modality_loss(
@@ -172,7 +175,7 @@ class PECLLoss(nn.Module):
             labels,
             temperature=self.text_temperature,
             generator=generator,
-            detach_prototypes=False,
+            detach_prototypes=self.detach_text_prototypes,
         )
         image_loss = self.modality_loss(
             image_features,
