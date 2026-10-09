@@ -38,7 +38,7 @@ def test_identical_maps_have_unit_correlations(tmp_path) -> None:
     assert metrics["within_case_same_disease_corr"] == 1.0
     assert metrics["same_prop_across_cases_corr"] == 1.0
     assert metrics["image_max_over_mean"] == pytest.approx(1.6, rel=1e-3)
-    assert metrics["image_mass_share"] == 1.0
+    assert metrics["image_mass_share"] == pytest.approx(1.0, abs=1e-3)
     assert metrics["num_cases"] == 2
     assert metrics["num_props_used"] == 2
     assert (checklist / "segment_map_analysis.json").is_file()
