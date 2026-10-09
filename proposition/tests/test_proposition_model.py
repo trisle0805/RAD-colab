@@ -7,6 +7,7 @@ from proposition.models.proposition_model import (
     PositiveCalibration,
     PropositionModel,
     PropositionPathway,
+    SegmentQueryPathway,
 )
 
 
@@ -161,6 +162,50 @@ def test_disease_level_path_skips_polarity_and_aggregation() -> None:
     assert torch.equal(output.compatibility, output.support)
     assert torch.equal(output.disease_scores, output.support)
     assert pathway.aggregation_weights() is None
+
+def test_segment_query_pathway_shapes_context_and_chunking() -> None:
+    torch.manual_seed(13)
+    prop_disease = torch.tensor([0, 0, 1])
+    prop_align_index = torch.tensor([0, 1, 2])
+    pathway = SegmentQueryPathway(4, 2, prop_disease, prop_align_index, 3)
+    query = torch.randn(3, 5, 4)
+    content_mask = torch.tensor(
+        [[False, True, True, False, False], [False, True, False, False, False], [False, True, True, True, False]]
+    )
+    memory = torch.randn(2, 6, 4)
+    full = pathway(query, content_mask, memory, return_attention=True)
+    chunked = pathway(query, content_mask, memory, return_attention=True, query_chunk_size=3)
+
+    assert full.logits.shape == (2, 2)
+    assert full.support.shape == (2, 2)
+    assert full.attention is not None and full.attention.shape == (2, 3, 6)
+    assert chunked.attention is not None
+    assert torch.allclose(chunked.logits, full.logits, atol=1e-6)
+    assert torch.allclose(chunked.attention, full.attention, atol=1e-6)
+
+    disease_attention = torch.stack(
+        [full.attention[:, prop_disease == disease].mean(dim=1) for disease in range(2)], dim=1
+    )
+    expected_context = disease_attention @ pathway.attention.v_proj(memory)
+    content_queries = torch.stack(
+        [query[text, content_mask[text]].mean(dim=0) for text in range(3)]
+    )
+    disease_query = torch.stack(
+        [content_queries[prop_disease == disease].mean(dim=0) for disease in range(2)]
+    )
+    expected_support = torch.sigmoid(pathway.scorer(expected_context, disease_query))
+    assert torch.allclose(full.support, expected_support, atol=1e-5)
+
+def test_segment_query_ignores_special_and_padding_tokens() -> None:
+    torch.manual_seed(17)
+    pathway = SegmentQueryPathway(4, 1, torch.tensor([0, 0]), torch.tensor([0, 1]), 2)
+    query = torch.randn(2, 5, 4)
+    content_mask = torch.tensor([[False, True, True, False, False], [False, True, False, False, False]])
+    memory = torch.randn(2, 6, 4)
+    baseline = pathway(query, content_mask, memory).logits
+    changed = query.clone()
+    changed[~content_mask] = torch.randn_like(changed[~content_mask]) * 1000
+    assert torch.allclose(pathway(changed, content_mask, memory).logits, baseline, atol=1e-6)
 
 
 def test_optional_label_branch_schema_and_independent_parameters() -> None:

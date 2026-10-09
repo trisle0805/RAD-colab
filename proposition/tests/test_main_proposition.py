@@ -1,7 +1,13 @@
 import pytest
 import torch
 
-from main_proposition import _checkpoint_state, _validate_resume_freeze_config
+from argparse import Namespace
+
+from main_proposition import (
+    _checkpoint_state,
+    _validate_query_configuration,
+    _validate_resume_freeze_config,
+)
 
 
 def test_resume_rejects_changed_frozen_query_setting() -> None:
@@ -25,3 +31,13 @@ def test_default_checkpoint_preserves_prior_schema_except_explicit_flag() -> Non
     assert checkpoint["freeze_proposition_queries"] is False
     assert "frozen_proposition_queries" not in checkpoint
     _validate_resume_freeze_config(checkpoint, False)
+
+def test_segment_cli_rejects_frozen_queries_and_weighted_aggregation() -> None:
+    with pytest.raises(NotImplementedError, match="freeze_proposition_queries"):
+        _validate_query_configuration(
+            Namespace(query_level="proposition_segments", freeze_proposition_queries=True, agg="mean")
+        )
+    with pytest.raises(ValueError, match="agg weighted"):
+        _validate_query_configuration(
+            Namespace(query_level="proposition_segments", freeze_proposition_queries=False, agg="weighted")
+        )

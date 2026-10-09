@@ -76,3 +76,26 @@ def test_checklist_artifact_contains_complete_ui_contract(tmp_path) -> None:
         schema = json.load(handle)
     assert schema["memory_layout"] == {"image": [0, 2], "caption": [2, 5]}
     assert schema["query_level"] == "proposition"
+
+def test_segment_checklist_uses_disease_scores_and_proposition_attention(tmp_path) -> None:
+    result = _result()
+    result.support = torch.tensor([[0.8, 0.4]])
+    result.compatibility = result.support.clone()
+    paths = save_checklist_artifacts(
+        result,
+        tmp_path,
+        _kb(tmp_path),
+        image_paths=["case.png"],
+        top_evidence=2,
+        query_level="proposition_segments",
+    )
+
+    assert paths["evidence"].endswith("test_segment_evidence.npz")
+    assert "proposition_index" in paths
+    with np.load(paths["evidence"]) as artifact:
+        assert artifact["support"].shape == (1, 2)
+        assert artifact["full_attention"].shape == (1, 3, 5)
+    with open(paths["schema"], encoding="utf-8") as handle:
+        schema = json.load(handle)
+    assert schema["query_level"] == "proposition_segments"
+    assert schema["attention_axes"] == ["sample", "proposition", "memory_token"]

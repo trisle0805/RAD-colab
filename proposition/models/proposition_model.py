@@ -16,7 +16,7 @@ import torch.nn.functional as F
 
 
 AggregationMode = Literal["mean", "weighted"]
-QueryLevel = Literal["proposition", "disease"]
+QueryLevel = Literal["proposition", "disease", "proposition_segments"]
 
 
 @dataclass
@@ -80,29 +80,8 @@ class CosineCrossAttention(nn.Module):
         ``True`` for positions that must not receive attention.
         """
 
-        if memory.ndim != 3 or memory.shape[-1] != self.embed_dim:
-            raise ValueError(f"memory must have shape (B, L, {self.embed_dim})")
-        batch_size, memory_length, _ = memory.shape
-
-        if query.ndim == 2:
-            if query.shape[-1] != self.embed_dim:
-                raise ValueError(f"query must have final dimension {self.embed_dim}")
-            query = query.unsqueeze(0).expand(batch_size, -1, -1)
-        elif query.ndim == 3:
-            if query.shape[0] != batch_size or query.shape[-1] != self.embed_dim:
-                raise ValueError(
-                    f"batched query must have shape (B, Q, {self.embed_dim})"
-                )
-        else:
-            raise ValueError("query must have shape (Q, d) or (B, Q, d)")
-
-        mask: Tensor | None = None
-        if memory_padding_mask is not None:
-            if memory_padding_mask.shape != (batch_size, memory_length):
-                raise ValueError("memory_padding_mask must have shape (B, L)")
-            mask = memory_padding_mask.to(device=memory.device, dtype=torch.bool)
-            if mask.all(dim=1).any():
-                raise ValueError("each sample must contain at least one unmasked memory token")
+        query, mask = self._validate_inputs(query, memory, memory_padding_mask)
+        batch_size = memory.shape[0]
 
         query_count = query.shape[1]
         if query_chunk_size is None:
@@ -117,12 +96,9 @@ class CosineCrossAttention(nn.Module):
 
         for start in range(0, query_count, query_chunk_size):
             query_chunk = query[:, start : start + query_chunk_size]
-            projected_queries = F.normalize(self.q_proj(query_chunk), p=2, dim=-1)
-            logits = torch.matmul(projected_queries, projected_keys.transpose(-2, -1))
-            logits = logits / self.tau_att
-            if mask is not None:
-                logits = logits.masked_fill(mask.unsqueeze(1), float("-inf"))
-            attention = torch.softmax(logits, dim=-1)
+            attention = self.attention_weights(
+                query_chunk, memory, mask, projected_keys=projected_keys
+            )
             contexts.append(torch.matmul(attention, projected_values))
             if return_attention:
                 attentions.append(attention)
@@ -130,6 +106,63 @@ class CosineCrossAttention(nn.Module):
         context = torch.cat(contexts, dim=1)
         full_attention = torch.cat(attentions, dim=1) if return_attention else None
         return AttentionOutput(context=context, attention=full_attention)
+
+    def _validate_inputs(
+        self,
+        query: Tensor,
+        memory: Tensor,
+        memory_padding_mask: Tensor | None,
+    ) -> tuple[Tensor, Tensor | None]:
+        if memory.ndim != 3 or memory.shape[-1] != self.embed_dim:
+            raise ValueError(f"memory must have shape (B, L, {self.embed_dim})")
+        batch_size, memory_length, _ = memory.shape
+        if query.ndim == 2:
+            if query.shape[-1] != self.embed_dim:
+                raise ValueError(f"query must have final dimension {self.embed_dim}")
+            query = query.unsqueeze(0).expand(batch_size, -1, -1)
+        elif query.ndim == 3:
+            if query.shape[0] != batch_size or query.shape[-1] != self.embed_dim:
+                raise ValueError(
+                    f"batched query must have shape (B, Q, {self.embed_dim})"
+                )
+        else:
+            raise ValueError("query must have shape (Q, d) or (B, Q, d)")
+        if memory_padding_mask is None:
+            return query, None
+        if memory_padding_mask.shape != (batch_size, memory_length):
+            raise ValueError("memory_padding_mask must have shape (B, L)")
+        mask = memory_padding_mask.to(device=memory.device, dtype=torch.bool)
+        if mask.all(dim=1).any():
+            raise ValueError("each sample must contain at least one unmasked memory token")
+        return query, mask
+
+    def attention_weights(
+        self,
+        query: Tensor,
+        memory: Tensor,
+        memory_padding_mask: Tensor | None = None,
+        *,
+        projected_keys: Tensor | None = None,
+    ) -> Tensor:
+        """Return normalized attention weights without applying the value projection.
+
+        This is intentionally shared by the legacy forward path and the segment
+        pathway, whose disease evidence must be formed only after averaging maps.
+        """
+
+        query, mask = self._validate_inputs(query, memory, memory_padding_mask)
+        keys = (
+            F.normalize(self.k_proj(memory), p=2, dim=-1)
+            if projected_keys is None
+            else projected_keys
+        )
+        if keys.shape != memory.shape:
+            raise ValueError("projected_keys must have shape matching memory")
+        projected_queries = F.normalize(self.q_proj(query), p=2, dim=-1)
+        logits = torch.matmul(projected_queries, keys.transpose(-2, -1)) / self.tau_att
+        if mask is not None:
+            logits = logits.masked_fill(mask.unsqueeze(1), float("-inf"))
+        return torch.softmax(logits, dim=-1)
 
 
 class SharedScorer(nn.Module):
@@ -334,6 +367,122 @@ class PropositionPathway(nn.Module):
         return self.aggregator.weights()
 
 
+class SegmentQueryPathway(nn.Module):
+    """Disease prediction from token queries with post-hoc proposition maps."""
+
+    def __init__(
+        self,
+        embed_dim: int,
+        num_diseases: int,
+        prop_disease: Tensor,
+        prop_align_index: Tensor,
+        num_align_texts: int,
+        *,
+        tau_att: float = 0.1,
+    ) -> None:
+        super().__init__()
+        if prop_disease.ndim != 1 or prop_disease.numel() == 0:
+            raise ValueError("prop_disease must be a non-empty one-dimensional tensor")
+        if prop_align_index.shape != prop_disease.shape:
+            raise ValueError("prop_align_index must match prop_disease")
+        if num_align_texts <= 0:
+            raise ValueError("num_align_texts must be positive")
+        prop_disease = prop_disease.to(dtype=torch.long)
+        prop_align_index = prop_align_index.to(dtype=torch.long)
+        if int(prop_disease.min()) < 0 or int(prop_disease.max()) >= num_diseases:
+            raise ValueError("prop_disease contains an out-of-range disease index")
+        if int(prop_align_index.min()) < 0 or int(prop_align_index.max()) >= num_align_texts:
+            raise ValueError("prop_align_index contains an out-of-range alignment index")
+        counts = torch.bincount(prop_disease, minlength=num_diseases)
+        if (counts == 0).any():
+            raise ValueError("every disease must own at least one proposition")
+
+        aggregation = torch.zeros(num_diseases, prop_disease.numel(), dtype=torch.float32)
+        aggregation[prop_disease, torch.arange(prop_disease.numel())] = 1.0 / counts[
+            prop_disease
+        ].to(torch.float32)
+        self.embed_dim = embed_dim
+        self.num_diseases = num_diseases
+        self.num_align_texts = num_align_texts
+        self.attention = CosineCrossAttention(embed_dim, tau_att)
+        self.scorer = SharedScorer(embed_dim)
+        self.calibration = PositiveCalibration(num_diseases)
+        self.register_buffer("prop_disease", prop_disease.clone())
+        self.register_buffer("prop_align_index", prop_align_index.clone())
+        self.register_buffer("P_dis", aggregation)
+
+    def forward(
+        self,
+        query: Tensor,
+        query_token_mask: Tensor,
+        memory: Tensor,
+        memory_padding_mask: Tensor | None = None,
+        *,
+        return_attention: bool = False,
+        query_chunk_size: int | None = None,
+    ) -> PropositionOutput:
+        if query.ndim != 3 or query.shape[0] != self.num_align_texts or query.shape[-1] != self.embed_dim:
+            raise ValueError(
+                f"segment query must have shape ({self.num_align_texts}, T, {self.embed_dim})"
+            )
+        if query_token_mask.shape != query.shape[:2]:
+            raise ValueError("query_token_mask must have shape (U, T) matching query")
+        content_mask = query_token_mask.to(device=query.device, dtype=torch.bool)
+        if not content_mask.any(dim=1).all():
+            raise ValueError("each alignment text must have at least one content token")
+        if memory.ndim != 3 or memory.shape[-1] != self.embed_dim:
+            raise ValueError(f"memory must have shape (B, L, {self.embed_dim})")
+
+        owner, _ = content_mask.nonzero(as_tuple=True)
+        token_query = query[content_mask]
+        token_count = token_query.shape[0]
+        if query_chunk_size is None:
+            query_chunk_size = token_count
+        if query_chunk_size <= 0:
+            raise ValueError("query_chunk_size must be positive when provided")
+
+        batch_size, memory_length, _ = memory.shape
+        projected_keys = F.normalize(self.attention.k_proj(memory), p=2, dim=-1)
+        text_attention = memory.new_zeros((batch_size, self.num_align_texts, memory_length))
+        for start in range(0, token_count, query_chunk_size):
+            end = min(start + query_chunk_size, token_count)
+            token_attention = self.attention.attention_weights(
+                token_query[start:end],
+                memory,
+                memory_padding_mask,
+                projected_keys=projected_keys,
+            )
+            text_attention.index_add_(1, owner[start:end], token_attention)
+        token_counts = content_mask.sum(dim=1).to(device=memory.device, dtype=memory.dtype)
+        text_attention = text_attention / token_counts.view(1, -1, 1)
+
+        proposition_attention = text_attention[:, self.prop_align_index]
+        disease_attention = torch.einsum(
+            "cj,bjl->bcl", self.P_dis.to(dtype=memory.dtype), proposition_attention
+        )
+        context = torch.matmul(disease_attention, self.attention.v_proj(memory))
+        text_query = torch.zeros(
+            self.num_align_texts, self.embed_dim, dtype=query.dtype, device=query.device
+        )
+        text_query.index_add_(0, owner, token_query)
+        text_query = text_query / content_mask.sum(dim=1).to(query.dtype).unsqueeze(1)
+        proposition_query = text_query[self.prop_align_index]
+        disease_query = torch.matmul(self.P_dis.to(dtype=query.dtype), proposition_query)
+        support = torch.sigmoid(self.scorer(context, disease_query))
+        logits = self.calibration(support)
+        return PropositionOutput(
+            logits=logits,
+            probabilities=torch.sigmoid(logits),
+            support=support,
+            compatibility=support,
+            disease_scores=support,
+            attention=proposition_attention if return_attention else None,
+        )
+
+    def aggregation_weights(self) -> Tensor | None:
+        return None
+
+
 class AuxiliaryLabelBranch(nn.Module):
     """Independent disease-label query branch used only as auxiliary supervision."""
 
@@ -379,18 +528,35 @@ class PropositionModel(nn.Module):
         tau_att: float = 0.1,
         aggregation: AggregationMode = "mean",
         query_level: QueryLevel = "proposition",
+        prop_align_index: Tensor | None = None,
+        num_align_texts: int | None = None,
         use_label_branch: bool = True,
     ) -> None:
         super().__init__()
-        self.pathway = PropositionPathway(
-            embed_dim,
-            num_diseases,
-            prop_disease,
-            prop_polarity,
-            tau_att=tau_att,
-            aggregation=aggregation,
-            query_level=query_level,
-        )
+        self.query_level = query_level
+        if query_level == "proposition_segments":
+            if prop_disease is None or prop_align_index is None or num_align_texts is None:
+                raise ValueError("segment queries require prop_disease, prop_align_index, and num_align_texts")
+            if aggregation != "mean":
+                raise ValueError("--agg weighted is not supported with proposition_segments")
+            self.pathway: PropositionPathway | SegmentQueryPathway = SegmentQueryPathway(
+                embed_dim,
+                num_diseases,
+                prop_disease,
+                prop_align_index,
+                num_align_texts,
+                tau_att=tau_att,
+            )
+        else:
+            self.pathway = PropositionPathway(
+                embed_dim,
+                num_diseases,
+                prop_disease,
+                prop_polarity,
+                tau_att=tau_att,
+                aggregation=aggregation,
+                query_level=query_level,
+            )
         self.label_branch = (
             AuxiliaryLabelBranch(embed_dim, tau_att) if use_label_branch else None
         )
@@ -402,16 +568,33 @@ class PropositionModel(nn.Module):
         memory_padding_mask: Tensor | None = None,
         *,
         label_query: Tensor | None = None,
+        query_token_mask: Tensor | None = None,
         return_attention: bool = False,
         query_chunk_size: int | None = None,
     ) -> ModelOutput:
-        proposition_output = self.pathway(
-            query,
-            memory,
-            memory_padding_mask,
-            return_attention=return_attention,
-            query_chunk_size=query_chunk_size,
-        )
+        if self.query_level == "proposition_segments":
+            if query_token_mask is None:
+                raise ValueError("query_token_mask is required with proposition_segments")
+            assert isinstance(self.pathway, SegmentQueryPathway)
+            proposition_output = self.pathway(
+                query,
+                query_token_mask,
+                memory,
+                memory_padding_mask,
+                return_attention=return_attention,
+                query_chunk_size=query_chunk_size,
+            )
+        else:
+            if query_token_mask is not None:
+                raise ValueError("query_token_mask is only supported with proposition_segments")
+            assert isinstance(self.pathway, PropositionPathway)
+            proposition_output = self.pathway(
+                query,
+                memory,
+                memory_padding_mask,
+                return_attention=return_attention,
+                query_chunk_size=query_chunk_size,
+            )
 
         label_output: LabelBranchOutput | None = None
         if self.label_branch is not None:

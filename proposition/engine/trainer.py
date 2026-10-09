@@ -30,6 +30,7 @@ class EncodedBatch:
     alignment_prototypes: Tensor
     memory_padding_mask: Tensor | None = None
     label_query: Tensor | None = None
+    query_token_mask: Tensor | None = None
     image_token_count: Tensor | None = None
     caption_input_ids: Tensor | None = None
     caption_attention_mask: Tensor | None = None
@@ -79,6 +80,7 @@ def compute_objective(
         batch.memory,
         batch.memory_padding_mask,
         label_query=batch.label_query,
+        query_token_mask=batch.query_token_mask,
         return_attention=return_attention,
         query_chunk_size=query_chunk_size,
     )

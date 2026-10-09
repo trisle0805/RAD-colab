@@ -76,6 +76,9 @@ def test_prepare_knowledge_tokens_measures_and_rounds(tmp_path) -> None:
     assert prepared.max_length == 8
     assert prepared.unique["input_ids"].shape[1] == 8
     assert prepared.alignment["input_ids"].shape[1] == 8
+    assert prepared.alignment_content_mask.shape == prepared.alignment["input_ids"].shape
+    assert not prepared.alignment_content_mask[:, 0].any()
+    assert prepared.alignment_content_mask.any(dim=1).all()
     assert len(prepared.disease_lengths) == 2
 
 
@@ -173,3 +176,25 @@ def test_frozen_unique_queries_remain_identical_after_caption_encoder_update(tmp
     align_to_unique[kb.align_unique_index] = kb.align_text_index
     assert torch.equal(first.alignment_prototypes, frozen[align_to_unique])
     assert not first.query.requires_grad
+
+def test_segment_stream_uses_alignment_tokens_in_pecl_order_and_keeps_gradients(tmp_path) -> None:
+    kb = _kb(tmp_path)
+    tokenizer = FakeTokenizer()
+    prepared = prepare_knowledge_tokens(tokenizer, kb)
+    text_encoder = FakeTextEncoder(4)
+    raw = [{
+        "image": torch.zeros(1, 3, 4, 4),
+        "label": torch.tensor([[1, 0]]),
+        "entity": ["caption"],
+    }]
+    batch = next(iter(EncodedBatchStream(
+        raw, FakeImageEncoder(4), text_encoder, tokenizer, kb, prepared, torch.device("cpu"),
+        caption_max_length=5, query_level="proposition_segments",
+    )))
+
+    expected_pooled, expected_hidden = text_encoder.encode_text(prepared.alignment)
+    assert torch.equal(batch.query, expected_hidden)
+    assert torch.equal(batch.alignment_prototypes, expected_pooled)
+    assert torch.equal(batch.query_token_mask, prepared.alignment_content_mask)
+    batch.query[batch.query_token_mask].sum().backward()
+    assert text_encoder.scale.grad is not None

@@ -183,13 +183,15 @@ def save_checklist_artifacts(
     image_paths: Sequence[str],
     top_evidence: int = 10,
     aggregation_weights: Tensor | None = None,
+    query_level: str = "proposition",
 ) -> dict[str, str]:
     """Save compact UI-ready test evidence and its machine-readable schema."""
 
     if top_evidence <= 0:
         raise ValueError("top_evidence must be positive")
     output = Path(output_dir) / "checklist"
-    sample_count, query_count = result.support.shape
+    sample_count, score_query_count = result.support.shape
+    query_count = result.attention_entropy.shape[1]
     memory_length = result.caption_input_ids.shape[1] + int(result.image_token_count[0])
     if len(image_paths) != sample_count:
         raise ValueError("image_paths length must match checklist sample count")
@@ -203,9 +205,20 @@ def save_checklist_artifacts(
         raise ValueError("image and caption token lengths do not reconstruct attention memory")
     if result.pred_proposition.shape[0] != sample_count:
         raise ValueError("prediction sample count does not match attention")
-    is_proposition_level = query_count == kb.num_propositions
-    if not is_proposition_level and query_count != kb.num_diseases:
-        raise ValueError("attention query count matches neither propositions nor diseases")
+    if query_level not in ("proposition", "disease", "proposition_segments"):
+        raise ValueError("query_level must be 'proposition', 'disease', or 'proposition_segments'")
+    if query_level == "proposition" and (
+        score_query_count != kb.num_propositions or query_count != kb.num_propositions
+    ):
+        raise ValueError("proposition artifacts require proposition-level scores and attention")
+    if query_level == "disease" and (
+        score_query_count != kb.num_diseases or query_count != kb.num_diseases
+    ):
+        raise ValueError("disease artifacts require disease-level scores and attention")
+    if query_level == "proposition_segments" and (
+        score_query_count != kb.num_diseases or query_count != kb.num_propositions
+    ):
+        raise ValueError("segment artifacts require disease scores and proposition attention")
 
     top_indices = result.attention_top_indices.numpy().astype(np.int32, copy=False)
     top_weights = result.attention_top_weights.numpy().astype(np.float32, copy=False)
@@ -232,12 +245,15 @@ def save_checklist_artifacts(
     if aggregation_weights is not None:
         arrays["aggregation_weights"] = aggregation_weights.detach().cpu().numpy().astype(np.float32, copy=False)
 
-    artifact = output / (
-        "test_proposition_evidence.npz" if is_proposition_level else "test_disease_level_evidence.npz"
-    )
+    artifact_names = {
+        "proposition": "test_proposition_evidence.npz",
+        "disease": "test_disease_level_evidence.npz",
+        "proposition_segments": "test_segment_evidence.npz",
+    }
+    artifact = output / artifact_names[query_level]
     _atomic_npz(artifact, **arrays)
     proposition_index_path = output / "proposition_index.json"
-    if is_proposition_level:
+    if query_level in ("proposition", "proposition_segments"):
         kb.write_proposition_index(proposition_index_path)
     disease_index = [
         {"disease_id": disease, "disease_index": index}
@@ -247,14 +263,18 @@ def save_checklist_artifacts(
     schema = {
         "artifact": artifact.name,
         "sample_count": sample_count,
-        "query_level": "proposition" if is_proposition_level else "disease",
+        "query_level": query_level,
         "query_count": query_count,
         "memory_length": memory_length,
         "image_token_count": image_token_count,
         "caption_token_count": caption_length,
         "top_evidence_per_query": top_indices.shape[-1],
         "full_attention_sample_count": int(result.full_attention_sample_indices.numel()),
-        "attention_axes": ["sample", "query", "memory_token"],
+        "attention_axes": (
+            ["sample", "proposition", "memory_token"]
+            if query_level == "proposition_segments"
+            else ["sample", "query", "memory_token"]
+        ),
         "memory_layout": {
             "image": [0, image_token_count],
             "caption": [image_token_count, memory_length],
@@ -267,8 +287,15 @@ def save_checklist_artifacts(
         "fields": {
             "gt": "one-hot ground-truth disease labels (N, C)",
             "pred_proposition": "calibrated disease probabilities (N, C)",
-            "support": "raw query support s (N, Q)",
-            "compatibility": "polarity-aware proposition compatibility or disease support (N, Q)",
+            "support": (
+                "raw disease support s (N, C); no proposition-level scores are produced"
+                if query_level == "proposition_segments" else "raw query support s (N, Q)"
+            ),
+            "compatibility": (
+                "disease support (N, C); no proposition-level scores are produced"
+                if query_level == "proposition_segments"
+                else "polarity-aware proposition compatibility or disease support (N, Q)"
+            ),
             "disease_scores": "pre-calibration disease scores z (N, C)",
             "full_attention": "full cosine cross-attention for selected samples (K, J, L), float16",
             "full_attention_sample_indices": "dataset sample indices corresponding to full_attention (K)",
@@ -279,15 +306,18 @@ def save_checklist_artifacts(
             "caption_attention_mask": "caption valid-token mask (N, T)",
         },
     }
-    schema_path = output / (
-        "test_proposition_evidence.schema.json" if is_proposition_level else "test_disease_level_evidence.schema.json"
-    )
+    schema_names = {
+        "proposition": "test_proposition_evidence.schema.json",
+        "disease": "test_disease_level_evidence.schema.json",
+        "proposition_segments": "test_segment_evidence.schema.json",
+    }
+    schema_path = output / schema_names[query_level]
     _atomic_json(schema_path, schema)
     paths = {
         "evidence": str(artifact),
         "schema": str(schema_path),
         "disease_index": str(output / "disease_index.json"),
     }
-    if is_proposition_level:
+    if query_level in ("proposition", "proposition_segments"):
         paths["proposition_index"] = str(proposition_index_path)
     return paths

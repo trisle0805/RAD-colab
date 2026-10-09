@@ -170,6 +170,17 @@ def _validate_resume_freeze_config(
     if saved and "frozen_proposition_queries" not in checkpoint:
         raise ValueError("checkpoint enables frozen proposition queries but has no saved tensor")
 
+def _validate_query_configuration(args: argparse.Namespace) -> None:
+    """Reject CLI combinations that do not define a segment-query regime."""
+
+    if args.freeze_proposition_queries and args.query_level in ("disease", "proposition_segments"):
+        raise NotImplementedError(
+            "--freeze_proposition_queries is not supported with --query_level "
+            f"{args.query_level}"
+        )
+    if args.query_level == "proposition_segments" and args.agg == "weighted":
+        raise ValueError("--agg weighted is not supported with --query_level proposition_segments")
+
 
 def _checkpoint_state(
     model, image_encoder, text_encoder, optimizer, scheduler, epoch, metrics,
@@ -202,10 +213,7 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         raise RuntimeError("CUDA was requested but is unavailable")
     if args.clip_ratio != 0:
         raise NotImplementedError("ClipLoss is reserved for a later explicit ablation")
-    if args.freeze_proposition_queries and args.query_level == "disease":
-        raise NotImplementedError(
-            "--freeze_proposition_queries is not supported with --query_level disease"
-        )
+    _validate_query_configuration(args)
 
     seed_everything(args.seed)
     device = torch.device(args.device)
@@ -227,6 +235,18 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
     kb = load_proposition_kb(args.kb_path, labels)
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model_name, do_lower_case=True)
     knowledge_tokens = prepare_knowledge_tokens(tokenizer, kb)
+    if args.query_level == "proposition_segments":
+        content_counts = knowledge_tokens.alignment_content_mask.sum(dim=1).cpu().numpy()
+        _atomic_json(
+            output / "segment_query_stats.json",
+            {
+                "num_alignment_texts": len(kb.unique_alignment_texts),
+                "content_tokens_total": int(content_counts.sum()),
+                "content_tokens_min": int(content_counts.min()),
+                "content_tokens_median": float(np.median(content_counts)),
+                "content_tokens_max": int(content_counts.max()),
+            },
+        )
     if args.query_level == "disease":
         _atomic_json(
             output / "disease_level_lengths.json",
@@ -263,6 +283,8 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
     model = PropositionModel(
         args.embed_dim, kb.num_diseases, kb.prop_disease, kb.prop_polarity,
         tau_att=args.tau_att, aggregation=args.agg, query_level=args.query_level,
+        prop_align_index=kb.align_unique_index,
+        num_align_texts=len(kb.unique_alignment_texts),
         use_label_branch=not args.no_label_branch,
     ).to(device)
     pecl = None if args.no_pecl else PECLLoss(
@@ -444,6 +466,7 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         image_paths=test_image_paths,
         top_evidence=args.attention_topk,
         aggregation_weights=model.pathway.aggregation_weights(),
+        query_level=args.query_level,
     )
 
     run_config = {
@@ -457,6 +480,11 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         "sample_counts": {"train": len(train_dataset), "validation": len(val_dataset), "test": len(test_dataset)},
         "num_diseases": kb.num_diseases,
         "num_propositions": kb.num_propositions,
+        "query_level": args.query_level,
+        "segment_query_tokens_total": (
+            int(knowledge_tokens.alignment_content_mask.sum())
+            if args.query_level == "proposition_segments" else None
+        ),
         "knowledge_max_length": knowledge_tokens.max_length,
         "measured_knowledge_max_length": knowledge_tokens.measured_max_length,
         "versions": {"torch": torch.__version__, "transformers": __import__("transformers").__version__},
@@ -478,7 +506,7 @@ def main(args: argparse.Namespace, config: dict[str, Any]) -> None:
         "checklist_artifacts": checklist_paths,
     }
     _atomic_json(output / "run_config.json", run_config)
-    if args.query_level == "proposition":
+    if args.query_level in ("proposition", "proposition_segments"):
         kb.write_proposition_index(output / "checklist" / "proposition_index.json")
 
 
@@ -502,7 +530,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--topk", nargs="+", type=int, default=[1, 2, 3])
     parser.add_argument("--tau_att", type=float, default=0.1)
     parser.add_argument("--agg", choices=("mean", "weighted"), default="mean")
-    parser.add_argument("--query_level", choices=("proposition", "disease"), default="proposition")
+    parser.add_argument(
+        "--query_level",
+        choices=("proposition", "disease", "proposition_segments"),
+        default="proposition",
+    )
     parser.add_argument("--query_chunk_size", type=int)
     parser.add_argument("--attention_topk", type=int, default=10)
     parser.add_argument("--full_attention_samples", type=int, default=20)

@@ -18,6 +18,7 @@ class TokenizedKnowledge:
 
     unique: Mapping[str, Tensor]
     alignment: Mapping[str, Tensor]
+    alignment_content_mask: Tensor
     disease: Mapping[str, Tensor]
     max_length: int
     measured_max_length: int
@@ -63,6 +64,14 @@ def prepare_knowledge_tokens(
     max_length = ((measured_max + multiple - 1) // multiple) * multiple
     unique = _tokenize_fixed(tokenizer, kb.unique_texts, max_length)
     alignment = _tokenize_fixed(tokenizer, kb.unique_alignment_texts, max_length)
+    alignment_content_mask = alignment["attention_mask"].bool().clone()
+    alignment_content_mask[:, 0] = False
+    final_valid_positions = alignment["attention_mask"].sum(dim=1).to(torch.long) - 1
+    alignment_content_mask[
+        torch.arange(alignment_content_mask.shape[0]), final_valid_positions
+    ] = False
+    if not alignment_content_mask.any(dim=1).all():
+        raise ValueError("every alignment text must contain at least one non-special content token")
 
     disease_lengths = tuple(_token_lengths(tokenizer, kb.disease_query_texts))
     disease = tokenizer(
@@ -76,6 +85,7 @@ def prepare_knowledge_tokens(
     return TokenizedKnowledge(
         unique=unique,
         alignment=alignment,
+        alignment_content_mask=alignment_content_mask,
         disease=disease,
         max_length=max_length,
         measured_max_length=measured_max,
@@ -146,15 +156,22 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
             )
             memory_mask = torch.cat((image_mask, captions["attention_mask"].eq(0)), dim=1)
 
-            if self.frozen_unique_pooled is None:
-                unique_pooled, _ = self.text_encoder.encode_text(
-                    _to_device(self.knowledge_tokens.unique, self.device)
+            query_token_mask = None
+            if self.query_level == "proposition_segments":
+                alignment_pooled, query = self.text_encoder.encode_text(
+                    _to_device(self.knowledge_tokens.alignment, self.device)
                 )
+                query_token_mask = self.knowledge_tokens.alignment_content_mask.to(self.device)
             else:
-                unique_pooled = self.frozen_unique_pooled
-            align_to_unique = torch.empty(len(self.kb.unique_alignment_texts), dtype=torch.long)
-            align_to_unique[self.kb.align_unique_index] = self.kb.align_text_index
-            alignment_pooled = unique_pooled[align_to_unique.to(self.device)]
+                if self.frozen_unique_pooled is None:
+                    unique_pooled, _ = self.text_encoder.encode_text(
+                        _to_device(self.knowledge_tokens.unique, self.device)
+                    )
+                else:
+                    unique_pooled = self.frozen_unique_pooled
+                align_to_unique = torch.empty(len(self.kb.unique_alignment_texts), dtype=torch.long)
+                align_to_unique[self.kb.align_unique_index] = self.kb.align_text_index
+                alignment_pooled = unique_pooled[align_to_unique.to(self.device)]
             if self.query_level == "proposition":
                 query = unique_pooled[self.kb.query_text_index.to(self.device)]
             elif self.query_level == "disease":
@@ -162,7 +179,8 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
                     _to_device(self.knowledge_tokens.disease, self.device)
                 )
             else:
-                raise ValueError("query_level must be 'proposition' or 'disease'")
+                if self.query_level != "proposition_segments":
+                    raise ValueError("query_level must be 'proposition', 'disease', or 'proposition_segments'")
 
             label_query = None
             if self.use_label_branch:
@@ -185,6 +203,7 @@ class EncodedBatchStream(Iterable[EncodedBatch]):
                 alignment_prototypes=alignment_pooled,
                 memory_padding_mask=memory_mask,
                 label_query=label_query,
+                query_token_mask=query_token_mask,
                 image_token_count=torch.full(
                     (images.shape[0],), image_tokens.shape[1], dtype=torch.int32, device=self.device
                 ),
