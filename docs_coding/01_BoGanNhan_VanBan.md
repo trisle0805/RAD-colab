@@ -69,6 +69,17 @@ Nếu chạy bước 7: thêm `WeakSup/teacher_text/modernbert_mednli_eval/` g�
 - Cặp 1–3 trong bảng thử nhanh ra đúng nhãn kỳ vọng. Cặp 4–5 nên đúng; nếu sai thì ghi chú lại, không chặn việc chuyển sang file tiếp theo.
 - Trí đã xem `metrics.json` và `sanity_derm.csv`.
 
+## Trạng thái: đã xong (13/10/2026)
+
+Trí chạy thêm một bộ thử mở rộng gồm 30 cặp tự soạn (`sanity_derm_extended.csv`, đặt cùng thư mục kết quả). Kết quả:
+
+- Lấy nhãn có xác suất cao nhất: đúng 21/30 (dễ 9/10, trung bình 7/10, khó 5/10).
+- Theo quy tắc ngưỡng: ở ngưỡng 0,9 / 0,8, nhãn 1 đúng 12/13 và nhãn 0 đúng 6/6; các ca còn lại rơi vào ∅.
+- Kiểu lỗi chính là **phủ định nằm giữa câu** ("but not", "without", "sparing", "unaffected"), dẫn tới entailment sai. Đây là lý do có bước A2b (LLM kiểm tra lại) ở file 03.
+- Ca 5, 7, 9, 25 trong bộ thử bị bọc mẫu hai lần ("The patient has pustules are present."). Nên sửa lại thành cụm danh từ rồi chạy lại 4 ca này. Không ảnh hưởng tới pipeline thật, vì ở đó giả thuyết sinh từ `canonicalDescription`.
+
+Các con số này dùng để đặt ngưỡng ban đầu ở file 03 ($\tau^{+}_{txt}=0{,}9$, $\tau^{-}_{txt}=0{,}8$).
+
 ## Không được làm
 
 - Dùng tập test để chọn checkpoint hay chỉnh tham số.

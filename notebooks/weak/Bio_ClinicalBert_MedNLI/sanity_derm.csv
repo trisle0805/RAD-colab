@@ -1,0 +1,7 @@
+case,premise,hypothesis,expected,predicted,p_entailment,p_neutral,p_contradiction
+1,Multiple sharply demarcated red plaques with silvery scales.,The patient has well-demarcated erythematous plaques.,entailment,contradiction,0.016355447471141815,0.006247358396649361,0.9773971438407898
+2,Erythematous plaques without any scale.,The patient has scaly plaques.,contradiction,contradiction,0.11785639077425003,0.2180183231830597,0.6641252636909485
+3,Plaques with silvery scales on the elbows.,The patient has nail pitting.,neutral,entailment,0.9272847175598145,0.04536235332489014,0.027352916076779366
+4,Ill-defined red patches on the cheeks.,The patient has well-demarcated patches.,contradiction,contradiction,0.03778848052024841,0.00601707911118865,0.9561944603919983
+5,Depigmented white patches with clear borders on the hands.,The patient has chalk-white macules or patches.,entailment,entailment,0.7003227472305298,0.03490108251571655,0.26477620005607605
+6,Lesions on the face.,"The patient has lesions on the face, chest and back.",record only,entailment,0.9705917239189148,0.016553819179534912,0.012854413129389286

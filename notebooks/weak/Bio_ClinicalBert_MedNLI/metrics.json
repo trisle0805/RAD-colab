@@ -1,0 +1,73 @@
+{
+  "selection_metric": "dev_accuracy",
+  "best_model_checkpoint": "/content/drive/MyDrive/Cao học/Models/weak_supervision/teacher_text/bioclinicalbert_mednli_v1/20261012_162149/trainer_checkpoints/checkpoint-1404",
+  "best_metric": 0.8265232974910395,
+  "dev_by_epoch": [
+    {
+      "eval_loss": 0.5553025603294373,
+      "eval_accuracy": 0.7569892473118279,
+      "eval_macro_f1": 0.7574461982832674,
+      "eval_runtime": 2.0331,
+      "eval_samples_per_second": 686.14,
+      "eval_steps_per_second": 21.642,
+      "epoch": 1.0,
+      "step": 351
+    },
+    {
+      "eval_loss": 0.47681599855422974,
+      "eval_accuracy": 0.8086021505376344,
+      "eval_macro_f1": 0.808456843711529,
+      "eval_runtime": 1.9024,
+      "eval_samples_per_second": 733.298,
+      "eval_steps_per_second": 23.129,
+      "epoch": 2.0,
+      "step": 702
+    },
+    {
+      "eval_loss": 0.46472764015197754,
+      "eval_accuracy": 0.8258064516129032,
+      "eval_macro_f1": 0.8256553429880865,
+      "eval_runtime": 1.8618,
+      "eval_samples_per_second": 749.27,
+      "eval_steps_per_second": 23.633,
+      "epoch": 3.0,
+      "step": 1053
+    },
+    {
+      "eval_loss": 0.4983481466770172,
+      "eval_accuracy": 0.8265232974910395,
+      "eval_macro_f1": 0.8266528918792247,
+      "eval_runtime": 2.0234,
+      "eval_samples_per_second": 689.427,
+      "eval_steps_per_second": 21.745,
+      "epoch": 4.0,
+      "step": 1404
+    }
+  ],
+  "test": {
+    "accuracy": 0.79957805907173,
+    "macro_f1": 0.7998341276572666,
+    "per_class_f1": {
+      "entailment": 0.7602956705385427,
+      "neutral": 0.7971014492753623,
+      "contradiction": 0.8421052631578947
+    },
+    "confusion_matrix": [
+      [
+        360,
+        79,
+        35
+      ],
+      [
+        59,
+        385,
+        30
+      ],
+      [
+        54,
+        28,
+        392
+      ]
+    ]
+  }
+}

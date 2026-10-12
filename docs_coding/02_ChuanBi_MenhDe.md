@@ -4,7 +4,7 @@
 
 ## Mục tiêu
 
-Từ KB, tạo **một bảng duy nhất** để Trí duyệt. Bảng ghi, cho từng mệnh đề:
+Từ KB, tạo **một bảng duy nhất** để Trí duyệt. Ở đây, một mệnh đề được xem là **quan sát được** nếu có thể xác định đáng tin cậy từ ảnh da **hoặc caption lâm sàng** của SkinCAP; không giới hạn ở dấu hiệu nhìn trực tiếp trên ảnh. Bảng ghi, cho từng mệnh đề:
 
 1. Mệnh đề có **quan sát được** trên SkinCAP không.
 2. Bộ gán nhãn **ảnh** có áp dụng cho mệnh đề này không.
@@ -22,7 +22,8 @@ KB gốc giữ nguyên, không sửa.
 
 | Điều kiện | `auto_observable` |
 |---|---|
-| `category` ∉ {morphology, location} | `0` (bệnh sử, triệu chứng, xét nghiệm) |
+| Bệnh sử hoặc triệu chứng có thể được nêu trực tiếp trong caption (ví dụ: family history, onset, itching, pain, fatigue) | `1`, gắn cờ `review_needed=1` |
+| Xét nghiệm, sinh thiết, chẩn đoán hình ảnh, hoặc thông tin chỉ có trong hồ sơ mà không thể hiện đáng tin cậy trong caption | `0` |
 | `category` ∈ {morphology, location} **và** mô tả nói về cơ quan bên trong hoặc toàn thân | `0` |
 | `category` ∈ {morphology, location} còn lại | `1` |
 | Trường hợp lưng chừng (mắt, kết mạc, niêm mạc miệng/sinh dục, toàn thân nhưng có biểu hiện da) | `1`, gắn cờ `review_needed=1` |
@@ -33,7 +34,7 @@ Kiểm tra thử trên KB hiện tại: khoảng 50 trong 502 mệnh đề morph
 
 ### Bước 2. Bộ gán nhãn ảnh có áp dụng không
 
-`image_applicable = 1` khi và chỉ khi `observable = 1` **và** `category = morphology`. Mệnh đề vị trí không dùng nhãn từ ảnh, vì ảnh không chụp tới một vị trí không có nghĩa là không có tổn thương ở đó (file câu chuyện, mục 6.2).
+`image_applicable = 1` khi và chỉ khi `observable = 1` **và** `category = morphology`. Vì vậy, bệnh sử và triệu chứng được giữ để gán nhãn từ văn bản nhưng có `image_applicable = 0`. Mệnh đề vị trí cũng không dùng nhãn từ ảnh, vì ảnh không chụp tới một vị trí không có nghĩa là không có tổn thương ở đó (file câu chuyện, mục 6.2).
 
 ### Bước 3. Phân loại cách diễn đạt và tách câu hỏi con
 

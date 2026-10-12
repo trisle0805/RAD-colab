@@ -25,9 +25,9 @@ File 01 và 02 không phụ thuộc nhau nên có thể làm song song.
 
 | File | Đầu ra chính | Người duyệt trước khi đi tiếp |
 |---|---|---|
-| 01 | checkpoint bộ gán nhãn văn bản và kết quả MedNLI | Trí |
+| 01 | checkpoint bộ gán nhãn văn bản và kết quả MedNLI | Trí (**đã xong**) |
 | 02 | danh sách mệnh đề quan sát được và các câu hỏi đã tách | **Trí duyệt từng dòng** |
-| 03 | file nhãn yếu, thống kê, mẫu chấm tay | **Trí chấm mẫu** |
+| 03 | file nhãn yếu (NLI + LLM kiểm tra lại + ConceptCLIP), thống kê, mẫu chấm tay | **Trí xác nhận lần chạy thử LLM và chấm mẫu** |
 | 04 | checkpoint Stage 1, ma trận điểm $S$, C1, C2 | Trí |
 | 05 | dự đoán bệnh, `final_metrics.json`, C3 | Trí |
 | 06 | bảng kết quả so với RAD và các kiểm tra | Trí |
@@ -86,6 +86,8 @@ proposition/weak/
 ├── labels.py          # đọc file nhãn yếu, ánh xạ case_id → hàng, mệnh đề → cột   (03, 04)
 ├── propositions.py    # đọc danh sách mệnh đề quan sát được và câu hỏi           (02, 03, 04)
 ├── dataset.py         # wrapper dataset trả thêm case_id (không sửa dataset/)    (04)
+├── llm_verify.py      # LLM kiểm tra lại nhãn văn bản (bước A2b)                 (03)
+├── prompts/llm_verify_v1.txt
 ├── losses.py          # masked BCE, tuỳ chọn pos_weight                          (04)
 ├── aggregation.py     # tổng hợp trên tập active: mean / weighted / group        (05)
 └── metrics.py         # C1, C2, C3                                               (04, 05, 06)
