@@ -38,6 +38,7 @@ Gán nhãn cho **cả ba split**: train dùng làm tín hiệu huấn luyện, v
    Xuất `disease_alias_v1.csv` (`disease_id`, `alias`, `source`) để **Trí duyệt**.
 2. Thay mọi alias đã duyệt (không phân biệt hoa thường, khớp nguyên từ) bằng cụm `this skin condition`.
 3. **Mô hình chính (file 04) vẫn đọc caption gốc.** Bước che tên chỉ dùng cho bộ gán nhãn.
+4. Ngoài tên bệnh, caption giữ nguyên, không tách hay bỏ đoạn nào, kể cả đoạn mô tả bệnh nói chung. Ảnh hưởng của đoạn này được xử lý ở A2b, nhóm D.
 
 ### A2. Nhãn từ văn bản (NLI)
 
@@ -71,6 +72,9 @@ Chạy theo lô (batch 256, fp16, `max_length=128`) và lưu kết quả dở da
 | A | `label_text_nli = 1` **và** câu căn cứ (`best_sentence_idx`) chứa từ phủ định | `--llm_group_a` | bật |
 | B | `label_text_nli = -1`, không có câu hỏi con nào $p^{ent}\ge\tau^{+}_{txt}$, và $0{,}5\le \max p^{con}<\tau^{-}_{txt}$ | `--llm_group_b` | bật |
 | C | `label_text_nli = -1` và $0{,}5\le \max p^{ent}<\tau^{+}_{txt}$ | `--llm_group_c` | **tắt** |
+| D | `label_text_nli = 1` **và** mệnh đề thuộc nhóm `symptom` hoặc `history` (mọi ô, không cần từ phủ định). Một ô thoả cả A và D thì xếp vào D | `--llm_group_d` | **bật** |
+
+*Lý do có nhóm D:* thông tin bệnh sử và triệu chứng trong caption SkinCAP thường nằm ở đoạn mô tả bệnh nói chung ("this skin condition is characterized by itching…"), không phải ở mô tả của riêng bệnh nhân. Nếu không lọc, các nhãn này sẽ trùng với nhãn bệnh (file 02, mục Trạng thái).
 
 Danh sách từ phủ định (khớp nguyên từ, không phân biệt hoa thường; đặt trong config): `no, not, without, absent, absence, sparing, spared, spares, unaffected, negative, free of, lack, lacks, lacking, none, neither, nor, denies, never`.
 
@@ -99,6 +103,9 @@ For each sign below, answer based ONLY on the description text.
 
 Do NOT use medical knowledge to infer signs that are not written.
 Do NOT guess the diagnosis.
+Only statements about THIS patient count. Sentences that describe the condition in general
+(e.g. "this skin condition is characterized by …", "it commonly causes …", "it is often triggered by …")
+are NOT evidence about the patient: answer NOT_MENTIONED for signs supported only by such sentences.
 For PRESENT or ABSENT, copy the exact supporting phrase from the description (verbatim).
 
 Description:
@@ -127,6 +134,9 @@ Return JSON only:
 | B | PRESENT / NOT_MENTIONED | −1 (giữ) |
 | C (nếu bật) | PRESENT | 1 |
 | C (nếu bật) | ABSENT / NOT_MENTIONED | −1 (giữ) |
+| D | PRESENT | 1 (giữ) |
+| D | ABSENT | 0 |
+| D | NOT_MENTIONED | −1 |
 
 Áp dụng **cùng quy tắc cho train, val và test**. Không chỉnh tay nhãn của bất kỳ ô nào.
 
@@ -171,7 +181,7 @@ WeakSup/weak_labels/v1/
 │   ├── proposition_id     (M,)     str   đúng thứ tự propositions_final.json
 │   ├── label_text_nli     (N, M)   int8  {1, 0, -1}   kết quả A2
 │   ├── label_text         (N, M)   int8  {1, 0, -1}   sau A2b
-│   ├── llm_group          (N, M)   int8  0 = không gửi, 1 = A, 2 = B, 3 = C
+│   ├── llm_group          (N, M)   int8  0 = không gửi, 1 = A, 2 = B, 3 = C, 4 = D
 │   ├── llm_verdict        (N, M)   int8  -1 = không gửi, 0 = NOT_MENTIONED, 1 = PRESENT, 2 = ABSENT
 │   ├── llm_quote_invalid  (N, M)   int8
 │   ├── label_img          (N, M)   int8
@@ -202,8 +212,8 @@ Chỉ đọc `labels.npz` rồi xuất kết quả, không sửa nhãn.
    - tách theo nguồn: số nhãn đến từ văn bản và số nhãn đến từ ảnh;
    - `n_present_own_disease` và `n_present_other_disease`: nhãn 1 nằm trên ca thuộc chính bệnh của mệnh đề hay trên ca bệnh khác;
    - cờ `positive_only` (có nhãn 1 nhưng không có nhãn 0) và cờ `no_label` (không có nhãn nào).
-2. **Theo nhóm** (morphology / location) và **toàn bộ**: tổng số nhãn 1, nhãn 0, ∅, và tỉ lệ nhãn 1 trên nhãn 0. Tỉ lệ này dùng để quyết định có bật cân bằng lớp ở file 04 hay không.
-3. **Tác động của LLM (A2b)**: với từng nhóm A/B/C, số ô đã gửi, số ô giữ nguyên, số ô hạ từ 1 xuống ∅, số ô đổi từ 1 sang 0, số ô thêm nhãn 0, và số ô có `quote_invalid`.
+2. **Theo nhóm** (morphology / location / symptom / history) và **toàn bộ**: tổng số nhãn 1, nhãn 0, ∅, và tỉ lệ nhãn 1 trên nhãn 0. Tỉ lệ này dùng để quyết định có bật cân bằng lớp ở file 04 hay không.
+3. **Tác động của LLM (A2b)**: với từng nhóm A/B/C/D, số ô đã gửi, số ô giữ nguyên, số ô hạ từ 1 xuống ∅, số ô đổi từ 1 sang 0, số ô thêm nhãn 0, và số ô có `quote_invalid`. Riêng nhóm D, ghi thêm tỉ lệ nhãn 1 nằm trên ca thuộc **chính bệnh** của mệnh đề, **trước và sau** A2b. Nếu sau A2b tỉ lệ này vẫn gần 100%, nhãn của nhóm này đang gần như trùng nhãn bệnh; Trí cần xem lại trước khi train.
 4. **Độ khớp giữa văn bản và ảnh** trên các ô mà cả hai nguồn đều có nhãn: bảng chéo 2×2 và số ô mâu thuẫn.
 5. **Histogram** của `p_entail`, `p_contra`, `p_img`, kèm vị trí các ngưỡng.
 6. **Tóm tắt** trong `survey_summary.md`: các con số chính và danh sách mệnh đề `no_label` / `positive_only`. Chỉ ghi số liệu, không viết diễn giải.

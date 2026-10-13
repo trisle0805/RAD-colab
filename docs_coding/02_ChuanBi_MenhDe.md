@@ -2,6 +2,37 @@
 
 *Lý do: file câu chuyện, mục 5.5 (tập mệnh đề quan sát được) và mục 6.2 (đọc mệnh đề theo nghĩa lâm sàng: liệt kê vị trí hoặc dạng thay thế thì chỉ cần có một).*
 
+## Trạng thái: bảng v1 đã chốt (13/10/2026)
+
+**Bảng cuối là `propositions_v1/propositions_review_final.csv`.** Trí đã duyệt bảng này. Claude chỉ sửa thêm 6 mệnh đề luôn đúng (xem mục 4 bên dưới). **Agent không tạo lại bảng.** Agent chỉ chạy **bước 5**, lấy file này làm đầu vào. Lịch sử và lý do sửa của từng dòng nằm ở cột `note`, có tiền tố `[GPT-final]` hoặc `[Claude-final]`.
+
+Kết quả của bảng cuối:
+
+| Nhóm | Quan sát được | Không |
+|---|---:|---:|
+| morphology | 320 | 1 |
+| location | 123 | 58 |
+| symptom | 157 | 0 |
+| history | 388 | 4 |
+| lab | 0 | 385 |
+| **Tổng** | **988** | 448 |
+
+- 320 mệnh đề có `image_applicable=1`.
+- Mỗi bệnh có từ 11 đến 39 mệnh đề quan sát được, trung vị 19.
+- Thống kê theo bệnh: `propositions_v1/summary_per_disease.csv`.
+
+Các quy tắc đã áp dụng khi duyệt, dùng lại cho những lần tạo phiên bản sau:
+
+1. **"Quan sát được" nghĩa là có thể xác định đáng tin cậy từ ảnh *hoặc* caption.** Vì vậy bệnh sử và triệu chứng được giữ để gán nhãn từ văn bản. Xét nghiệm, sinh thiết, chẩn đoán hình ảnh, cùng tổn thương ở cơ quan bên trong hoặc toàn thân (hạch, khớp, màng phổi, màng ngoài tim, ruột, nội tạng, di căn…) thì loại.
+2. **Tách các dạng thay thế:** khi tách thì **lặp lại danh từ chính** cho mỗi vế, ví dụ "large lesions ‖ thick lesions", "gray lesions ‖ pink lesions ‖ red lesions ‖ skin-colored lesions".
+3. **Không tách** các trường hợp sau: dấu hiệu có tên riêng ("shawl sign", "mechanics' hands", "butterfly rash"); kích thước; diễn tiến theo thời gian; vị trí có trạng từ chen giữa ("…, especially the legs"). Các câu này giữ nguyên.
+4. **Mệnh đề luôn đúng với mọi ca → 0.** Đó là các mệnh đề mà các vế cộng lại bao hết mọi khả năng, nên không mang thông tin: "isolated or numerous lesions", "solitary or grouped lesions", "male or female sex", "any age", "onset at any age", "onset in children or adults".
+5. **Vị trí:** mỗi câu hỏi con phải đúng ngữ pháp và đủ nghĩa.
+
+**Lưu ý dành cho file 03.** Bệnh sử và triệu chứng trong caption SkinCAP thường nằm trong đoạn kiến thức chung về bệnh, không phải mô tả của riêng bệnh nhân. Vì vậy mọi nhãn 1 của hai nhóm này phải qua bước LLM kiểm tra lại (file 03, A2b, **nhóm D**).
+
+---
+
 ## Mục tiêu
 
 Từ KB, tạo **một bảng duy nhất** để Trí duyệt. Ở đây, một mệnh đề được xem là **quan sát được** nếu có thể xác định đáng tin cậy từ ảnh da **hoặc caption lâm sàng** của SkinCAP; không giới hạn ở dấu hiệu nhìn trực tiếp trên ảnh. Bảng ghi, cho từng mệnh đề:
@@ -18,6 +49,8 @@ KB gốc giữ nguyên, không sửa.
 
 ## Việc cần làm (notebook `WS_02_propositions.ipynb`, hàm trong `proposition/weak/propositions.py`)
 
+> Với phiên bản v1, bước 1–4 **đã xong**: bảng đã được duyệt (xem mục Trạng thái). Phần dưới đây giữ lại để dùng khi tạo phiên bản sau.
+
 ### Bước 1. Đề xuất tự động "quan sát được"
 
 | Điều kiện | `auto_observable` |
@@ -27,10 +60,9 @@ KB gốc giữ nguyên, không sửa.
 | `category` ∈ {morphology, location} **và** mô tả nói về cơ quan bên trong hoặc toàn thân | `0` |
 | `category` ∈ {morphology, location} còn lại | `1` |
 | Trường hợp lưng chừng (mắt, kết mạc, niêm mạc miệng/sinh dục, toàn thân nhưng có biểu hiện da) | `1`, gắn cờ `review_needed=1` |
+| Mệnh đề luôn đúng với mọi ca (các vế bao hết mọi khả năng) | `0` |
 
-Danh sách từ khoá gợi ý cho "cơ quan bên trong hoặc toàn thân" (Trí có thể chỉnh): lung, pulmonary, kidney, renal, liver, heart, cardiac, pericardium, pleura, brain, central nervous system, muscle, weakness, lymph node, metastases, gastrointestinal, pancreas, omentum, testis, cervix, oropharynx, hypertension, internal organs, multisystem, larval migration, parasitic infection.
-
-Kiểm tra thử trên KB hiện tại: khoảng 50 trong 502 mệnh đề morphology/location bị loại, còn khoảng 452. Mỗi bệnh còn ít nhất 2 mệnh đề (ít nhất là nematode infection). Con số cuối cùng tuỳ Trí duyệt.
+Danh sách từ khoá gợi ý cho "cơ quan bên trong hoặc toàn thân" (Trí có thể chỉnh): lung(s), pulmonary, kidney, renal, liver, heart, cardiac, pericardium/pericardial, pleura/pleural, brain, central nervous system, muscle, weakness, lymph node(s), lymphadenopathy, arthritis, joint(s), spine, metastases, gastrointestinal, bowel, rectal, pancreas, omentum, testis, cervix/cervical, oropharynx, hypertension, internal organs, visceral, multiorgan/multisystem, dissemination, larval migration, parasitic infection, deep tissue. **Không** loại vì từ "muscle" khi nó chỉ một vùng da (vd. "triangular muscle").
 
 ### Bước 2. Bộ gán nhãn ảnh có áp dụng không
 
@@ -44,7 +76,7 @@ Với mỗi mệnh đề quan sát được, gán `expression_type`:
 |---|---|---|---|
 | `single` | không có "and / or / ," | "nail pitting" | giữ nguyên 1 câu |
 | `site_list` | dạng "<tổn thương> on/in A, B and/or C" | "lesions on the face, chest and back" | "lesions on the face" ‖ "lesions on the chest" ‖ "lesions on the back" |
-| `alternatives` | các dạng nối bằng "or" có chung đầu ngữ hoặc đuôi ngữ | "papules or nodules", "gray pink red or skin-colored lesions" | "papules" ‖ "nodules"; "gray lesions" ‖ "pink lesions" ‖ … |
+| `alternatives` | các dạng nối bằng "or" có chung đầu ngữ hoặc đuôi ngữ | "papules or nodules", "gray pink red or skin-colored lesions" | "papules" ‖ "nodules"; "gray lesions" ‖ "pink lesions" ‖ … (luôn lặp lại danh từ chính) |
 | `pattern` | một dấu hiệu kinh điển gồm nhiều đặc điểm ("with … and …") | "bull's-eye rash with central red spot, central clearing and outer red ring" | **không tách**, 1 câu |
 | `and_pair` | "A and B" mà không phải danh sách vị trí | "papules and plaques", "vesicles and crusts" | mặc định không tách; Trí quyết khi duyệt |
 
@@ -71,22 +103,22 @@ Mẫu này ghi trong `meta.json`. Đổi mẫu thì phải tạo phiên bản m�
 | `review_needed` | 0/1 |
 | `final_observable` | **Trí điền** (0/1); mặc định copy từ `auto_observable` |
 | `final_sub_hypotheses` | **Trí sửa nếu cần**; mặc định copy từ `sub_hypotheses` |
-| `note` | ghi chú của Trí |
+| `note` | ghi chú |
 
 Sắp xếp sao cho các dòng `review_needed=1` nằm lên đầu.
 
-### Bước 5. Chốt phiên bản (chạy sau khi Trí duyệt xong)
+### Bước 5. Chốt phiên bản (chạy với `propositions_review_final.csv`)
 
-Đọc lại CSV đã duyệt, kiểm tra hợp lệ, rồi ghi:
+Đọc CSV đã duyệt, kiểm tra hợp lệ, rồi ghi:
 
 ```text
 WeakSup/propositions/v1/
-├── propositions_review.csv     # bản Trí đã duyệt
+├── propositions_review.csv     # = propositions_review_final.csv
 ├── propositions_final.json     # chỉ các mệnh đề final_observable=1:
 │                               #   proposition_id, disease_id, category, polarity,
 │                               #   image_applicable, sub_hypotheses[list], hypotheses[list đã bọc mẫu]
 ├── summary_per_disease.csv     # số mệnh đề quan sát được theo bệnh và theo nhóm
-└── meta.json                   # SHA-256 KB, mẫu câu hỏi, từ khoá, ngày duyệt
+└── meta.json                   # SHA-256 KB và CSV đã duyệt, mẫu câu hỏi, từ khoá, ngày duyệt
 ```
 
 Kiểm tra hợp lệ (assert):
@@ -94,15 +126,15 @@ Kiểm tra hợp lệ (assert):
 - Mỗi bệnh có ít nhất 1 mệnh đề `final_observable=1`.
 - Mọi `proposition_id` tồn tại trong KB.
 - Không có câu hỏi con nào rỗng.
+- Mệnh đề `final_observable=0` phải có `image_applicable=0`.
 - Thứ tự mệnh đề trong `propositions_final.json` theo đúng thứ tự trong KB. Thứ tự này cố định cột của ma trận nhãn và ma trận $S$ về sau.
 
 ## Xong khi
 
-- Trí đã duyệt `propositions_review.csv`, ưu tiên các dòng `review_needed=1`.
-- `propositions/v1/` đã tạo và qua mọi assert.
+- `propositions/v1/` đã được tạo từ `propositions_review_final.csv` và qua mọi assert.
 
 ## Không được làm
 
-- Sửa `kb_propositions.json`.
+- Sửa `kb_propositions.json`, hay sửa `propositions_review_final.csv`.
 - Tự quyết các dòng `review_needed=1` mà không qua Trí duyệt.
 - Dùng LLM để viết lại `canonicalDescription`. Tách câu hỏi chỉ bằng quy tắc, phần còn lại do Trí sửa tay.

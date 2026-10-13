@@ -21,9 +21,17 @@ Học cách kết hợp điểm mệnh đề $s_{ij}$ thành xác suất bệnh.
 
 | File | Nội dung |
 |---|---|
-| `proposition/weak/aggregation.py` | `ActiveAggregator(prop_disease, prop_group, num_diseases, mode)` với `mode ∈ {mean, weighted, group}`. Mọi mode chỉ tổng hợp trên các mệnh đề quan sát được, theo đúng thứ tự cột của $S$ |
+| `proposition/weak/aggregation.py` | `ActiveAggregator(prop_disease, prop_group, num_diseases, mode)` với `mode ∈ {mean, weighted, group}`. Mọi mode chỉ tổng hợp trên **tập tổng hợp $B_d^*$** (định nghĩa bên dưới), theo đúng thứ tự cột của $S$ |
 | `proposition/weak/model.py` (thêm) | `DecisionHead(aggregator, calibration)`: polarity → aggregation → `PositiveCalibration` (import từ P1, không sửa) |
 | `main_ws_stage2.py` | entrypoint |
+
+### Tập tổng hợp $B_d^*$
+
+$B_d^*$ gồm các mệnh đề quan sát được của bệnh *d* **có ít nhất 1 nhãn (0 hoặc 1) trong train**, tính trên `label_final` sau bước LLM (file 03).
+
+- Mệnh đề quan sát được nhưng chưa có nhãn nào trong train **vẫn có điểm $s$** (để hiển thị trong bảng kiểm), nhưng **không tham gia** tính điểm bệnh, vì điểm của nó chưa từng được dạy.
+- Nếu $B_d^*$ của một bệnh bị rỗng, dùng mọi mệnh đề quan sát được của bệnh đó và ghi cờ `fallback=true` cho bệnh đó vào `run_config.json`.
+- Ghi danh sách $B_d^*$ ra `aggregation_set.json` (theo từng bệnh: số mệnh đề, theo nhóm, cờ `fallback`).
 
 ### Các mode tổng hợp
 
@@ -31,7 +39,7 @@ Học cách kết hợp điểm mệnh đề $s_{ij}$ thành xác suất bệnh.
 |---|---|---|
 | `mean` (chính) | $z_{id}=\frac{1}{\lvert B_d^*\rvert}\sum_{j\in B_d^*}\tilde s_{ij}$ | không có |
 | `weighted` | $z_{id}=\sum_{j\in B_d^*}\mathrm{softmax}_{j\in B_d^*}(a_j)\,\tilde s_{ij}$ | $a_j$ cho từng mệnh đề |
-| `group` | như `weighted`, nhưng $a_j=a_{g(j)}$ dùng chung theo nhóm *g* (morphology / location) | $a_g$, 2 tham số |
+| `group` | như `weighted`, nhưng $a_j=a_{g(j)}$ dùng chung theo nhóm *g* (morphology / location / symptom / history) | $a_g$, 4 tham số |
 
 Sau đó: $\hat y_{id}=\sigma(\gamma_d z_{id}+b_d)$ với $\gamma_d>0$, dùng `PositiveCalibration` của P1.
 
@@ -71,7 +79,7 @@ Với mỗi ca test và 3 bệnh có xác suất cao nhất, ghi lại **mọi m
 
 | Loại mệnh đề | Thông tin ghi |
 |---|---|
-| quan sát được | $s_{ij}$, $\tilde s_{ij}$, polarity, trạng thái `có` khi $s\ge$ `--status_threshold` (mặc định 0,5), ngược lại là `không`; top-k vết attention (lấy từ `attention_test.npz`, hoặc tính lại nếu chạy `unfrozen`); nhãn yếu; nhãn chấm tay nếu ca nằm trong mẫu chấm tay |
+| quan sát được | $s_{ij}$, $\tilde s_{ij}$, polarity, cờ `in_aggregation` (thuộc $B_d^*$ hay không), trạng thái `có` khi $s\ge$ `--status_threshold` (mặc định 0,5), ngược lại là `không`; top-k vết attention (lấy từ `attention_test.npz`, hoặc tính lại nếu chạy `unfrozen`); nhãn yếu; nhãn chấm tay nếu ca nằm trong mẫu chấm tay |
 | không quan sát được | trạng thái `không đủ thông tin` |
 
 Mọi dòng đều kèm `sourceExcerpt`. Ghi ra `checklist/checklist_test.json`. Ngưỡng 0,5 chỉ dùng để hiển thị; không dùng ở bất kỳ phép tính nào khác.
@@ -108,6 +116,6 @@ Tên khoá `pred_proposition` và cấu trúc `final_metrics.json` phải giữ 
 ## Không được làm
 
 - Ở chế độ `frozen`: cập nhật hay tính lại $S$ trong lúc train; để bộ mã hoá ở `train()`.
-- Đưa mệnh đề không quan sát được vào phép tổng hợp.
+- Đưa vào phép tổng hợp mệnh đề không quan sát được, hoặc mệnh đề không có nhãn nào trong train (trừ khi dùng fallback).
 - Chọn mô hình theo test.
 - Đổi tên khoá hay cấu trúc file dự đoán so với P1.

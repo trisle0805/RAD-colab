@@ -1,0 +1,75 @@
+# Weak-supervision experiment configuration for the WS branch.
+#
+# Do not store API or Hugging Face tokens in this file; configure them as
+# Colab Secrets / environment variables.
+
+# Repository cloned in the Colab runtime. It must be on branch WS.
+repo_dir: /content/RAD-colab
+
+# Verified from notebooks/K34_Proposition_clean.ipynb, cell 4.
+# The original SkinCAP inputs are already stored on Drive at this location.
+drive_root: /content/drive/MyDrive/Cao học
+skincap:
+  train_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_train.csv
+  val_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_val.csv
+  test_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_test.csv
+  image_root: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap
+
+# Verified repository inputs. These exist in the WS working tree.
+kb_path: /content/RAD-colab/kb_builder/outputs/final/kb_propositions.json
+propositions_review_final: /content/RAD-colab/weak_supervisior/propositions_review_final.csv
+
+# Proposed output root: it does not exist yet. Change this one value only if
+# you want WeakSup artifacts in another Drive folder.
+ws_root: /content/drive/MyDrive/Cao học/WeakSup
+
+# Versioned output/input paths under ws_root. The values are intentional
+# proposals because these artifacts have not yet been produced on Drive.
+propositions_dir: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1
+propositions_final: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1/propositions_final.json
+teacher_text_dir: /content/drive/MyDrive/Cao học/WeakSup/teacher_text/bioclinicalbert_mednli_v1
+teacher_text_model: /content/drive/MyDrive/Cao học/WeakSup/teacher_text/bioclinicalbert_mednli_v1/model
+weak_labels_dir: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v1
+
+# Stage 03 initial, versioned labeling settings.
+seed: 42
+text_labeler:
+  max_length: 128
+  batch_size: 256
+  fp16: true
+  entailment_threshold: 0.90
+  contradiction_threshold: 0.80
+image_labeler:
+  model_id: JerrryNie/ConceptCLIP
+  positive_threshold: 0.80
+  negative_threshold: 0.20
+llm_verify:
+  enabled: true
+  provider: null                  # Set only at execution time: openai or anthropic.
+  group_a: true
+  group_b: true
+  group_c: false
+  group_d: true
+  temperature: 0
+  max_retries: 3
+  prompt_path: /content/RAD-colab/proposition/weak/prompts/llm_verify_v1.txt
+  negation_terms:
+    - no
+    - not
+    - without
+    - absent
+    - absence
+    - sparing
+    - spared
+    - spares
+    - unaffected
+    - negative
+    - free of
+    - lack
+    - lacks
+    - lacking
+    - none
+    - neither
+    - nor
+    - denies
+    - never

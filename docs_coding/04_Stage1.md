@@ -103,7 +103,7 @@ Kèm theo **AUC toàn cục** trên mọi ô có nhãn, so với baseline "chỉ
 
 **C2: các mệnh đề có còn nhân bản nhau không.**
 
-- (a) **Điểm:** với mỗi bệnh *d*, lấy ma trận $s$ trên các ca test thuộc *d* và các mệnh đề trong $B_d^*$. Tính tương quan Pearson giữa các cột, lấy trung bình phần ngoài đường chéo, rồi lấy trung bình theo bệnh.
+- (a) **Điểm:** với mỗi bệnh *d*, lấy ma trận $s$ trên các ca test thuộc *d* và các mệnh đề trong $B_d^*$ (định nghĩa ở file 00 / 05). Tính tương quan Pearson giữa các cột, lấy trung bình phần ngoài đường chéo, rồi lấy trung bình theo bệnh.
 - (b) **Attention:** với các ca có full attention, lấy bệnh đúng *d* của ca, tính tương quan Pearson giữa bản đồ attention của các mệnh đề trong $B_d^*$, rồi lấy trung bình.
 - Chạy **cùng hàm này** trên artifact checklist của P1 (`support` và `full_attention` trong `checklist/` của run P1), giới hạn ở các mệnh đề quan sát được, để có mốc so sánh cùng cách đo.
 

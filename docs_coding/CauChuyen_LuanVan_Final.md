@@ -83,7 +83,7 @@ Trong học máy, hiện tượng này gọi là **tính không định danh c�
 
 - **Về chẩn đoán:** độ chính xác top-1 khoảng 0,80–0,83, tương đương RAD (0,82). Nhìn từ đầu ra cuối, mô hình có vẻ hoạt động tốt.
 - **Về mệnh đề:** điểm và attention cho thấy mô hình không đọc từng dấu hiệu.
-  - Điểm mệnh đề bật hoặc tắt theo bệnh, không theo dấu hiệu. Tỉ lệ mệnh đề có điểm cao vượt 0,75 ở mọi nhóm, kể cả nhóm bệnh sử (0,81) và xét nghiệm (0,77), là những thông tin mà ảnh và mô tả tổn thương không chứa.
+  - Điểm mệnh đề bật hoặc tắt theo bệnh, không theo dấu hiệu. Tỉ lệ mệnh đề có điểm cao vượt 0,75 ở mọi nhóm, kể cả nhóm xét nghiệm (0,77), là thông tin mà ảnh và mô tả lâm sàng không thể chứa, và nhóm bệnh sử (0,81), là thông tin mà mô tả hiếm khi nhắc tới.
   - Bản đồ attention của từng mệnh đề gần như trùng với bản đồ trung bình của cả bệnh (tương quan khoảng 0,99). Các mệnh đề khác nhau cùng nhìn vào một chỗ.
   - Dự đoán của nhánh mệnh đề trùng với một nhánh đối chứng chỉ dùng tên bệnh làm query ở 539/546 ca kiểm tra.
 - **Về độ bền của hiện tượng:** thay đổi cách biểu diễn query (cho học hoặc giữ cố định), hay cách tổ chức bộ nhớ bệnh nhân, đều không làm hiện tượng biến mất.
@@ -151,14 +151,21 @@ Bộ gán nhãn chỉ chạy **một lần, bên ngoài mô hình, trước khi 
 
 ### 5.5 Tri thức đầy đủ và tập mệnh đề quan sát được
 
-Không phải dấu hiệu nào cũng quan sát được trên mọi bộ dữ liệu. SkinCAP gồm ảnh tổn thương và mô tả tổn thương, không có bệnh sử, triệu chứng cơ năng hay kết quả xét nghiệm của bệnh nhân.
+Không phải dấu hiệu nào cũng quan sát được trên mọi bộ dữ liệu. SkinCAP gồm ảnh tổn thương và mô tả lâm sàng đi kèm, không có kết quả xét nghiệm hay hồ sơ bệnh án.
 
 Luận văn phân biệt:
 
 - **cơ sở tri thức đầy đủ:** toàn bộ mệnh đề phân rã từ guideline, giữ nguyên, không cắt tỉa;
 - **tập mệnh đề quan sát được trên một bộ dữ liệu:** những mệnh đề mà dữ liệu của bộ đó *có thể chứa bằng chứng*, nên gán nhãn và học được.
 
-Tiêu chí quan sát được là **bản chất của dấu hiệu so với loại dữ liệu**, không chỉ là nhóm của mệnh đề. Trên SkinCAP, tập này gồm các dấu hiệu hình thái và vị trí **biểu hiện trên da hoặc niêm mạc nhìn thấy được**. Một số mệnh đề tuy thuộc nhóm hình thái hay vị trí nhưng mô tả tổn thương ở cơ quan bên trong (phổi, thận, hạch, di căn…). Ảnh da và mô tả tổn thương không thể chứa bằng chứng cho những dấu hiệu này, nên chúng không thuộc tập quan sát được.
+Một mệnh đề là **quan sát được** nếu dấu hiệu của nó có thể được xác định đáng tin cậy từ **ảnh hoặc mô tả lâm sàng** của bộ dữ liệu. Tiêu chí này xét **bản chất của dấu hiệu so với loại dữ liệu**, không chỉ nhóm của mệnh đề. Trên SkinCAP:
+
+- **quan sát được:** dấu hiệu hình thái và vị trí biểu hiện trên da hoặc niêm mạc nhìn thấy được; triệu chứng và bệnh sử mà mô tả lâm sàng có thể nêu trực tiếp (ngứa, đau, khởi phát sau dùng thuốc…);
+- **không quan sát được:** xét nghiệm, sinh thiết, chẩn đoán hình ảnh, và tổn thương ở cơ quan bên trong (phổi, thận, hạch, khớp, di căn…), dù mệnh đề có thể thuộc nhóm hình thái hay vị trí.
+
+Ngoài ra, mệnh đề mà các vế cộng lại bao hết mọi khả năng (ví dụ "một hoặc nhiều tổn thương") cũng bị loại, vì nó đúng với mọi ca nên không mang thông tin.
+
+Mệnh đề triệu chứng và bệnh sử cần thêm một lưu ý. Mô tả lâm sàng có thể nói về **bệnh nói chung** ("bệnh này thường gây ngứa") chứ không phải về **chính bệnh nhân**. Câu kiểu đó không phải bằng chứng của ca, nên bộ gán nhãn phải bỏ qua (mục 6.2).
 
 Mệnh đề ngoài tập quan sát được không bị coi là "không có". Chúng hiện trong bảng kiểm với trạng thái **"không đủ thông tin"** và không tham gia tính điểm bệnh. Khi chuyển sang bộ dữ liệu có bệnh án hoặc xét nghiệm, tập quan sát được tự mở rộng mà không cần thay đổi tri thức.
 
@@ -233,7 +240,7 @@ Các mục sau đi lần lượt từng bước. Một **ca minh hoạ** đượ
 
 **Mục đích.** Tạo cho mỗi cặp (ca, mệnh đề) một câu trả lời *có / không / không đủ thông tin*, để làm tín hiệu huấn luyện cho tầng bằng chứng.
 
-**Những cặp nào được gán nhãn.** Mọi ca trong tập huấn luyện, ghép với mọi mệnh đề **quan sát được** (mục 5.5) của **mọi bệnh**, không chỉ bệnh đúng của ca. Lý do: nhiều dấu hiệu dùng chung giữa các bệnh. Một ca vảy nến vẫn có thể có "mảng đỏ" vốn cũng là dấu hiệu của bệnh khác. Mệnh đề không quan sát được (bệnh sử, triệu chứng, xét nghiệm, tổn thương cơ quan bên trong trên SkinCAP) không đưa vào bộ gán nhãn và mặc định là $\varnothing$.
+**Những cặp nào được gán nhãn.** Mọi ca trong tập huấn luyện, ghép với mọi mệnh đề **quan sát được** (mục 5.5) của **mọi bệnh**, không chỉ bệnh đúng của ca. Lý do: nhiều dấu hiệu dùng chung giữa các bệnh. Một ca vảy nến vẫn có thể có "mảng đỏ" vốn cũng là dấu hiệu của bệnh khác. Mệnh đề không quan sát được (xét nghiệm, tổn thương cơ quan bên trong, và các mệnh đề luôn đúng trên SkinCAP) không đưa vào bộ gán nhãn và mặc định là $\varnothing$.
 
 **Nguồn văn bản (NLI).**
 
@@ -243,6 +250,7 @@ Các mục sau đi lần lượt từng bước. Một **ca minh hoạ** đượ
 - **Kiểm tra lại bằng LLM, có điều kiện.** LLM không gán nhãn cho mọi cặp mà chỉ xem lại hai loại trường hợp:
   - (a) NLI cho "có" nhưng câu căn cứ chứa từ phủ định. LLM có thể giữ, hạ xuống "không đủ thông tin", hoặc đổi thành "không".
   - (b) NLI gần cho "không" nhưng chưa đủ chắc. LLM có thể xác nhận thành "không".
+  - (c) NLI cho "có" với một mệnh đề triệu chứng hoặc bệnh sử. LLM chỉ giữ nhãn "có" khi mô tả nói về **chính bệnh nhân**; câu mô tả bệnh nói chung không được tính.
 
   LLM được yêu cầu chỉ dựa vào những gì mô tả viết ra, không suy luận từ kiến thức bệnh, và phải trích nguyên văn cụm từ làm căn cứ. LLM **không** được tạo ra nhãn "có" từ một trường hợp đang là "không đủ thông tin". Nhờ vậy bước này chỉ bớt nhãn "có" sai và thêm nhãn "không", không đưa tri thức bệnh vào nhãn.
 - Mệnh đề được hiểu theo **nghĩa lâm sàng**, không theo nghĩa đen của từ nối. Nhiều mệnh đề liệt kê các vị trí hay gặp ("tổn thương ở mặt, ngực và lưng") hoặc các dạng biểu hiện thay thế ("sẩn hoặc nốt"). Ca có tổn thương ở *một* trong các vị trí đó, hoặc có *một* trong các dạng đó, là đã có dấu hiệu, không cần có đủ tất cả.
@@ -294,7 +302,7 @@ flowchart LR
 | B. vảy trắng bạc | ủng hộ → 1 | điểm cao → 1 | **1** | |
 | C. rỗ móng | không nói tới → $\varnothing$ | ảnh không có móng → $\varnothing$ | **$\varnothing$** | không đủ thông tin, **không** phải "không có" |
 | D. phân bố ở mặt duỗi | ủng hộ → 1 | (không áp dụng) | **1** | |
-| E. tiền sử gia đình | (không quan sát được) | (không áp dụng) | **$\varnothing$** | ngoài tập quan sát được |
+| E. tiền sử gia đình | không nói tới → $\varnothing$ | (không áp dụng: bệnh sử) | **$\varnothing$** | mô tả không nhắc tới tiền sử gia đình |
 | F. dát đỏ ranh giới không rõ (chàm) | phủ định → 0 | (ví dụ: $\varnothing$) | **0** | mô tả nói "giới hạn rõ" |
 | G. mụn nước | không nói tới → $\varnothing$ | điểm thấp → 0 | **0** | ảnh cho thấy không có mụn nước |
 
@@ -356,14 +364,14 @@ Cách huấn luyện "học khái niệm trước, đóng băng, rồi học quy
 
 1. **Lật cực tính.** Dấu hiệu ủng hộ giữ nguyên điểm; dấu hiệu loại trừ đổi thành "điểm không có dấu hiệu":
    $$\tilde s_{ij} = \begin{cases} s_{ij} & \text{dấu hiệu ủng hộ} \\ 1 - s_{ij} & \text{dấu hiệu loại trừ} \end{cases}$$
-2. **Tổng hợp.** Lấy trung bình $\tilde s_{ij}$ trên các mệnh đề quan sát được của bệnh *d*, ký hiệu $B_d^*$:
+2. **Tổng hợp.** Lấy trung bình $\tilde s_{ij}$ trên **tập tổng hợp** $B_d^*$ của bệnh *d*. Tập này gồm các mệnh đề quan sát được của bệnh *d* có ít nhất một nhãn trong dữ liệu huấn luyện. Mệnh đề chưa từng có nhãn thì điểm của nó chưa được dạy, nên chỉ hiển thị trong bảng kiểm, không góp vào điểm bệnh:
    $$z_{id} = \frac{1}{|B_d^*|}\sum_{j \in B_d^*}\tilde s_{ij}$$
 3. **Hiệu chỉnh.** Một hàm đơn điệu tăng riêng cho từng bệnh chuyển $z_{id}$ thành xác suất:
    $$\hat y_{id} = \sigma(\gamma_d\, z_{id} + b_d),\quad \gamma_d > 0$$
 
 **Hàm mất mát:** BCE giữa $\hat y_{id}$ và nhãn bệnh. Chỉ $\gamma_d, b_d$ được học.
 
-**Vì sao trung bình đều?** Để điểm bệnh giải thích được trực tiếp bằng bảng kiểm: mỗi dấu hiệu đóng góp như nhau, và người đọc thấy ngay điểm bệnh cao vì những dấu hiệu nào. Các biến thể có trọng số (học trọng số không âm cho từng mệnh đề, hoặc cho từng nhóm mệnh đề như hình thái và vị trí) được xét qua thực nghiệm như phương án so sánh. **Vì sao hàm hiệu chỉnh phải đơn điệu tăng?** Để nhiều dấu hiệu ủng hộ hơn luôn dẫn tới xác suất bệnh cao hơn, không bao giờ ngược lại.
+**Vì sao trung bình đều?** Để điểm bệnh giải thích được trực tiếp bằng bảng kiểm: mỗi dấu hiệu đóng góp như nhau, và người đọc thấy ngay điểm bệnh cao vì những dấu hiệu nào. Các biến thể có trọng số (học trọng số không âm cho từng mệnh đề, hoặc cho từng nhóm mệnh đề: hình thái, vị trí, triệu chứng, bệnh sử) được xét qua thực nghiệm như phương án so sánh. **Vì sao hàm hiệu chỉnh phải đơn điệu tăng?** Để nhiều dấu hiệu ủng hộ hơn luôn dẫn tới xác suất bệnh cao hơn, không bao giờ ngược lại.
 
 ```mermaid
 flowchart LR
@@ -374,7 +382,7 @@ flowchart LR
     Y --> L["BCE với nhãn bệnh<br/>chỉ cập nhật γ_d, b_d"]
 ```
 
-**Trên ca minh hoạ** (bệnh vảy nến; giả sử các mệnh đề quan sát được trong ví dụ là A, B, C, D, G):
+**Trên ca minh hoạ** (bệnh vảy nến; giả sử trong ví dụ, tập tổng hợp $B_d^*$ của vảy nến gồm A, B, C, D, G):
 
 | Mệnh đề | $s_{ij}$ | Cực tính | $\tilde s_{ij}$ |
 |---|---|---|---|
@@ -384,7 +392,7 @@ flowchart LR
 | D | 0,85 | + | 0,85 |
 | G | 0,08 | − | 0,92 |
 
-$z = (0{,}92 + 0{,}88 + 0{,}30 + 0{,}85 + 0{,}92)/5 = 0{,}774$, rồi qua hiệu chỉnh ra xác suất vảy nến. Mệnh đề E (bệnh sử) không tham gia.
+$z = (0{,}92 + 0{,}88 + 0{,}30 + 0{,}85 + 0{,}92)/5 = 0{,}774$, rồi qua hiệu chỉnh ra xác suất vảy nến. Trong ví dụ này, giả sử mệnh đề E (tiền sử gia đình) chưa từng có nhãn trong dữ liệu huấn luyện, nên nó không thuộc $B_d^*$ và không tham gia.
 
 ### 6.6 Bước 5: dự đoán cho ca mới
 
@@ -416,7 +424,7 @@ flowchart LR
 | phân bố ở mặt duỗi | **có** (0,85) | … |
 | rỗ móng | **không** (0,30) | … |
 | mụn nước (dấu hiệu loại trừ) | **không có**, phù hợp với vảy nến | … |
-| tiền sử gia đình | **không đủ thông tin** | dữ liệu không có bệnh sử |
+| tiền sử gia đình | **không đủ thông tin** | mô tả không nhắc tới |
 
 Mỗi dòng dẫn về đoạn guideline gốc của mệnh đề. Chẩn đoán và bảng kiểm dùng **cùng một bộ điểm**, nên bảng kiểm phản ánh đúng cái mô hình đã dùng để chẩn đoán, không phải một lời giải thích dựng thêm sau.
 
@@ -461,9 +469,9 @@ Attention chỉ được hiểu là **vết bằng chứng**, không phải gi�
 ## 8. Hạn chế
 
 1. **Phụ thuộc bộ gán nhãn:** điểm mệnh đề chỉ tốt tới mức nhãn yếu cho phép.
-2. **Thông tin gắn chặt với bệnh trong dữ liệu đầu vào:** nếu mô tả lâm sàng chứa tên bệnh hoặc thông tin gắn chặt với bệnh, mô hình vẫn có thể dựa một phần vào đó (một dạng reasoning shortcut ở mức dữ liệu) thay vì quan sát trên ca.
+2. **Thông tin gắn chặt với bệnh trong dữ liệu đầu vào:** nếu mô tả lâm sàng chứa tên bệnh hoặc đoạn mô tả bệnh nói chung, mô hình vẫn có thể dựa một phần vào đó (một dạng reasoning shortcut ở mức dữ liệu) thay vì quan sát trên ca. Rủi ro này lớn nhất ở nhóm triệu chứng và bệnh sử; bước kiểm tra bằng LLM chỉ giảm được, không loại bỏ hoàn toàn.
 3. **Ít nhãn "không" (0):** đây là nhãn của bộ gán nhãn cho biết ca *không có* dấu hiệu, khác với cực tính của mệnh đề. Mô tả lâm sàng ít khi viết phủ định, nên nhãn 0 từ văn bản hiếm; nhãn 0 chủ yếu đến từ ảnh. Khi nhãn 1 áp đảo, tầng bằng chứng có xu hướng cho điểm cao ở mọi nơi, nên cần được cân bằng khi huấn luyện.
-4. **Độ phủ:** trên SkinCAP chỉ các dấu hiệu hình thái và vị trí biểu hiện trên da hoặc niêm mạc nhìn thấy được là quan sát được; các mệnh đề còn lại chỉ có trạng thái "không đủ thông tin".
+4. **Độ phủ:** trên SkinCAP, xét nghiệm và tổn thương cơ quan bên trong không quan sát được. Nhiều mệnh đề triệu chứng và bệnh sử tuy quan sát được về nguyên tắc nhưng hiếm khi được nêu trong mô tả, nên phần lớn chỉ có trạng thái "không đủ thông tin".
 5. **Cách diễn đạt của mệnh đề:** nhiều mệnh đề liệt kê các vị trí hay dạng biểu hiện thay thế. Nếu bộ gán nhãn hiểu theo nghĩa đen của từ nối ("và" là phải có đủ) thay vì nghĩa lâm sàng, nhãn sẽ thiếu hoặc sai.
 6. **Bộ gán nhãn phía ảnh còn hạn chế:** độ chính xác gán khái niệm zero-shot của các mô hình ảnh–chữ hiện nay còn khiêm tốn. Với ảnh cơ xương khớp, ConceptCLIP mới được đánh giá ở mức phân loại bệnh, chưa ở mức gán khái niệm.
 7. **Nguồn bằng chứng của mô hình:** khi nhãn chủ yếu sinh từ văn bản và mô hình cũng đọc văn bản, mô hình có thể dựa nhiều vào văn bản hơn ảnh. Không thể mặc định vết attention trên ảnh là bằng chứng thị giác.

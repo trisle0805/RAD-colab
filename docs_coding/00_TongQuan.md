@@ -26,7 +26,7 @@ File 01 và 02 không phụ thuộc nhau nên có thể làm song song.
 | File | Đầu ra chính | Người duyệt trước khi đi tiếp |
 |---|---|---|
 | 01 | checkpoint bộ gán nhãn văn bản và kết quả MedNLI | Trí (**đã xong**) |
-| 02 | danh sách mệnh đề quan sát được và các câu hỏi đã tách | **Trí duyệt từng dòng** |
+| 02 | danh sách mệnh đề quan sát được và các câu hỏi đã tách | Trí (**bảng v1 đã chốt**, agent chỉ chạy bước 5) |
 | 03 | file nhãn yếu (NLI + LLM kiểm tra lại + ConceptCLIP), thống kê, mẫu chấm tay | **Trí xác nhận lần chạy thử LLM và chấm mẫu** |
 | 04 | checkpoint Stage 1, ma trận điểm $S$, C1, C2 | Trí |
 | 05 | dự đoán bệnh, `final_metrics.json`, C3 | Trí |
@@ -110,7 +110,8 @@ proposition/tests/weak/            # unit test cho mọi module mới
 | Thuật ngữ | Nghĩa |
 |---|---|
 | `case_id` | tên file ảnh ở cột đầu của CSV SkinCAP (vd. `1761.png`), là khoá duy nhất của một ca |
-| mệnh đề quan sát được | mệnh đề thuộc tập active trên SkinCAP (file 02; file câu chuyện mục 5.5) |
+| mệnh đề quan sát được | mệnh đề có `final_observable=1` trong `propositions_review_final.csv` (file 02; file câu chuyện mục 5.5); là các cột của ma trận nhãn và ma trận $S$ |
+| tập tổng hợp $B_d^*$ | các mệnh đề quan sát được của bệnh *d* **có ít nhất 1 nhãn (0 hoặc 1) trong train**, tính trên `label_final` sau bước LLM. Nếu rỗng thì dùng mọi mệnh đề quan sát được của bệnh *d* và ghi cờ `fallback`. Định nghĩa trong file 05 |
 | câu hỏi (hypothesis) | câu dùng để hỏi bộ gán nhãn, sinh từ `canonicalDescription` (file 02) |
 | nhãn yếu $r_{ij}$ | `1` có, `0` không, `-1` không đủ thông tin (∅) |
 | $S$ | ma trận điểm mệnh đề $s_{ij}$ (ca × mệnh đề quan sát được) do Stage 1 tạo ra |
