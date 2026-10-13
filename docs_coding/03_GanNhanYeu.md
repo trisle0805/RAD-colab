@@ -38,7 +38,6 @@ Gán nhãn cho **cả ba split**: train dùng làm tín hiệu huấn luyện, v
    Xuất `disease_alias_v1.csv` (`disease_id`, `alias`, `source`) để **Trí duyệt**.
 2. Thay mọi alias đã duyệt (không phân biệt hoa thường, khớp nguyên từ) bằng cụm `this skin condition`.
 3. **Mô hình chính (file 04) vẫn đọc caption gốc.** Bước che tên chỉ dùng cho bộ gán nhãn.
-4. Ngoài tên bệnh, caption giữ nguyên, không tách hay bỏ đoạn nào, kể cả đoạn mô tả bệnh nói chung. Ảnh hưởng của đoạn này được xử lý ở A2b, nhóm D.
 
 ### A2. Nhãn từ văn bản (NLI)
 
@@ -205,20 +204,15 @@ Hàm đọc file này đặt trong `proposition/weak/labels.py`: `load_weak_labe
 
 ## Phần B · Khảo sát thống kê (notebook `WS_03b_label_survey.ipynb`)
 
-Chỉ đọc `labels.npz` rồi xuất kết quả, không sửa nhãn.
+Chỉ đọc `weak_labels/v1/` rồi xuất kết quả. **Không** chạy lại NLI, ConceptCLIP hay LLM; **không** sửa `labels.npz`. Nếu cần đổi ngưỡng thì tạo `weak_labels/v2/` và chạy lại phần A.
 
-1. **Theo mệnh đề**, ghi ra `stats_per_proposition.csv`:
-   - `n_present`, `n_absent`, `n_unknown`, `positive_rate`, `coverage` (tỉ lệ ô có nhãn), tính riêng cho từng split;
-   - tách theo nguồn: số nhãn đến từ văn bản và số nhãn đến từ ảnh;
-   - `n_present_own_disease` và `n_present_other_disease`: nhãn 1 nằm trên ca thuộc chính bệnh của mệnh đề hay trên ca bệnh khác;
-   - cờ `positive_only` (có nhãn 1 nhưng không có nhãn 0) và cờ `no_label` (không có nhãn nào).
-2. **Theo nhóm** (morphology / location / symptom / history) và **toàn bộ**: tổng số nhãn 1, nhãn 0, ∅, và tỉ lệ nhãn 1 trên nhãn 0. Tỉ lệ này dùng để quyết định có bật cân bằng lớp ở file 04 hay không.
-3. **Tác động của LLM (A2b)**: với từng nhóm A/B/C/D, số ô đã gửi, số ô giữ nguyên, số ô hạ từ 1 xuống ∅, số ô đổi từ 1 sang 0, số ô thêm nhãn 0, và số ô có `quote_invalid`. Riêng nhóm D, ghi thêm tỉ lệ nhãn 1 nằm trên ca thuộc **chính bệnh** của mệnh đề, **trước và sau** A2b. Nếu sau A2b tỉ lệ này vẫn gần 100%, nhãn của nhóm này đang gần như trùng nhãn bệnh; Trí cần xem lại trước khi train.
-4. **Độ khớp giữa văn bản và ảnh** trên các ô mà cả hai nguồn đều có nhãn: bảng chéo 2×2 và số ô mâu thuẫn.
-5. **Histogram** của `p_entail`, `p_contra`, `p_img`, kèm vị trí các ngưỡng.
-6. **Tóm tắt** trong `survey_summary.md`: các con số chính và danh sách mệnh đề `no_label` / `positive_only`. Chỉ ghi số liệu, không viết diễn giải.
+1. **Số nhãn:** số và tỉ lệ nhãn 1 / 0 / ∅. Tách theo split, theo nhóm (morphology / location / symptom / history) và theo nguồn (văn bản / ảnh). Kèm tỉ lệ nhãn 1 / nhãn 0 trên train, dùng để quyết định `pos_weight` ở file 04. Theo từng mệnh đề, ghi ra `stats_per_proposition.csv` gồm `n_present`, `n_absent`, `n_unknown`, `n_train_labels`.
+2. **Tác động của bước LLM:** với từng nhóm A/B/D, đếm số ô đã gửi, số ô đổi 1→∅, 1→0, ∅→0, và số ô có `quote_invalid`.
+3. **Histogram** của `p_entail`, `p_contra` (kẻ ngưỡng 0,9 và 0,8) và `p_img` (kẻ ngưỡng 0,2 và 0,8).
+4. **Mô phỏng `min_labels`:** với `min_labels` ∈ {1, 3, 5, 10}, đếm số mệnh đề còn lại trong tập tổng hợp, số mệnh đề nhỏ nhất theo bệnh, và số bệnh phải dùng fallback.
+5. **Kiểm tra rò rỉ:** với mỗi mệnh đề, tính tỉ lệ nhãn 1 nằm trên ca thuộc chính bệnh của mệnh đề đó (`own_share`), trước và sau bước LLM. Liệt kê các mệnh đề có `own_share ≥ 0,9`.
 
-Đầu ra: `WeakSup/weak_labels/v1/survey/`.
+Đầu ra: `WeakSup/weak_labels/v1/survey/`, gồm các file CSV, các hình PNG và `survey_summary.md`. File tóm tắt chỉ ghi số liệu, không viết diễn giải.
 
 ---
 
