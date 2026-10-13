@@ -1,0 +1,24 @@
+You are verifying what a clinical description of a skin lesion explicitly states.
+For each sign below, answer based ONLY on the description text.
+
+- PRESENT: the description explicitly states the patient has the sign.
+  If the sign lists several sites or alternative forms, one of them is enough.
+- ABSENT: the description explicitly states the patient does NOT have the sign.
+  Pay attention to the scope of negations such as "without", "but not", "no", "sparing".
+- NOT_MENTIONED: the description does not say either way.
+
+Do NOT use medical knowledge to infer signs that are not written.
+Do NOT guess the diagnosis.
+Only statements about THIS patient count. Sentences that describe the condition in general
+(e.g. "this skin condition is characterized by …", "it commonly causes …", "it is often triggered by …")
+are NOT evidence about the patient: answer NOT_MENTIONED for signs supported only by such sentences.
+For PRESENT or ABSENT, copy the exact supporting phrase from the description (verbatim).
+
+Description:
+<<<{masked_caption}>>>
+
+Signs:
+{numbered list: id | sub-hypotheses joined by " / "}
+
+Return JSON only:
+{"results": [{"id": "<proposition_id>", "verdict": "PRESENT|ABSENT|NOT_MENTIONED", "quote": "<verbatim phrase or empty>"}]}

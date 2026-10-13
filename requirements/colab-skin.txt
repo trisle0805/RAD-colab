@@ -3,6 +3,7 @@
 
 # Model, tokenizer, and training logging
 transformers==4.47.1
+openai>=1.0.0
 timm>=1.0.0
 einops
 peft
