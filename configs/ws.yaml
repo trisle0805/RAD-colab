@@ -15,18 +15,17 @@ skincap:
   test_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_test.csv
   image_root: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap
 
-# Verified repository inputs. These exist in the WS working tree.
-kb_path: /content/RAD-colab/kb_builder/outputs/final/kb_propositions.json
-propositions_review_final: /content/RAD-colab/weak_supervisior/propositions_review_final.csv
-
-# Proposed output root: it does not exist yet. Change this one value only if
-# you want WeakSup artifacts in another Drive folder.
+# Verified Stage-02 artifacts on Drive. Stage 03 must treat all of these as
+# read-only inputs; it must not regenerate, overwrite, or use a repository
+# review CSV instead.
 ws_root: /content/drive/MyDrive/Cao học/WeakSup
-
-# Versioned output/input paths under ws_root. The values are intentional
-# proposals because these artifacts have not yet been produced on Drive.
 propositions_dir: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1
 propositions_final: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1/propositions_final.json
+propositions_review: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1/propositions_review.csv
+propositions_summary: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1/summary_per_disease.csv
+propositions_meta: /content/drive/MyDrive/Cao học/WeakSup/propositions/v1/meta.json
+
+# Proposed locations for artifacts not yet confirmed as present on Drive.
 teacher_text_dir: /content/drive/MyDrive/Cao học/WeakSup/teacher_text/bioclinicalbert_mednli_v1
 teacher_text_model: /content/drive/MyDrive/Cao học/WeakSup/teacher_text/bioclinicalbert_mednli_v1/model
 weak_labels_dir: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v1
