@@ -11,7 +11,7 @@ Huấn luyện mô hình đọc (ảnh + caption) bằng query của từng mệ
 | Thứ | Nguồn |
 |---|---|
 | CSV, ảnh, KB | `configs/ws.yaml` |
-| Mệnh đề quan sát được | `WeakSup/propositions/v1/propositions_final.json` (file 02) |
+| Mệnh đề quan sát được | `WeakSup/propositions/v2/propositions_final.json` (file 02) |
 | Nhãn yếu | `WeakSup/weak_labels/v<k>/labels.npz` (file 03); dùng cột `label_final` |
 | Bộ mã hoá | `resnet50` và `emilyalsentzer/Bio_ClinicalBERT`, giống P1 |
 | Cấu hình huấn luyện | `configs/skin.yaml` (batch, lr, scheduler) cộng `configs/ws_stage1.yaml` |

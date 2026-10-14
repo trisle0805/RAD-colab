@@ -2,11 +2,25 @@
 
 *Lý do: file câu chuyện, mục 5.5 (tập mệnh đề quan sát được) và mục 6.2 (đọc mệnh đề theo nghĩa lâm sàng: liệt kê vị trí hoặc dạng thay thế thì chỉ cần có một).*
 
-## Trạng thái: bảng v1 đã chốt (13/10/2026)
+## Trạng thái: dùng bảng v2 (14/10/2026)
 
-**Bảng cuối là `propositions_v1/propositions_review_final.csv`.** Trí đã duyệt bảng này. Claude chỉ sửa thêm 6 mệnh đề luôn đúng (xem mục 4 bên dưới). **Agent không tạo lại bảng.** Agent chỉ chạy **bước 5**, lấy file này làm đầu vào. Lịch sử và lý do sửa của từng dòng nằm ở cột `note`, có tiền tố `[GPT-final]` hoặc `[Claude-final]`.
+**Bảng đang dùng là `propositions_v2/propositions_review_final.csv`.** Agent **không tạo lại bảng**; agent chỉ chạy **bước 5** với file này và ghi ra `WeakSup/propositions/v2/`. Thư mục `propositions/v1/` giữ nguyên, không ghi đè.
 
-Kết quả của bảng cuối:
+v2 khác v1 đúng 27 dòng, mỗi dòng có ghi chú `[Claude-v2]` ở cột `note`. Trí duyệt các dòng này trước khi chạy:
+
+- **10 mệnh đề chuyển thành không quan sát được**, vì đúng với mọi ca da liễu hoặc không mang thông tin (quy tắc 4 bên dưới): "skin involvement" (2), "skin symptoms", "cutaneous symptoms" (2), "cutaneous manifestations", "underlying skin disorders", "variable lesion size and number", "lesion size", "diameter ranging from a few millimeters to several centimeters".
+- **12 mệnh đề kích thước tắt nhãn ảnh** (`image_applicable=0`), vì ảnh không có thước đo. Văn bản vẫn gán nhãn được nếu caption ghi kích thước.
+- **5 mệnh đề về bên trong mắt tắt nhãn ảnh**: hyphema, glaucoma, uveitis, ocular manifestations, corneal ulcers.
+
+Kết quả v2: **978 mệnh đề quan sát được** (morphology 315, location 122, symptom 154, history 387); 298 mệnh đề có `image_applicable=1`; mỗi bệnh có từ 11 đến 39 mệnh đề, trung vị 19. Thống kê theo bệnh: `propositions_v2/summary_per_disease.csv`.
+
+Quy tắc bổ sung từ v2: **mệnh đề chỉ nói về kích thước → `image_applicable=0`.**
+
+### Bảng v1 (13/10/2026, giữ để đối chiếu)
+
+Bảng v1 là `propositions_v1/propositions_review_final.csv`. Trí đã duyệt bảng này; Claude sửa thêm 6 mệnh đề luôn đúng (xem quy tắc 4 bên dưới). Lịch sử và lý do sửa của từng dòng nằm ở cột `note`, có tiền tố `[GPT-final]` hoặc `[Claude-final]`.
+
+Kết quả của bảng v1:
 
 | Nhóm | Quan sát được | Không |
 |---|---:|---:|
@@ -29,7 +43,7 @@ Các quy tắc đã áp dụng khi duyệt, dùng lại cho những lần tạo 
 4. **Mệnh đề luôn đúng với mọi ca → 0.** Đó là các mệnh đề mà các vế cộng lại bao hết mọi khả năng, nên không mang thông tin: "isolated or numerous lesions", "solitary or grouped lesions", "male or female sex", "any age", "onset at any age", "onset in children or adults".
 5. **Vị trí:** mỗi câu hỏi con phải đúng ngữ pháp và đủ nghĩa.
 
-**Lưu ý dành cho file 03.** Bệnh sử và triệu chứng trong caption SkinCAP thường nằm trong đoạn kiến thức chung về bệnh, không phải mô tả của riêng bệnh nhân. Vì vậy mọi nhãn 1 của hai nhóm này phải qua bước LLM kiểm tra lại (file 03, A2b, **nhóm D**).
+**Lưu ý dành cho file 03.** Bệnh sử và triệu chứng trong caption SkinCAP thường nằm trong đoạn kiến thức chung về bệnh, không phải mô tả của riêng bệnh nhân. Prompt của LLM (file 03, A2) yêu cầu bỏ qua các câu kiểu này.
 
 ---
 
@@ -112,7 +126,7 @@ Sắp xếp sao cho các dòng `review_needed=1` nằm lên đầu.
 Đọc CSV đã duyệt, kiểm tra hợp lệ, rồi ghi:
 
 ```text
-WeakSup/propositions/v1/
+WeakSup/propositions/v<k>/          # v2 với bảng hiện tại
 ├── propositions_review.csv     # = propositions_review_final.csv
 ├── propositions_final.json     # chỉ các mệnh đề final_observable=1:
 │                               #   proposition_id, disease_id, category, polarity,
@@ -131,7 +145,7 @@ Kiểm tra hợp lệ (assert):
 
 ## Xong khi
 
-- `propositions/v1/` đã được tạo từ `propositions_review_final.csv` và qua mọi assert.
+- `propositions/v2/` đã được tạo từ `propositions_v2/propositions_review_final.csv` và qua mọi assert.
 
 ## Không được làm
 

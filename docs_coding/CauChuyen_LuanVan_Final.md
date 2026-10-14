@@ -129,15 +129,17 @@ Nếu không phân rã, điều này không làm được: không thể hỏi d�
 
 ### 5.4 Bộ gán nhãn
 
-**Từ văn bản: suy diễn ngôn ngữ tự nhiên (NLI).** NLI là một bài toán chuẩn của xử lý ngôn ngữ. Cho một **tiền đề** (mô tả lâm sàng của ca) và một **giả thuyết** (mệnh đề), NLI xác định tiền đề **ủng hộ** (entailment), **phủ định** (contradiction) hay **không nói tới** (neutral) giả thuyết. Ba đầu ra này ánh xạ thẳng sang 1, 0 và $\varnothing$.
+**Từ văn bản: mô hình ngôn ngữ lớn (LLM).** Bộ gán nhãn phía văn bản trả lời một câu hỏi hẹp: *mô tả lâm sàng của ca nói bệnh nhân **có** dấu hiệu này, nói là **không có**, hay **không nhắc tới**?* Ba câu trả lời ánh xạ thẳng sang 1, 0 và $\varnothing$. Câu hỏi này khác đo độ tương đồng: "mảng **không** có vảy" và "mảng có vảy" rất giống nhau về từ ngữ nhưng nghĩa ngược nhau, và đo tương đồng cũng không có trạng thái "không nhắc tới".
 
-NLI khác đo độ tương đồng. "Mảng **không** có vảy" và "mảng có vảy" rất giống nhau về từ ngữ, nhưng NLI cho kết quả phủ định. Đo tương đồng cũng không có trạng thái "không nói tới".
+Luận văn dùng một LLM đọc mô tả của ca (đã che tên bệnh) cùng danh sách mệnh đề, rồi trả lời cho từng mệnh đề. Dùng LLM để trích thông tin có cấu trúc từ văn bản thay cho gán nhãn tay là hướng đã được nhiều nghiên cứu khảo sát **[Cần trích dẫn: LLM làm bộ gán nhãn / trích thông tin từ văn bản lâm sàng; ứng viên cần kiểm tra: Gilardi et al., 2023 (PNAS) cho gán nhãn văn bản nói chung, và một nghiên cứu dùng LLM trích phát hiện từ báo cáo y khoa]**. Ba ràng buộc giữ cho nhãn đáng tin:
 
-NLI là một *bài toán*, không phải một mô hình cụ thể. Mô hình giải bài toán này thường là một bộ mã hoá họ BERT, đọc **cùng lúc** tiền đề và giả thuyết rồi phân loại thành ba nhãn. Để làm được việc đó, bộ mã hoá phải được huấn luyện thêm (fine-tune) trên một **bộ dữ liệu NLI**. Trong y khoa, bộ dữ liệu chuẩn là **MedNLI**: các cặp câu lấy từ ghi chú lâm sàng, được bác sĩ gán nhãn ủng hộ / phủ định / trung lập **[Cần trích dẫn: Romanov & Shivade, 2018]**. Luận văn dùng **Bio_ClinicalBERT**, cùng họ bộ mã hoá lâm sàng với RAD, fine-tune trên MedNLI làm bộ gán nhãn phía văn bản; bài giới thiệu Bio_ClinicalBERT cũng báo cáo đúng thí nghiệm này **[Cần trích dẫn: Alsentzer et al., 2019, kết quả trên MedNLI]**. Các bộ mã hoá khác đã được fine-tune sẵn trên MedNLI có thể dùng làm phương án so sánh. Lưu ý rằng MedNLI được xây từ ghi chú nội khoa, không phải mô tả tổn thương da, nên nhãn sinh ra vẫn là nhãn yếu và cần được đối chiếu với một mẫu chấm tay.
+1. Chỉ dựa vào những gì mô tả viết ra; không suy luận từ kiến thức y khoa, không đoán bệnh.
+2. Chỉ tính câu nói về **chính bệnh nhân**; câu mô tả bệnh nói chung không được tính (mục 5.5).
+3. Mọi câu trả lời "có" hoặc "không" phải kèm **trích nguyên văn** cụm từ làm căn cứ. Trích dẫn được kiểm tra tự động là có thật trong mô tả; nếu không, câu trả lời bị hạ về $\varnothing$.
 
-Thử nghiệm trên các câu mô tả da liễu cho thấy bộ gán nhãn này đáng tin khi đủ chắc chắn, nhưng hay sai khi phủ định nằm giữa câu ("mảng đỏ, **không** có vảy bạc"): nó thấy từ trùng nên trả "ủng hộ". Vì vậy luận văn thêm một bước **kiểm tra lại bằng mô hình ngôn ngữ lớn (LLM)**, chỉ cho một phần nhỏ các trường hợp có nguy cơ (mục 6.2). Bộ gán nhãn văn bản là sự kết hợp của hai thành phần này, và cả hai đều được ghi rõ khi báo cáo.
+Trước đó luận văn đã thử một bộ mã hoá BERT lâm sàng (Bio_ClinicalBERT) fine-tune trên tập suy diễn ngôn ngữ y khoa MedNLI **[Cần trích dẫn: Romanov & Shivade, 2018; Alsentzer et al., 2019]**. Cách này không hiệu quả trên mô tả da liễu: mô hình dễ bị đánh lừa bởi từ ngữ trùng lặp và gán "có" cho cả những dấu hiệu mà mô tả không nhắc tới. Vì vậy luận văn dùng LLM.
 
-**Từ ảnh: mô hình ảnh–chữ.** Mô hình ảnh–chữ cho điểm mức một ảnh thể hiện một khái niệm (ví dụ "vảy", "ban đỏ"). Nó trả lời câu hỏi "ảnh trông có giống dấu hiệu này không", bổ sung cho NLI vốn trả lời "mô tả nói gì về dấu hiệu này".
+**Từ ảnh: mô hình ảnh–chữ.** Mô hình ảnh–chữ cho điểm mức một ảnh thể hiện một khái niệm (ví dụ "vảy", "ban đỏ"). Nó trả lời câu hỏi "ảnh trông có giống dấu hiệu này không", bổ sung cho bộ gán nhãn văn bản vốn trả lời "mô tả nói gì về dấu hiệu này".
 
 Luận văn chọn **ConceptCLIP** (Nie et al., 2026) làm bộ gán nhãn phía ảnh, vì ba lý do:
 
@@ -191,7 +193,7 @@ flowchart TD
     DATA["Dữ liệu huấn luyện<br/>ảnh + mô tả + nhãn bệnh"]
 
     subgraph B1["Bước 1 · Gán nhãn yếu (offline, một lần)"]
-        T["Bộ gán nhãn<br/>NLI (Bio_ClinicalBERT fine-tune MedNLI) trên mô tả<br/>ConceptCLIP trên ảnh"]
+        T["Bộ gán nhãn<br/>LLM trên mô tả<br/>ConceptCLIP trên ảnh"]
         R["Ma trận nhãn yếu R<br/>r_ij ∈ {1, 0, ∅}"]
         T --> R
     end
@@ -242,17 +244,14 @@ Các mục sau đi lần lượt từng bước. Một **ca minh hoạ** đượ
 
 **Những cặp nào được gán nhãn.** Mọi ca trong tập huấn luyện, ghép với mọi mệnh đề **quan sát được** (mục 5.5) của **mọi bệnh**, không chỉ bệnh đúng của ca. Lý do: nhiều dấu hiệu dùng chung giữa các bệnh. Một ca vảy nến vẫn có thể có "mảng đỏ" vốn cũng là dấu hiệu của bệnh khác. Mệnh đề không quan sát được (xét nghiệm, tổn thương cơ quan bên trong, và các mệnh đề luôn đúng trên SkinCAP) không đưa vào bộ gán nhãn và mặc định là $\varnothing$.
 
-**Nguồn văn bản (NLI).**
+**Nguồn văn bản (LLM).**
 
-- Tiền đề là mô tả lâm sàng của ca. Tên bệnh trong mô tả được che lại khi gán nhãn, để bộ gán nhãn không suy ra dấu hiệu từ tên bệnh.
-- Giả thuyết là câu mệnh đề.
-- Kết quả ủng hộ / phủ định / không nói tới được chuyển thành 1 / 0 / $\varnothing$, **chỉ khi bộ gán nhãn đủ chắc chắn**. Trường hợp không chắc thì cho $\varnothing$; luận văn ưu tiên ít nhãn mà đáng tin hơn nhiều nhãn mà nhiễu.
-- **Kiểm tra lại bằng LLM, có điều kiện.** LLM không gán nhãn cho mọi cặp mà chỉ xem lại hai loại trường hợp:
-  - (a) NLI cho "có" nhưng câu căn cứ chứa từ phủ định. LLM có thể giữ, hạ xuống "không đủ thông tin", hoặc đổi thành "không".
-  - (b) NLI gần cho "không" nhưng chưa đủ chắc. LLM có thể xác nhận thành "không".
-  - (c) NLI cho "có" với một mệnh đề triệu chứng hoặc bệnh sử. LLM chỉ giữ nhãn "có" khi mô tả nói về **chính bệnh nhân**; câu mô tả bệnh nói chung không được tính.
-
-  LLM được yêu cầu chỉ dựa vào những gì mô tả viết ra, không suy luận từ kiến thức bệnh, và phải trích nguyên văn cụm từ làm căn cứ. LLM **không** được tạo ra nhãn "có" từ một trường hợp đang là "không đủ thông tin". Nhờ vậy bước này chỉ bớt nhãn "có" sai và thêm nhãn "không", không đưa tri thức bệnh vào nhãn.
+- Đầu vào là mô tả lâm sàng của ca và danh sách mệnh đề quan sát được. Tên bệnh trong mô tả được che lại khi gán nhãn, để bộ gán nhãn không suy ra dấu hiệu từ tên bệnh.
+- Với mỗi mệnh đề, LLM trả lời một trong ba:
+  - **có**: mô tả nói rõ bệnh nhân có dấu hiệu → 1;
+  - **không**: mô tả nói rõ bệnh nhân không có, hoặc nêu một đặc điểm trái ngược trực tiếp với dấu hiệu (ví dụ mô tả viết "giới hạn rõ" trong khi mệnh đề là "ranh giới không rõ") → 0;
+  - **không nhắc tới** → $\varnothing$.
+- "Có" và "không" phải kèm trích nguyên văn từ mô tả; trích dẫn sai thì câu trả lời bị hạ về $\varnothing$. Câu mô tả bệnh nói chung không được tính là bằng chứng của ca. Khi không chắc, LLM được yêu cầu trả "không nhắc tới": luận văn ưu tiên ít nhãn mà đáng tin hơn nhiều nhãn mà nhiễu.
 - Mệnh đề được hiểu theo **nghĩa lâm sàng**, không theo nghĩa đen của từ nối. Nhiều mệnh đề liệt kê các vị trí hay gặp ("tổn thương ở mặt, ngực và lưng") hoặc các dạng biểu hiện thay thế ("sẩn hoặc nốt"). Ca có tổn thương ở *một* trong các vị trí đó, hoặc có *một* trong các dạng đó, là đã có dấu hiệu, không cần có đủ tất cả.
 
 **Nguồn ảnh (ConceptCLIP).**
@@ -277,34 +276,34 @@ flowchart LR
     CASE["Ca i<br/>ảnh + mô tả"]
     PROP["Mệnh đề j<br/>quan sát được"]
     MASK["Che tên bệnh<br/>trong mô tả"]
-    NLI["NLI: Bio_ClinicalBERT<br/>fine-tune trên MedNLI<br/>tiền đề = mô tả, giả thuyết = mệnh đề"]
+    LLM["LLM đọc mô tả<br/>trả lời có / không / không nhắc tới<br/>kèm trích nguyên văn"]
+    CHK["Kiểm tra trích dẫn<br/>sai → ∅"]
     IMG["ConceptCLIP<br/>câu dương / câu âm so với ảnh<br/>(chỉ mệnh đề hình thái)"]
-    LLM["LLM kiểm tra lại<br/>chỉ ô có phủ định / gần ngưỡng"]
     TXT_L["Nhãn văn bản<br/>1 / 0 / ∅"]
     IMG_L["Nhãn ảnh<br/>1 / 0 / ∅"]
     FUSE["Gộp hai nguồn<br/>mâu thuẫn → ∅"]
     OUT["r_ij ∈ {1, 0, ∅}"]
 
-    CASE --> MASK --> NLI
-    PROP --> NLI
+    CASE --> MASK --> LLM
+    PROP --> LLM
     CASE --> IMG
     PROP --> IMG
-    NLI --> LLM --> TXT_L --> FUSE
+    LLM --> CHK --> TXT_L --> FUSE
     IMG --> IMG_L --> FUSE
     FUSE --> OUT
 ```
 
 **Kết quả trên ca minh hoạ.**
 
-| Mệnh đề | NLI trên mô tả | Ảnh | $r_{ij}$ | Giải thích |
+| Mệnh đề | LLM trên mô tả | Ảnh | $r_{ij}$ | Giải thích |
 |---|---|---|---|---|
-| A. mảng đỏ giới hạn rõ | ủng hộ → 1 | điểm cao → 1 | **1** | mô tả nói rõ, ảnh khớp |
-| B. vảy trắng bạc | ủng hộ → 1 | điểm cao → 1 | **1** | |
-| C. rỗ móng | không nói tới → $\varnothing$ | ảnh không có móng → $\varnothing$ | **$\varnothing$** | không đủ thông tin, **không** phải "không có" |
-| D. phân bố ở mặt duỗi | ủng hộ → 1 | (không áp dụng) | **1** | |
-| E. tiền sử gia đình | không nói tới → $\varnothing$ | (không áp dụng: bệnh sử) | **$\varnothing$** | mô tả không nhắc tới tiền sử gia đình |
-| F. dát đỏ ranh giới không rõ (chàm) | phủ định → 0 | (ví dụ: $\varnothing$) | **0** | mô tả nói "giới hạn rõ" |
-| G. mụn nước | không nói tới → $\varnothing$ | điểm thấp → 0 | **0** | ảnh cho thấy không có mụn nước |
+| A. mảng đỏ giới hạn rõ | có, trích "mảng đỏ giới hạn rõ" → 1 | điểm cao → 1 | **1** | mô tả nói rõ, ảnh khớp |
+| B. vảy trắng bạc | có, trích "vảy trắng bạc" → 1 | điểm cao → 1 | **1** | |
+| C. rỗ móng | không nhắc tới → $\varnothing$ | ảnh không có móng → $\varnothing$ | **$\varnothing$** | không đủ thông tin, **không** phải "không có" |
+| D. phân bố ở mặt duỗi | có, trích "mặt duỗi khuỷu tay" → 1 | (không áp dụng) | **1** | |
+| E. tiền sử gia đình | không nhắc tới → $\varnothing$ | (không áp dụng: bệnh sử) | **$\varnothing$** | mô tả không nhắc tới tiền sử gia đình |
+| F. dát đỏ ranh giới không rõ (chàm) | không, trích "giới hạn rõ" → 0 | (ví dụ: $\varnothing$) | **0** | mô tả nêu đặc điểm trái ngược trực tiếp |
+| G. mụn nước | không nhắc tới → $\varnothing$ | điểm thấp → 0 | **0** | ảnh cho thấy không có mụn nước |
 
 Kết quả của bước 1 là một **ma trận nhãn yếu** $R$ cho toàn bộ tập huấn luyện, lưu lại một lần và dùng cho bước 2.
 
@@ -364,7 +363,7 @@ Cách huấn luyện "học khái niệm trước, đóng băng, rồi học quy
 
 1. **Lật cực tính.** Dấu hiệu ủng hộ giữ nguyên điểm; dấu hiệu loại trừ đổi thành "điểm không có dấu hiệu":
    $$\tilde s_{ij} = \begin{cases} s_{ij} & \text{dấu hiệu ủng hộ} \\ 1 - s_{ij} & \text{dấu hiệu loại trừ} \end{cases}$$
-2. **Tổng hợp.** Lấy trung bình $\tilde s_{ij}$ trên **tập tổng hợp** $B_d^*$ của bệnh *d*. Tập này gồm các mệnh đề quan sát được của bệnh *d* có ít nhất một nhãn trong dữ liệu huấn luyện. Mệnh đề chưa từng có nhãn thì điểm của nó chưa được dạy, nên chỉ hiển thị trong bảng kiểm, không góp vào điểm bệnh:
+2. **Tổng hợp.** Lấy trung bình $\tilde s_{ij}$ trên **tập tổng hợp** $B_d^*$ của bệnh *d*. Tập này gồm các mệnh đề quan sát được của bệnh *d* có **đủ một số lượng nhãn tối thiểu** trong dữ liệu huấn luyện. Mệnh đề có quá ít nhãn thì điểm của nó gần như chưa được dạy, nên chỉ hiển thị trong bảng kiểm với trạng thái "độ tin cậy thấp", không góp vào điểm bệnh:
    $$z_{id} = \frac{1}{|B_d^*|}\sum_{j \in B_d^*}\tilde s_{ij}$$
 3. **Hiệu chỉnh.** Một hàm đơn điệu tăng riêng cho từng bệnh chuyển $z_{id}$ thành xác suất:
    $$\hat y_{id} = \sigma(\gamma_d\, z_{id} + b_d),\quad \gamma_d > 0$$
@@ -459,7 +458,7 @@ Attention chỉ được hiểu là **vết bằng chứng**, không phải gi�
 
 ### 7.3 Những gì luận văn không tuyên bố
 
-- Không tuyên bố phát minh NLI, giám sát yếu, cross-attention hay mô hình nút thắt khái niệm.
+- Không tuyên bố phát minh việc dùng LLM để gán nhãn, giám sát yếu, cross-attention hay mô hình nút thắt khái niệm.
 - Không tuyên bố nhãn yếu là ground truth, hay mô hình độc lập với chất lượng bộ gán nhãn.
 - Không tuyên bố attention là giải thích nhân quả.
 - Không tuyên bố vượt RAD về độ chính xác chẩn đoán. Mục tiêu là chẩn đoán đi kèm bằng chứng mức dấu hiệu có thể kiểm chứng.
@@ -468,8 +467,8 @@ Attention chỉ được hiểu là **vết bằng chứng**, không phải gi�
 
 ## 8. Hạn chế
 
-1. **Phụ thuộc bộ gán nhãn:** điểm mệnh đề chỉ tốt tới mức nhãn yếu cho phép.
-2. **Thông tin gắn chặt với bệnh trong dữ liệu đầu vào:** nếu mô tả lâm sàng chứa tên bệnh hoặc đoạn mô tả bệnh nói chung, mô hình vẫn có thể dựa một phần vào đó (một dạng reasoning shortcut ở mức dữ liệu) thay vì quan sát trên ca. Rủi ro này lớn nhất ở nhóm triệu chứng và bệnh sử; bước kiểm tra bằng LLM chỉ giảm được, không loại bỏ hoàn toàn.
+1. **Phụ thuộc bộ gán nhãn:** điểm mệnh đề chỉ tốt tới mức nhãn yếu cho phép. LLM có thể trả lời sai; luận văn hạn chế điều này bằng trích dẫn được kiểm tra tự động và đối chiếu với một mẫu chấm tay, nhưng không loại bỏ được hoàn toàn.
+2. **Thông tin gắn chặt với bệnh trong dữ liệu đầu vào:** nếu mô tả lâm sàng chứa tên bệnh hoặc đoạn mô tả bệnh nói chung, mô hình vẫn có thể dựa một phần vào đó (một dạng reasoning shortcut ở mức dữ liệu) thay vì quan sát trên ca. Rủi ro này lớn nhất ở nhóm triệu chứng và bệnh sử; việc yêu cầu LLM bỏ qua câu mô tả bệnh nói chung chỉ giảm được, không loại bỏ hoàn toàn.
 3. **Ít nhãn "không" (0):** đây là nhãn của bộ gán nhãn cho biết ca *không có* dấu hiệu, khác với cực tính của mệnh đề. Mô tả lâm sàng ít khi viết phủ định, nên nhãn 0 từ văn bản hiếm; nhãn 0 chủ yếu đến từ ảnh. Khi nhãn 1 áp đảo, tầng bằng chứng có xu hướng cho điểm cao ở mọi nơi, nên cần được cân bằng khi huấn luyện.
 4. **Độ phủ:** trên SkinCAP, xét nghiệm và tổn thương cơ quan bên trong không quan sát được. Nhiều mệnh đề triệu chứng và bệnh sử tuy quan sát được về nguyên tắc nhưng hiếm khi được nêu trong mô tả, nên phần lớn chỉ có trạng thái "không đủ thông tin".
 5. **Cách diễn đạt của mệnh đề:** nhiều mệnh đề liệt kê các vị trí hay dạng biểu hiện thay thế. Nếu bộ gán nhãn hiểu theo nghĩa đen của từ nối ("và" là phải có đủ) thay vì nghĩa lâm sàng, nhãn sẽ thiếu hoặc sai.
@@ -494,4 +493,4 @@ Attention chỉ được hiểu là **vết bằng chứng**, không phải gi�
 - Romanov & Shivade, 2018. *Lessons from Natural Language Inference in the Clinical Domain* (MedNLI). EMNLP.
 - Alsentzer et al., 2019. *Publicly Available Clinical BERT Embeddings* (Bio_ClinicalBERT). Clinical NLP Workshop.
 - Zhou et al., 2024. *SkinCAP: A Multi-modal Dermatology Dataset Annotated with Rich Medical Captions.*
-- **[Cần trích dẫn:** tổng quan weak supervision (Zhou, 2018); data programming / Snorkel (Ratner et al.); CheXpert (Irvin et al., 2019).**]**
+- **[Cần trích dẫn:** tổng quan weak supervision (Zhou, 2018); data programming / Snorkel (Ratner et al.); CheXpert (Irvin et al., 2019); LLM làm bộ gán nhãn / trích thông tin từ văn bản (mục 5.4).**]**
