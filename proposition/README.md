@@ -16,7 +16,7 @@ proposition/
 +-- data/       # KB and immutable v3 weak-supervision contracts
 +-- models/     # Stage-1 frozen-backbone evidence model (added in Commit 3)
 +-- losses/     # Masked weak-supervision loss (added in Commit 4)
-+-- engine/     # Trainer, metrics, artifacts, diagnostics (Commits 5–6)
++-- engine/     # Trainer, metrics, artifacts, diagnostics (Commits 5ï¿½6)
 +-- tests/      # Tests only for the current Stage-1 architecture
 ```
 
@@ -39,3 +39,30 @@ are never converted to absent labels. Matrix columns are aligned by their
 explicit proposition IDs (and case lookup is by `case_id`), rather than by an
 assumed file order. Inactive propositions remain unavailable (`N/A`), not zero
 scores.
+
+## Evidence model
+
+`models.stage1_evidence_model.Stage1EvidenceModel` creates active proposition
+queries solely from their `canonicalDescription`, caches those frozen-text
+embeddings, and attends them separately over frozen image and caption features.
+The scalar evidence heads are shared per modality and the support fusion is
+fixed: mean for both modalities, otherwise the trainable modality only. Frozen
+encoders stay in evaluation mode (including BERT dropout and ResNet BatchNorm)
+and run under `torch.no_grad()`.
+## Running Stage 1
+
+Use [`main_proposition.py`](../main_proposition.py) with
+[`configs/ws.yaml`](../configs/ws.yaml). The command accepts v3 artifact path
+overrides, `--resume`, an optional `--pilot_diseases` subset, and an explicit
+`--device`. A real run also needs a JSON global disease-alias map through
+`--disease_aliases_json`; every disease name and alias is masked from every
+caption before tokenization.
+
+```powershell
+python main_proposition.py --config configs/ws.yaml --output_dir <run_dir> `
+  --disease_aliases_json <aliases.json> --device cuda
+```
+
+Each run writes latest/best checkpoints; proposition-level metric and
+prediction artifacts; label-distribution auditing; and a captured run config.
+These artifacts contain proposition evidence onlyâ€”never disease probabilities.
