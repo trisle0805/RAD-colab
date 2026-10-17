@@ -296,39 +296,54 @@ class Stage1Trainer:
         if self.output_dir is None:
             return
         diagnostics_dir = self.output_dir / "diagnostics"
-        baseline = result.predictions["score_fused"]
+        baseline = {
+            "score_image": result.predictions["score_image"],
+            "score_text": result.predictions["score_text"],
+            "score_fused": result.predictions["score_fused"],
+        }
+        text_trainable = self.text_trainable.detach().cpu().numpy()
+        image_trainable = self.image_trainable.detach().cpu().numpy()
         summary = {
-            "within_patient_differentiation": within_patient_differentiation(baseline),
-            "proposition_correlation": proposition_correlation(baseline),
-            "macro_auc": _fused_macro_auc(
+            "baseline": _modality_macro_aucs(
                 baseline,
                 result.predictions["label_text"],
                 result.predictions["label_img"],
-                self.text_trainable.detach().cpu().numpy(),
-                self.image_trainable.detach().cpu().numpy(),
+                text_trainable,
+                image_trainable,
                 min_present=self.config.selection_min_present,
                 min_absent=self.config.selection_min_absent,
             ),
+            "within_patient_differentiation": within_patient_differentiation(baseline["score_fused"]),
+            "proposition_correlation": proposition_correlation(baseline["score_fused"]),
         }
         queries = getattr(self.model, "_queries")(self.device).detach()
         controls: dict[str, np.ndarray] = {}
         for name, query_embeddings in _query_controls(queries):
             control = self._predict_with_queries(dataloader, query_embeddings)
-            controls[name] = control
+            for score_name, scores in control.items():
+                controls[f"query_{name}_{score_name}"] = scores
             summary[f"query_{name}"] = {
-                "mean_absolute_score_delta": float(np.nanmean(np.abs(control - baseline))),
-                "macro_auc": _fused_macro_auc(
+                **_modality_macro_aucs(
                     control,
                     result.predictions["label_text"],
                     result.predictions["label_img"],
-                    self.text_trainable.detach().cpu().numpy(),
-                    self.image_trainable.detach().cpu().numpy(),
+                    text_trainable,
+                    image_trainable,
                     min_present=self.config.selection_min_present,
                     min_absent=self.config.selection_min_absent,
                 ),
-                "within_patient_differentiation": within_patient_differentiation(control),
+                "mean_absolute_score_delta": float(
+                    np.nanmean(np.abs(control["score_fused"] - baseline["score_fused"]))
+                ),
+                "within_patient_differentiation": within_patient_differentiation(
+                    control["score_fused"]
+                ),
             }
-        np.savez_compressed(diagnostics_dir / "query_controls.npz", baseline=baseline, **controls)
+        np.savez_compressed(
+            diagnostics_dir / "query_controls.npz",
+            **{f"baseline_{name}": scores for name, scores in baseline.items()},
+            **controls,
+        )
         (diagnostics_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
     @torch.no_grad()
@@ -358,15 +373,20 @@ class Stage1Trainer:
         return written
 
     @torch.no_grad()
-    def _predict_with_queries(self, dataloader: Iterable[Mapping[str, Any]], query_embeddings: Tensor) -> np.ndarray:
-        scores: list[np.ndarray] = []
+    def _predict_with_queries(
+        self, dataloader: Iterable[Mapping[str, Any]], query_embeddings: Tensor
+    ) -> dict[str, np.ndarray]:
+        scores = {"score_image": [], "score_text": [], "score_fused": []}
         self.model.eval()
         for batch in dataloader:
             _, images, captions = self._batch_inputs(batch)
             tokens = {key: value.to(self.device) for key, value in self.tokenizer(captions).items()}
             outputs = self.model(images, tokens, query_embeddings=query_embeddings)
-            scores.append(outputs["support_scores"].detach().cpu().numpy())
-        return np.concatenate(scores) if scores else np.empty((0, len(self.proposition_ids)), dtype=np.float32)
+            scores["score_image"].append(outputs["scores_img"].detach().cpu().numpy())
+            scores["score_text"].append(outputs["scores_txt"].detach().cpu().numpy())
+            scores["score_fused"].append(outputs["support_scores"].detach().cpu().numpy())
+        empty = np.empty((0, len(self.proposition_ids)), dtype=np.float32)
+        return {name: np.concatenate(values) if values else empty for name, values in scores.items()}
 
     def _save_predictions(self, result: EpochResult, filename: str) -> None:
         if self.output_dir is None:
@@ -460,8 +480,8 @@ class Stage1Trainer:
         _restore_rng_state(checkpoint["rng_state"])
 
 
-def _fused_macro_auc(
-    scores: np.ndarray,
+def _modality_macro_aucs(
+    scores: Mapping[str, np.ndarray],
     label_text: np.ndarray,
     label_image: np.ndarray,
     text_trainable: np.ndarray,
@@ -469,25 +489,26 @@ def _fused_macro_auc(
     *,
     min_present: int = 1,
     min_absent: int = 1,
-) -> float | None:
-    """Macro AUC over all eligible modality/proposition pairs using fused scores."""
-    metrics = {
-        "text": modality_metrics(
-            scores, label_text, valid_propositions=text_trainable,
-            min_present=min_present, min_absent=min_absent,
-        ),
-        "image": modality_metrics(
-            scores, label_image, valid_propositions=image_trainable,
-            min_present=min_present, min_absent=min_absent,
-        ),
+) -> dict[str, float | None]:
+    """Evaluate each modality against its own weak-label target."""
+    image = modality_metrics(
+        scores["score_image"],
+        label_image,
+        valid_propositions=image_trainable,
+        min_present=min_present,
+        min_absent=min_absent,
+    )
+    text = modality_metrics(
+        scores["score_text"],
+        label_text,
+        valid_propositions=text_trainable,
+        min_present=min_present,
+        min_absent=min_absent,
+    )
+    return {
+        "image_macro_auc": image["macro_roc_auc"],
+        "text_macro_auc": text["macro_roc_auc"],
     }
-    values = [
-        row["roc_auc"]
-        for modality in ("text", "image")
-        for row in metrics[modality]["rows"]
-        if row["eligible"] and row["roc_auc"] is not None
-    ]
-    return float(np.mean(values)) if values else None
 
 
 def _query_controls(queries: Tensor) -> list[tuple[str, Tensor]]:

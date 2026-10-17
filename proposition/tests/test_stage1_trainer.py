@@ -11,7 +11,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from proposition.data.weak_supervision import ActiveProposition, WeakSupervisionArtifacts
-from proposition.engine.trainer import Stage1Trainer, TrainerConfig
+from proposition.engine.trainer import Stage1Trainer, TrainerConfig, _modality_macro_aucs
 from proposition.losses import MaskedBCELoss
 
 
@@ -124,6 +124,24 @@ def test_metrics_exclude_untrainable_modality_propositions() -> None:
     assert metrics["selection"] == {
         "source": "image", "metric": "macro_roc_auc", "min_present": 1, "min_absent": 1, "n_eligible": 1,
     }
+
+def test_query_control_auc_uses_each_modalitys_weak_labels() -> None:
+    scores = {
+        "score_image": np.asarray([[0.1], [0.9]]),
+        "score_text": np.asarray([[0.9], [0.1]]),
+        "score_fused": np.asarray([[0.5], [0.5]]),
+    }
+    result = _modality_macro_aucs(
+        scores,
+        label_text=np.asarray([[0], [1]], dtype=np.int8),
+        label_image=np.asarray([[0], [1]], dtype=np.int8),
+        text_trainable=np.asarray([True]),
+        image_trainable=np.asarray([True]),
+        min_present=1,
+        min_absent=1,
+    )
+    assert result == {"image_macro_auc": 1.0, "text_macro_auc": 0.0}
+
 
 def test_default_strict_selection_excludes_insufficient_validation_labels() -> None:
     trainer = Stage1Trainer(

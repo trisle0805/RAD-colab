@@ -16,11 +16,11 @@ skincap:
   num_workers: 2
 
 weak_supervision:
-  root: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3
-  labels: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/labels_raw_v3.npz
-  active_masks: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/active_masks_v3.npz
-  active_csv: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/active_propositions_v3.csv
-  metadata: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/metadata_final_v3.json
+  root: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/artifacts
+  labels: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/artifacts/labels_raw_v3.npz
+  active_masks: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/artifacts/active_masks_v3.npz
+  active_csv: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/artifacts/active_propositions_v3.csv
+  metadata: /content/drive/MyDrive/Cao học/WeakSup/weak_labels/v3/artifacts/metadata_final_v3.json
   min_labels: 10
 
 stage1:
