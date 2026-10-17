@@ -35,16 +35,19 @@ def _artifacts() -> WeakSupervisionArtifacts:
 def test_pos_weights_use_only_train_valid_active_trainable_labels() -> None:
     weights = build_pos_weight_artifacts(_artifacts(), pos_weight_cap=1.5)
 
-    assert weights.text_pos_weight.tolist() == pytest.approx([1.0, 1.0, 0.5, 1.0])
-    assert weights.image_pos_weight.tolist() == pytest.approx([1.0, 1.0, 1.5, 1.0])
+    assert weights.text_pos_weight.tolist() == pytest.approx([1.0, 1.0, 0.5])
+    assert weights.image_pos_weight.tolist() == pytest.approx([1.0, 1.0, 1.5])
+    assert [row.proposition_id for row in weights.rows] == [
+        "positive-only", "negative-only", "mixed", "positive-only", "negative-only", "mixed",
+    ]
     rows = {(row.proposition_id, row.modality): row for row in weights.rows}
     assert rows[("positive-only", "text")].n_present == 2
     assert rows[("positive-only", "text")].n_absent == 0
     assert rows[("positive-only", "text")].n_unknown == 1
     assert rows[("positive-only", "text")].single_class is True
     assert rows[("mixed", "image")].pos_weight == pytest.approx(1.5)
-    assert rows[("inactive", "text")].n_present == 0
-    assert rows[("inactive", "image")].n_unknown == 0
+    assert ("inactive", "text") not in rows
+    assert ("inactive", "image") not in rows
 
 
 def test_positive_only_target_has_nonzero_loss() -> None:
@@ -117,4 +120,4 @@ def test_distribution_writer_uses_required_audit_columns(tmp_path) -> None:
     with output.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     assert list(rows[0]) == ["proposition_id", "modality", "N_present", "N_absent", "N_unknown", "pos_weight", "single_class"]
-    assert len(rows) == 8
+    assert len(rows) == 6

@@ -16,7 +16,7 @@ proposition/
 +-- data/       # KB and immutable v3 weak-supervision contracts
 +-- models/     # Stage-1 frozen-backbone evidence model (added in Commit 3)
 +-- losses/     # Masked weak-supervision loss (added in Commit 4)
-+-- engine/     # Trainer, metrics, artifacts, diagnostics (Commits 5�6)
++-- engine/     # Trainer, metrics, artifacts, diagnostics
 +-- tests/      # Tests only for the current Stage-1 architecture
 ```
 
@@ -65,5 +65,7 @@ python main_proposition.py --config configs/ws.yaml --output_dir <run_dir> `
 ```
 
 Each run writes latest/best checkpoints; proposition-level metric and
-prediction artifacts; label-distribution auditing; and a captured run config.
-These artifacts contain proposition evidence only—never disease probabilities.
+prediction artifacts; label-distribution auditing; query-control diagnostics
+(including fused-score macro AUC); and a captured run config. `ws.yaml` uses
+512-pixel inputs to match the RAD SkinCAP comparison setting. These artifacts
+contain proposition evidence only—never disease probabilities.

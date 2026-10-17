@@ -10,7 +10,7 @@ skincap:
   val_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_val.csv
   test_csv: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap_47_test.csv
   image_root: /content/drive/MyDrive/Cao học/Experiments/SkinCAP/skincap
-  image_res: 224
+  image_res: 512
   batch_size: 32
   eval_batch_size: 64
   num_workers: 2

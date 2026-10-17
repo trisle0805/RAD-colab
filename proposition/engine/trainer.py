@@ -21,7 +21,7 @@ from torch import Tensor, nn
 from proposition.data.weak_supervision import UNKNOWN_LABEL, WeakSupervisionArtifacts
 from proposition.losses.masked_bce import MaskedBCELoss
 from .diagnostics import proposition_correlation, within_patient_differentiation
-from .metrics import evaluate_modalities
+from .metrics import evaluate_modalities, modality_metrics
 
 
 @dataclass
@@ -128,7 +128,7 @@ class Stage1Trainer:
                 or (
                     np.isclose(selection, self.best_metric)
                     and validation.loss is not None
-                    and (not hasattr(self, "best_loss") or validation.loss < self.best_loss)
+                    and (self.best_loss is None or validation.loss < self.best_loss)
                 )
             )
             if improved:
@@ -238,6 +238,13 @@ class Stage1Trainer:
         summary = {
             "within_patient_differentiation": within_patient_differentiation(baseline),
             "proposition_correlation": proposition_correlation(baseline),
+            "macro_auc": _fused_macro_auc(
+                baseline,
+                result.predictions["label_text"],
+                result.predictions["label_img"],
+                self.text_trainable.detach().cpu().numpy(),
+                self.image_trainable.detach().cpu().numpy(),
+            ),
         }
         queries = getattr(self.model, "_queries")(self.device).detach()
         controls: dict[str, np.ndarray] = {}
@@ -246,6 +253,13 @@ class Stage1Trainer:
             controls[name] = control
             summary[f"query_{name}"] = {
                 "mean_absolute_score_delta": float(np.nanmean(np.abs(control - baseline))),
+                "macro_auc": _fused_macro_auc(
+                    control,
+                    result.predictions["label_text"],
+                    result.predictions["label_img"],
+                    self.text_trainable.detach().cpu().numpy(),
+                    self.image_trainable.detach().cpu().numpy(),
+                ),
                 "within_patient_differentiation": within_patient_differentiation(control),
             }
         np.savez_compressed(diagnostics_dir / "query_controls.npz", baseline=baseline, **controls)
@@ -351,6 +365,27 @@ class Stage1Trainer:
         self.best_loss = checkpoint.get("best_loss")
         self.bad_epochs, self.history = checkpoint.get("bad_epochs", 0), checkpoint.get("history", [])
         _restore_rng_state(checkpoint["rng_state"])
+
+
+def _fused_macro_auc(
+    scores: np.ndarray,
+    label_text: np.ndarray,
+    label_image: np.ndarray,
+    text_trainable: np.ndarray,
+    image_trainable: np.ndarray,
+) -> float | None:
+    """Macro AUC over all eligible modality/proposition pairs using fused scores."""
+    metrics = {
+        "text": modality_metrics(scores, label_text, valid_propositions=text_trainable),
+        "image": modality_metrics(scores, label_image, valid_propositions=image_trainable),
+    }
+    values = [
+        row["roc_auc"]
+        for modality in ("text", "image")
+        for row in metrics[modality]["rows"]
+        if row["eligible"] and row["roc_auc"] is not None
+    ]
+    return float(np.mean(values)) if values else None
 
 
 def _query_controls(queries: Tensor) -> list[tuple[str, Tensor]]:

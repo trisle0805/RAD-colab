@@ -47,10 +47,12 @@ def build_pos_weight_artifacts(
 ) -> PosWeightArtifacts:
     """Derive modality-specific weights exclusively from valid training labels.
 
-    A modality/proposition is eligible only when it is active for scoring and
-    trainable for that modality. Unknown labels and every non-training row are
-    excluded. Single-class targets deliberately retain a weight of one so that
-    positive-only propositions cannot silently receive zero loss.
+    Only active-scoring propositions are returned, in the same order as
+    ``artifacts.active_indices`` used by the model. A modality/proposition is
+    eligible only when it is trainable for that modality. Unknown labels and
+    every non-training row are excluded. Single-class targets deliberately
+    retain a weight of one so that positive-only propositions cannot silently
+    receive zero loss.
     """
     if not np.isfinite(pos_weight_cap) or pos_weight_cap <= 0:
         raise ValueError("pos_weight_cap must be finite and greater than zero")
@@ -62,11 +64,12 @@ def build_pos_weight_artifacts(
     )
     weights: dict[Modality, list[float]] = {"text": [], "image": []}
     rows: list[LabelDistributionRow] = []
+    active_indices = artifacts.active_indices
 
     for modality, labels, trainable in specifications:
-        eligible = artifacts.active_scoring & trainable
-        for column, proposition_id in enumerate(artifacts.proposition_ids.tolist()):
-            if eligible[column]:
+        for column in active_indices.tolist():
+            proposition_id = artifacts.proposition_ids[column]
+            if trainable[column]:
                 values = labels[train_rows, column]
                 n_present = int(np.count_nonzero(values == 1))
                 n_absent = int(np.count_nonzero(values == 0))
