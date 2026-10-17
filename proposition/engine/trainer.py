@@ -343,13 +343,40 @@ class Stage1Trainer:
 
     def save_checkpoint(self, name: str = "latest.pt") -> Path:
         path = self._checkpoint_path(name)
-        torch.save({
-            "model_state": self.model.state_dict(), "optimizer_state": self.optimizer.state_dict(), "epoch": self.epoch,
-            "best_metric": self.best_metric, "best_epoch": self.best_epoch, "best_loss": self.best_loss, "bad_epochs": self.bad_epochs,
-            "history": self.history, "config": dict(self.config.config), "rng_state": _rng_state(),
-            "proposition_ids": self.proposition_ids, "artifact_hashes": dict(self.artifacts.artifact_hashes),
+        payload = {
+            "model_state": self.model.state_dict(),
+            "optimizer_state": self.optimizer.state_dict(),
+            "epoch": self.epoch,
+            "best_metric": self.best_metric,
+            "best_epoch": self.best_epoch,
+            "best_loss": self.best_loss,
+            "bad_epochs": self.bad_epochs,
+            "history": self.history,
+            "config": dict(self.config.config),
+            "rng_state": _rng_state(),
+            "proposition_ids": self.proposition_ids,
+            "artifact_hashes": dict(self.artifacts.artifact_hashes),
             "git_commit": _git_commit(),
-        }, path)
+        }
+
+        tmp_path = path.with_suffix(
+            path.suffix + ".tmp"
+        )
+
+        torch.save(
+            payload,
+            tmp_path,
+        )
+
+        # Verify file vừa ghi có thực sự đọc được
+        torch.load(
+            tmp_path,
+            map_location="cpu",
+            weights_only=False,
+        )
+
+        # Chỉ thay file chính sau khi verify thành công
+        tmp_path.replace(path)
         return path
 
     def load_checkpoint(self, path: str | Path, *, load_optimizer: bool = True) -> None:
