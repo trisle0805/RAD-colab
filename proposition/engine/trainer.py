@@ -20,6 +20,7 @@ from torch import Tensor, nn
 
 from proposition.data.weak_supervision import UNKNOWN_LABEL, WeakSupervisionArtifacts
 from proposition.losses.masked_bce import MaskedBCELoss
+from .diagnostics import proposition_correlation, within_patient_differentiation
 from .metrics import evaluate_modalities
 
 
@@ -30,6 +31,8 @@ class TrainerConfig:
     device: str = "cpu"
     early_stopping_patience: int = 10
     score_threshold: float = 0.5
+    learning_rate: float = 1e-4
+    weight_decay: float = 1e-4
     config: Mapping[str, Any] = field(default_factory=dict)
 
 
@@ -75,7 +78,9 @@ class Stage1Trainer:
         self.text_trainable = torch.as_tensor(weak_supervision.text_trainable[self.active_indices], dtype=torch.bool, device=self.device)
         self.image_trainable = torch.as_tensor(weak_supervision.image_trainable[self.active_indices], dtype=torch.bool, device=self.device)
         self.optimizer = optimizer or torch.optim.AdamW(
-            [parameter for parameter in model.parameters() if parameter.requires_grad], lr=1e-4
+            [parameter for parameter in model.parameters() if parameter.requires_grad],
+            lr=self.config.learning_rate,
+            weight_decay=self.config.weight_decay,
         )
         if any(not parameter.requires_grad for group in self.optimizer.param_groups for parameter in group["params"]):
             raise ValueError("optimizer must contain only requires_grad parameters")
@@ -83,6 +88,7 @@ class Stage1Trainer:
         self.epoch = 0
         self.best_metric = float("-inf")
         self.best_epoch: int | None = None
+        self.best_loss: float | None = None
         self.bad_epochs = 0
         self.history: list[dict[str, Any]] = []
         if self.output_dir is not None:
@@ -117,9 +123,16 @@ class Stage1Trainer:
             record = {"epoch": epoch, "train_loss": train.loss, "val_loss": validation.loss, "selection_macro_auc": selection}
             self.history.append(record)
             self.epoch = epoch
-            improved = selection is not None and selection > self.best_metric
+            improved = selection is not None and (
+                selection > self.best_metric
+                or (
+                    np.isclose(selection, self.best_metric)
+                    and validation.loss is not None
+                    and (not hasattr(self, "best_loss") or validation.loss < self.best_loss)
+                )
+            )
             if improved:
-                self.best_metric, self.best_epoch, self.bad_epochs = float(selection), epoch, 0
+                self.best_metric, self.best_epoch, self.best_loss, self.bad_epochs = float(selection), epoch, validation.loss, 0
                 self._save_best_outputs(validation)
                 self.save_checkpoint("best.pt")
             else:
@@ -128,9 +141,11 @@ class Stage1Trainer:
             self._write_history()
             if self.bad_epochs >= self.config.early_stopping_patience:
                 break
-        if test_dataloader is not None and self.best_epoch is not None:
+        if self.best_epoch is not None:
             self.load_checkpoint(self._checkpoint_path("best.pt"), load_optimizer=False)
-            self._save_predictions(self.evaluate(test_dataloader, split="test", epoch=self.best_epoch), "test_best.npz")
+            self._write_diagnostics(self.evaluate(validation_dataloader, split="val", epoch=self.best_epoch), validation_dataloader)
+            if test_dataloader is not None:
+                self._save_predictions(self.evaluate(test_dataloader, split="test", epoch=self.best_epoch), "test_best.npz")
         return self.history
 
     def _run_epoch(self, dataloader: Iterable[Mapping[str, Any]], *, split: str, training: bool, epoch: int) -> EpochResult:
@@ -177,9 +192,27 @@ class Stage1Trainer:
     def _metrics(self, prediction: Mapping[str, np.ndarray]) -> dict[str, Any]:
         outputs = {"text": prediction["score_text"], "image": prediction["score_image"]}
         labels = {"text": prediction["label_text"], "image": prediction["label_img"]}
-        metrics = evaluate_modalities(outputs, labels, proposition_ids=self.proposition_ids, valid_propositions=np.ones(len(self.proposition_ids), dtype=bool), threshold=self.config.score_threshold)
-        values = [metrics[name]["selection_macro"] for name in ("text", "image") if metrics[name]["selection_macro"] is not None]
-        metrics["selection_macro_auc"] = float(np.mean(values)) if values else None
+        metrics = {
+            "text": evaluate_modalities(
+                {"text": outputs["text"]}, {"text": labels["text"]},
+                proposition_ids=self.proposition_ids,
+                valid_propositions=self.text_trainable.detach().cpu().numpy(),
+                threshold=self.config.score_threshold,
+            )["text"],
+            "image": evaluate_modalities(
+                {"image": outputs["image"]}, {"image": labels["image"]},
+                proposition_ids=self.proposition_ids,
+                valid_propositions=self.image_trainable.detach().cpu().numpy(),
+                threshold=self.config.score_threshold,
+            )["image"],
+        }
+        auc_values = [
+            row["roc_auc"]
+            for modality in ("text", "image")
+            for row in metrics[modality]["rows"]
+            if row["eligible"] and row["roc_auc"] is not None
+        ]
+        metrics["selection_macro_auc"] = float(np.mean(auc_values)) if auc_values else None
         return metrics
 
     def _prepare_output(self) -> None:
@@ -194,6 +227,66 @@ class Stage1Trainer:
         metrics_dir = self.output_dir / "metrics"
         (metrics_dir / "best_validation.json").write_text(json.dumps({"epoch": result.epoch, "loss": result.loss, "metrics": result.metrics}, indent=2), encoding="utf-8")
         self._write_metric_tables(result.metrics)
+
+    @torch.no_grad()
+    def _write_diagnostics(self, result: EpochResult, dataloader: Iterable[Mapping[str, Any]]) -> None:
+        """Write disease-label-free score and query-control diagnostics for best validation model."""
+        if self.output_dir is None:
+            return
+        diagnostics_dir = self.output_dir / "diagnostics"
+        baseline = result.predictions["score_fused"]
+        summary = {
+            "within_patient_differentiation": within_patient_differentiation(baseline),
+            "proposition_correlation": proposition_correlation(baseline),
+        }
+        queries = getattr(self.model, "_queries")(self.device).detach()
+        controls: dict[str, np.ndarray] = {}
+        for name, query_embeddings in _query_controls(queries):
+            control = self._predict_with_queries(dataloader, query_embeddings)
+            controls[name] = control
+            summary[f"query_{name}"] = {
+                "mean_absolute_score_delta": float(np.nanmean(np.abs(control - baseline))),
+                "within_patient_differentiation": within_patient_differentiation(control),
+            }
+        np.savez_compressed(diagnostics_dir / "query_controls.npz", baseline=baseline, **controls)
+        (diagnostics_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+    @torch.no_grad()
+    def save_attention_samples(self, dataloader: Iterable[Mapping[str, Any]], *, count: int) -> Path | None:
+        """Persist a deterministic prefix of validation cross-attention matrices."""
+        if self.output_dir is None or count < 1:
+            return None
+        remaining = count
+        written: Path | None = None
+        self.model.eval()
+        for batch_index, batch in enumerate(dataloader):
+            case_ids, images, captions = self._batch_inputs(batch)
+            take = min(remaining, len(case_ids))
+            tokens = {key: value.to(self.device) for key, value in self.tokenizer(captions).items()}
+            outputs = self.model(images, tokens, return_attention=True)
+            attention = outputs["attention"]
+            assert isinstance(attention, Mapping)
+            destination = self.output_dir / "diagnostics" / f"attention_samples_{batch_index:03d}.npz"
+            image = attention["image"][:take].detach().cpu().numpy()
+            text = attention["text"][:take].detach().cpu().numpy()
+            np.savez_compressed(destination, image_attention=image, text_attention=text,
+                                case_id=np.asarray(case_ids[:take]), proposition_id=np.asarray(self.proposition_ids))
+            written = written or destination
+            remaining -= take
+            if not remaining:
+                break
+        return written
+
+    @torch.no_grad()
+    def _predict_with_queries(self, dataloader: Iterable[Mapping[str, Any]], query_embeddings: Tensor) -> np.ndarray:
+        scores: list[np.ndarray] = []
+        self.model.eval()
+        for batch in dataloader:
+            _, images, captions = self._batch_inputs(batch)
+            tokens = {key: value.to(self.device) for key, value in self.tokenizer(captions).items()}
+            outputs = self.model(images, tokens, query_embeddings=query_embeddings)
+            scores.append(outputs["support_scores"].detach().cpu().numpy())
+        return np.concatenate(scores) if scores else np.empty((0, len(self.proposition_ids)), dtype=np.float32)
 
     def _save_predictions(self, result: EpochResult, filename: str) -> None:
         if self.output_dir is None:
@@ -238,7 +331,7 @@ class Stage1Trainer:
         path = self._checkpoint_path(name)
         torch.save({
             "model_state": self.model.state_dict(), "optimizer_state": self.optimizer.state_dict(), "epoch": self.epoch,
-            "best_metric": self.best_metric, "best_epoch": self.best_epoch, "bad_epochs": self.bad_epochs,
+            "best_metric": self.best_metric, "best_epoch": self.best_epoch, "best_loss": self.best_loss, "bad_epochs": self.bad_epochs,
             "history": self.history, "config": dict(self.config.config), "rng_state": _rng_state(),
             "proposition_ids": self.proposition_ids, "artifact_hashes": dict(self.artifacts.artifact_hashes),
             "git_commit": _git_commit(),
@@ -255,9 +348,20 @@ class Stage1Trainer:
         if load_optimizer:
             self.optimizer.load_state_dict(checkpoint["optimizer_state"])
         self.epoch, self.best_metric, self.best_epoch = checkpoint["epoch"], checkpoint["best_metric"], checkpoint["best_epoch"]
+        self.best_loss = checkpoint.get("best_loss")
         self.bad_epochs, self.history = checkpoint.get("bad_epochs", 0), checkpoint.get("history", [])
         _restore_rng_state(checkpoint["rng_state"])
 
+
+def _query_controls(queries: Tensor) -> list[tuple[str, Tensor]]:
+    """Deterministic query controls for diagnostic-only evidence comparisons."""
+    generator = torch.Generator(device=queries.device).manual_seed(0)
+    return [
+        ("swap", queries.flip(0)),
+        ("zero", torch.zeros_like(queries)),
+        ("mean", queries.mean(dim=0, keepdim=True).expand_as(queries)),
+        ("random", torch.randn(queries.shape, generator=generator, device=queries.device, dtype=queries.dtype)),
+    ]
 
 def _selection_metric(metrics: Mapping[str, Any]) -> float | None:
     value = metrics.get("selection_macro_auc")

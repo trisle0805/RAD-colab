@@ -55,8 +55,9 @@ Use [`main_proposition.py`](../main_proposition.py) with
 [`configs/ws.yaml`](../configs/ws.yaml). The command accepts v3 artifact path
 overrides, `--resume`, an optional `--pilot_diseases` subset, and an explicit
 `--device`. A real run also needs a JSON global disease-alias map through
-`--disease_aliases_json`; every disease name and alias is masked from every
-caption before tokenization.
+`--disease_aliases_json`; it must map every disease ID in the complete
+artifact set to a list of aliases. Every disease name and alias is masked from
+every caption before tokenization, including when `--pilot_diseases` is used.
 
 ```powershell
 python main_proposition.py --config configs/ws.yaml --output_dir <run_dir> `

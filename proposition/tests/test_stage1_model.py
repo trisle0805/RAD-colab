@@ -19,7 +19,7 @@ class TinyImageEncoder(nn.Module):
         self.bn = nn.BatchNorm1d(dimension)
 
     def forward(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        features = self.bn(self.projection(images.transpose(1, 2))).transpose(1, 2)
+        features = self.bn(self.projection(images).transpose(1, 2)).transpose(1, 2)
         return features, features.mean(dim=1)
 
 
@@ -110,3 +110,55 @@ def test_attention_modules_are_distinct() -> None:
     model = build_model()
     assert model.image_cross_attention is not model.text_cross_attention
     assert model.image_cross_attention.attention.in_proj_weight is not model.text_cross_attention.attention.in_proj_weight
+
+
+class NativeResWrapper(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.res_features = nn.Conv2d(3, 2048, kernel_size=1)
+        self.res_l1 = nn.Linear(2048, 2048)
+        self.res_l2 = nn.Linear(2048, 8)
+
+    def forward(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        raise AssertionError("Stage 1 must use native res_features, not ModelRes.forward")
+
+
+class NativeBert(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.embedding = nn.Embedding(10, 8)
+
+    def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> SimpleNamespace:
+        return SimpleNamespace(last_hidden_state=self.embedding(input_ids))
+
+
+class NativeTextWrapper(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.bert_model = NativeBert()
+        self.mlp_embed = nn.Linear(8, 8)
+
+    def encode_text(self, tokens: dict[str, torch.Tensor]) -> tuple[torch.Tensor, torch.Tensor]:
+        raise AssertionError("Stage 1 must use native bert_model, not mlp_embed")
+
+
+def test_legacy_wrappers_use_native_features_and_train_stage_projection() -> None:
+    image_encoder = NativeResWrapper()
+    text_encoder = NativeTextWrapper()
+    model = Stage1EvidenceModel(
+        image_encoder=image_encoder, text_encoder=text_encoder, weak_supervision=artifacts(),
+        query_tokenizer=tokenizer, embed_dim=8, num_heads=2,
+    ).train()
+    assert all(not parameter.requires_grad for parameter in image_encoder.parameters())
+    assert all(not parameter.requires_grad for parameter in text_encoder.parameters())
+    outputs = model(
+        torch.randn(2, 3, 2, 2),
+        {"input_ids": torch.tensor([[1, 2, 0], [3, 4, 5]]), "attention_mask": torch.tensor([[1, 1, 0], [1, 1, 1]])},
+    )
+    assert model.query_cache.shape == (3, 8)
+    assert outputs["logits_img"].shape == (2, 3)
+    (outputs["logits_img"].sum() + outputs["logits_txt"].sum()).backward()
+    assert model.image_projection.weight.grad is not None
+    assert image_encoder.res_features.weight.grad is None
+    assert text_encoder.bert_model.embedding.weight.grad is None
+    assert text_encoder.mlp_embed.weight.grad is None

@@ -38,30 +38,30 @@ class Stage1SkinCAPDataset(Dataset):
         image_root: str | Path | None = None,
         split: str | None = None,
         transform: ImageTransform | None = None,
-        case_id_column: str = "case_id",
-        image_column: str = "image",
-        caption_column: str = "text",
+        case_id_column: str | None = None,
+        image_column: str | None = None,
+        caption_column: str | None = None,
         disease_label_columns: Sequence[str] | None = None,
         mask_token: str = DEFAULT_MASK_TOKEN,
     ) -> None:
         self.csv_path = Path(csv_path)
         self.image_root = Path(image_root) if image_root is not None else None
         self.transform = transform
-        self.case_id_column = case_id_column
-        self.image_column = image_column
-        self.caption_column = caption_column
         self._mask_caption = DiseaseAliasMasker(disease_aliases, mask_token=mask_token)
         self.weak_supervision = weak_supervision
         self._weak_index = _case_index(weak_supervision)
         rows, fieldnames = _read_csv(self.csv_path)
-        _require_columns(fieldnames, (case_id_column, image_column, caption_column), self.csv_path)
+        self.case_id_column, self.image_column, self.caption_column = _resolve_columns(
+            fieldnames, case_id_column, image_column, caption_column, self.csv_path
+        )
         self.disease_label_columns = tuple(disease_label_columns or _default_label_columns(fieldnames))
         _require_columns(fieldnames, self.disease_label_columns, self.csv_path)
 
         self._records: list[dict[str, Any]] = []
         seen_case_ids: set[str] = set()
         for row_number, row in enumerate(rows, start=2):
-            case_id = row[case_id_column].strip()
+            image_path = row[self.image_column].strip()
+            case_id = row[self.case_id_column].strip() if self.case_id_column is not None else Path(image_path).name
             if not case_id:
                 raise ValueError(f"{self.csv_path}:{row_number}: case_id must not be empty")
             if case_id in seen_case_ids:
@@ -77,8 +77,8 @@ class Stage1SkinCAPDataset(Dataset):
             self._records.append(
                 {
                     "case_id": case_id,
-                    "image_path": row[image_column].strip(),
-                    "caption": row[caption_column],
+                    "image_path": image_path,
+                    "caption": row[self.caption_column],
                     "split": artifact_split,
                     "disease_label": _disease_label(row, self.disease_label_columns, self.csv_path, row_number),
                     "weak_index": weak_position,
@@ -145,9 +145,30 @@ def _require_columns(fieldnames: Sequence[str], required: Sequence[str], path: P
     if missing:
         raise ValueError(f"{path}: missing required columns {missing!r}")
 
+def _resolve_columns(
+    fieldnames: Sequence[str],
+    case_id_column: str | None,
+    image_column: str | None,
+    caption_column: str | None,
+    path: Path,
+) -> tuple[str | None, str, str]:
+    """Support either named Stage-1 CSVs or the legacy SkinCAP positional schema.
 
-def _default_label_columns(fieldnames: Sequence[str]) -> tuple[str, ...]:
-    return tuple(column for column in fieldnames if column.startswith("label_"))
+    In the legacy schema, column 0 is the image path, column 1 is caption text,
+    and the weak-supervision ``case_id`` is the image filename (for example,
+    ``3359.png``), not a synthetic row number.
+    """
+    if len(fieldnames) < 2:
+        raise ValueError(f"{path}: expected at least image and caption columns")
+    resolved_image = image_column or ("image" if "image" in fieldnames else fieldnames[0])
+    resolved_caption = caption_column or ("text" if "text" in fieldnames else fieldnames[1])
+    case_id_column = case_id_column or ("case_id" if "case_id" in fieldnames else None)
+    if case_id_column is not None and case_id_column not in fieldnames:
+        raise ValueError(f"{path}: missing requested case_id column {case_id_column!r}")
+    _require_columns(fieldnames, (resolved_image, resolved_caption), path)
+    return case_id_column, resolved_image, resolved_caption
+
+def _default_label_columns(fieldnames: Sequence[str]) -> tuple[str, ...]:    return tuple(column for column in fieldnames if column.startswith("label_"))
 
 
 def _disease_label(row: Mapping[str, str], columns: Sequence[str], path: Path, row_number: int) -> tuple[int, ...]:

@@ -48,10 +48,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--pilot_diseases", nargs="*")
     parser.add_argument("--return_attention_samples", type=int, default=0)
     parser.add_argument("--resume")
-    parser.add_argument("--disease_aliases_json", help="Optional JSON map/list of every disease name and alias to mask.")
-    parser.add_argument("--case_id_column", default="case_id")
-    parser.add_argument("--image_column", default="image")
-    parser.add_argument("--caption_column", default="text")
+    parser.add_argument("--disease_aliases_json", required=True, help="JSON map/list covering every disease name and alias to mask globally.")
+    parser.add_argument("--case_id_column", help="Named case-ID column; omit for legacy SkinCAP filename-derived IDs.")
+    parser.add_argument("--image_column", help="Named image column; defaults to legacy CSV column 0.")
+    parser.add_argument("--caption_column", help="Named caption column; defaults to legacy CSV column 1.")
     parser.add_argument("--epochs", type=int)
     return parser
 
@@ -71,17 +71,20 @@ def _seed_everything(seed: int) -> None:
 
 
 def _load_aliases(path: str | None, artifacts: WeakSupervisionArtifacts) -> Mapping[str, list[str]]:
+    if not path:
+        raise ValueError("--disease_aliases_json is required to prevent disease-name leakage")
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError("disease_aliases_json must map every full-artifact disease_id to its aliases")
     aliases: dict[str, list[str]] = {}
-    if path:
-        payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if isinstance(payload, Mapping):
-            aliases = {str(key): [str(value) for value in values] for key, values in payload.items()}
-        elif isinstance(payload, list):
-            aliases = {str(value): [] for value in payload}
-        else:
-            raise ValueError("disease_aliases_json must contain a JSON mapping or list")
-    for proposition in artifacts.active_propositions:
-        aliases.setdefault(proposition.disease_id, [])
+    for key, values in payload.items():
+        if isinstance(values, str) or not isinstance(values, (list, tuple)):
+            raise ValueError(f"aliases for {key!r} must be a JSON list")
+        aliases[str(key)] = [str(value) for value in values]
+    required = {proposition.disease_id for proposition in artifacts.active_propositions}
+    missing = sorted(required - set(aliases))
+    if missing:
+        raise ValueError(f"disease_aliases_json is missing full-artifact disease IDs: {missing!r}")
     return aliases
 
 
@@ -121,9 +124,13 @@ def main(args: argparse.Namespace) -> None:
     config = yaml.safe_load(Path(args.config).read_text(encoding="utf-8")) or {}
     weak = config.get("weak_supervision", {})
     artifacts = load_weak_supervision_v3(
-        args.labels_npz or weak.get("labels"), args.active_masks_npz or weak.get("active_masks"),
-        args.active_csv or weak.get("active_csv"), args.metadata_json or weak.get("metadata"),
+        labels_npz=args.labels_npz or weak.get("labels"),
+        active_masks_npz=args.active_masks_npz or weak.get("active_masks"),
+        active_csv=args.active_csv or weak.get("active_csv"),
+        metadata_json=args.metadata_json or weak.get("metadata"),
     )
+    # Load aliases from the complete v3 artifact set before restricting a pilot.
+    aliases = _load_aliases(args.disease_aliases_json, artifacts)
     artifacts = _pilot_artifacts(artifacts, args.pilot_diseases)
     seed = int(args.seed if args.seed is not None else config.get("seed", 42)); _seed_everything(seed)
     device = args.device or config.get("device", "cuda")
@@ -131,7 +138,6 @@ def main(args: argparse.Namespace) -> None:
         raise RuntimeError("CUDA was requested but is unavailable; pass --device cpu explicitly")
     skincap = config.get("skincap", {}); stage1 = config.get("stage1", {})
     image_root = args.image_root or skincap.get("image_root")
-    aliases = _load_aliases(args.disease_aliases_json, artifacts)
     common = dict(weak_supervision=artifacts, disease_aliases=aliases, image_root=image_root,
                   case_id_column=args.case_id_column, image_column=args.image_column, caption_column=args.caption_column)
     train = Stage1SkinCAPDataset(args.train_csv or skincap.get("train_csv"), transform=_transform(int(skincap.get("image_res", 224)), True), split="train", **common)
@@ -145,11 +151,14 @@ def main(args: argparse.Namespace) -> None:
     model = Stage1EvidenceModel(image_encoder=ModelRes(args.image_encoder_name or stage1["image_encoder_name"], embed_dim), text_encoder=Text_Encoder_Bert(args.bert_model_name or stage1["bert_model_name"], embed_dim), weak_supervision=artifacts, query_tokenizer=tokenize, embed_dim=embed_dim, num_heads=int(stage1.get("attention_heads", 8)), query_chunk_size=args.query_chunk_size or stage1.get("query_chunk_size"))
     weights = build_pos_weight_artifacts(artifacts, pos_weight_cap=float(stage1.get("pos_weight_cap", 10.0)))
     output = Path(args.output_dir); write_label_distribution(weights.rows, output / "supervision" / "label_distribution.csv")
-    trainer = Stage1Trainer(model=model, tokenizer=tokenize, weak_supervision=artifacts, loss_fn=MaskedBCELoss(weights.text_pos_weight, weights.image_pos_weight), config=TrainerConfig(device=device, early_stopping_patience=int(stage1.get("early_stopping_patience", 10)), config=config), output_dir=output)
+    trainer = Stage1Trainer(model=model, tokenizer=tokenize, weak_supervision=artifacts, loss_fn=MaskedBCELoss(weights.text_pos_weight, weights.image_pos_weight), config=TrainerConfig(device=device, early_stopping_patience=int(stage1.get("early_stopping_patience", 10)), learning_rate=float(stage1.get("lr", 1e-4)), weight_decay=float(stage1.get("weight_decay", 1e-4)), config=config), output_dir=output)
     if args.resume:
         trainer.load_checkpoint(args.resume)
     batch_size, eval_batch_size, workers = int(skincap.get("batch_size", 32)), int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2))
-    trainer.fit(_loader(train, batch_size, workers, True), _loader(val, eval_batch_size, workers, False), max_epochs=args.epochs or int(stage1.get("epochs", 50)), test_dataloader=_loader(test, eval_batch_size, workers, False) if test else None)
+    val_loader = _loader(val, eval_batch_size, workers, False)
+    trainer.fit(_loader(train, batch_size, workers, True), val_loader, max_epochs=args.epochs or int(stage1.get("epochs", 50)), test_dataloader=_loader(test, eval_batch_size, workers, False) if test else None)
+    if args.return_attention_samples:
+        trainer.save_attention_samples(val_loader, count=args.return_attention_samples)
 
 
 if __name__ == "__main__":

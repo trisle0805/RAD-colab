@@ -38,6 +38,7 @@ class Stage1EvidenceModel(nn.Module):
         self.text_encoder = text_encoder
         self.query_tokenizer = query_tokenizer
         self.query_chunk_size = query_chunk_size
+        self.image_projection = nn.Linear(2048, embed_dim)
         self.image_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
         self.text_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
         self.image_head = nn.Linear(embed_dim, 1)
@@ -90,17 +91,17 @@ class Stage1EvidenceModel(nn.Module):
     @staticmethod
     def _pooled_features(output: Any) -> Tensor:
         if isinstance(output, tuple):
-            return output[0]
+            output = output[1] if len(output) > 1 else output[0]
         if hasattr(output, "last_hidden_state"):
-            return output.last_hidden_state[:, 0, :]
+            output = output.last_hidden_state
         if isinstance(output, Tensor):
-            return output
+            return output[:, 0, :] if output.ndim == 3 else output
         raise TypeError("encoder output must be a Tensor, tuple, or model output with last_hidden_state")
 
     @staticmethod
     def _sequence_features(output: Any) -> Tensor:
         if isinstance(output, tuple):
-            return output[1] if len(output) > 1 else output[0]
+            return output[0]
         if hasattr(output, "last_hidden_state"):
             return output.last_hidden_state
         if isinstance(output, Tensor):
@@ -108,11 +109,18 @@ class Stage1EvidenceModel(nn.Module):
         raise TypeError("encoder output must be a Tensor, tuple, or model output with last_hidden_state")
 
     def _encode_text(self, tokens: Mapping[str, Tensor]) -> Any:
+        if hasattr(self.text_encoder, "bert_model"):
+            return self.text_encoder.bert_model(**tokens)
         if hasattr(self.text_encoder, "encode_text"):
             return self.text_encoder.encode_text(tokens)
         return self.text_encoder(**tokens)
 
     def _encode_image(self, images: Tensor) -> Any:
+        if hasattr(self.image_encoder, "res_features"):
+            features = self.image_encoder.res_features(images)
+            if features.ndim != 4:
+                raise ValueError("ModelRes res_features must produce [batch, 2048, height, width]")
+            return features.flatten(2).transpose(1, 2)
         return self.image_encoder(images)
 
     def _run_attention(
@@ -152,6 +160,8 @@ class Stage1EvidenceModel(nn.Module):
         with torch.no_grad():
             image_memory = self._sequence_features(self._encode_image(images))
             text_memory = self._sequence_features(self._encode_text(caption_tokens))
+        if hasattr(self.image_encoder, "res_features"):
+            image_memory = self.image_projection(image_memory)
         queries = self._queries(image_memory.device) if query_embeddings is None else query_embeddings.to(image_memory.device)
         if queries.ndim != 2 or queries.shape[0] != len(self.active_proposition_ids):
             raise ValueError("query_embeddings must be [active_proposition, embed_dim]")

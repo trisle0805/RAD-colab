@@ -1,5 +1,6 @@
 import csv
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -83,6 +84,26 @@ def test_dataset_masks_global_aliases_and_aligns_weak_labels_by_case_id(tmp_path
     text_labels, image_labels = dataset.weak_labels(["case-a", "case-b"])
     assert text_labels[:, 0].tolist() == [0, 1]
     assert image_labels[:, 0].tolist() == [1, 0]
+
+
+def test_dataset_derives_legacy_skincap_case_id_from_image_filename(tmp_path: Path) -> None:
+    artifacts = _artifacts(tmp_path)
+    artifacts = replace(artifacts, case_ids=np.asarray(["case-b.png", "case-a.png"]))
+    image_root = tmp_path / "images"
+    csv_path = tmp_path / "legacy_skincap.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(("path", "caption", "disease_0"))
+        writer.writerow(("nested/case-a", "Acne with itchy papules.", "1"))
+        writer.writerow(("case-b", "Eczema is chronic.", "0"))
+    # SkinCAP artifact IDs use image filenames; legacy CSVs omit a case-ID column.
+    # Add suffixes in the CSV input to reproduce actual image-path semantics.
+    text = csv_path.read_text(encoding="utf-8").replace("nested/case-a", "nested/case-a.png").replace("case-b,Eczema", "case-b.png,Eczema")
+    csv_path.write_text(text, encoding="utf-8")
+    dataset = Stage1SkinCAPDataset(
+        csv_path, image_root=image_root, weak_supervision=artifacts, disease_aliases=("acne", "eczema")
+    )
+    assert [record["case_id"] for record in dataset._records] == ["case-a.png", "case-b.png"]
 
 
 def test_dataset_fails_when_csv_case_has_no_weak_labels(tmp_path: Path) -> None:

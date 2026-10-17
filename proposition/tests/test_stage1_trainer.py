@@ -27,12 +27,12 @@ class EvidenceModel(nn.Module):
         return {"logits_txt": logits, "logits_img": logits, "scores_txt": logits.sigmoid(), "scores_img": logits.sigmoid(), "support_scores": logits.sigmoid()}
 
 
-def artifacts() -> WeakSupervisionArtifacts:
+def artifacts(*, text_trainable=(True, True), image_trainable=(True, True)) -> WeakSupervisionArtifacts:
     ids = np.asarray(["p1", "p2"])
-    props = tuple(ActiveProposition(value, "disease", "category", value, 1, True, True, True) for value in ids)
+    props = tuple(ActiveProposition(value, "disease", "category", value, 1, text, image, True) for value, text, image in zip(ids, text_trainable, image_trainable))
     return WeakSupervisionArtifacts(np.asarray(["a", "b", "c", "d"]), np.asarray(["train", "train", "val", "val"]), ids,
         np.asarray([[0, 1], [1, 0], [0, 1], [1, 0]], dtype=np.int8), np.asarray([[0, 1], [1, 0], [0, 1], [1, 0]], dtype=np.int8),
-        np.zeros((4, 2), dtype=np.float32), np.asarray([1, 1], dtype=bool), np.asarray([1, 1], dtype=bool), np.asarray([1, 1], dtype=bool), 1, props, {}, {"labels": "hash"})
+        np.zeros((4, 2), dtype=np.float32), np.asarray(text_trainable, dtype=bool), np.asarray(image_trainable, dtype=bool), np.asarray([1, 1], dtype=bool), 1, props, {}, {"labels": "hash"})
 
 
 def collate(rows):
@@ -60,6 +60,23 @@ def test_trainer_writes_stage1_outputs_and_resumes_rng(tmp_path: Path) -> None:
     expected = (random.random(), float(np.random.rand()), float(torch.rand(())))
     trainer.load_checkpoint(tmp_path / "checkpoints" / "rng.pt")
     assert (random.random(), float(np.random.rand()), float(torch.rand(()))) == expected
+
+
+def test_metrics_exclude_untrainable_modality_propositions() -> None:
+    trainer = Stage1Trainer(
+        model=EvidenceModel(), tokenizer=tokenizer,
+        weak_supervision=artifacts(text_trainable=(True, False), image_trainable=(False, True)),
+        loss_fn=MaskedBCELoss(torch.ones(2), torch.ones(2)),
+    )
+    metrics = trainer._metrics({
+        "score_text": np.asarray([[0.1, 0.9], [0.9, 0.1]]),
+        "score_image": np.asarray([[0.1, 0.9], [0.9, 0.1]]),
+        "label_text": np.asarray([[0, 1], [1, 0]], dtype=np.int8),
+        "label_img": np.asarray([[0, 1], [1, 0]], dtype=np.int8),
+    })
+    assert [row["eligible"] for row in metrics["text"]["rows"]] == [True, False]
+    assert [row["eligible"] for row in metrics["image"]["rows"]] == [False, True]
+    assert metrics["selection_macro_auc"] == 1.0
 
 
 def test_optimizer_rejects_frozen_parameters() -> None:
