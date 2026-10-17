@@ -91,7 +91,7 @@ def tokenizer(captions):
 
 
 def test_trainer_writes_stage1_outputs_and_resumes_rng(tmp_path: Path) -> None:
-    trainer = Stage1Trainer(model=EvidenceModel(), tokenizer=tokenizer, weak_supervision=artifacts(), loss_fn=MaskedBCELoss(torch.ones(2), torch.ones(2)), config=TrainerConfig(early_stopping_patience=2, config={"stage": 1}), output_dir=tmp_path)
+    trainer = Stage1Trainer(model=EvidenceModel(), tokenizer=tokenizer, weak_supervision=artifacts(), loss_fn=MaskedBCELoss(torch.ones(2), torch.ones(2)), config=TrainerConfig(early_stopping_patience=2, selection_min_present=1, selection_min_absent=1, config={"stage": 1}), output_dir=tmp_path)
     trainer.fit(loader(["a", "b"]), loader(["c", "d"]), max_epochs=1, test_dataloader=loader(["c", "d"]))
     assert (tmp_path / "checkpoints" / "latest.pt").exists()
     assert (tmp_path / "checkpoints" / "best.pt").exists()
@@ -110,6 +110,7 @@ def test_metrics_exclude_untrainable_modality_propositions() -> None:
         model=EvidenceModel(), tokenizer=tokenizer,
         weak_supervision=artifacts(text_trainable=(True, False), image_trainable=(False, True)),
         loss_fn=MaskedBCELoss(torch.ones(2), torch.ones(2)),
+        config=TrainerConfig(selection_min_present=1, selection_min_absent=1),
     )
     metrics = trainer._metrics({
         "score_text": np.asarray([[0.1, 0.9], [0.9, 0.1]]),
@@ -120,7 +121,24 @@ def test_metrics_exclude_untrainable_modality_propositions() -> None:
     assert [row["eligible"] for row in metrics["text"]["rows"]] == [True, False]
     assert [row["eligible"] for row in metrics["image"]["rows"]] == [False, True]
     assert metrics["selection_macro_auc"] == 1.0
+    assert metrics["selection"] == {
+        "source": "image", "metric": "macro_roc_auc", "min_present": 1, "min_absent": 1, "n_eligible": 1,
+    }
 
+def test_default_strict_selection_excludes_insufficient_validation_labels() -> None:
+    trainer = Stage1Trainer(
+        model=EvidenceModel(), tokenizer=tokenizer, weak_supervision=artifacts(),
+        loss_fn=MaskedBCELoss(torch.ones(2), torch.ones(2)),
+    )
+    metrics = trainer._metrics({
+        "score_text": np.asarray([[0.1, 0.9], [0.9, 0.1]]),
+        "score_image": np.asarray([[0.1, 0.9], [0.9, 0.1]]),
+        "label_text": np.asarray([[0, 1], [1, 0]], dtype=np.int8),
+        "label_img": np.asarray([[0, 1], [1, 0]], dtype=np.int8),
+    })
+    assert metrics["text"]["n_eligible"] == 0
+    assert metrics["image"]["n_eligible"] == 0
+    assert metrics["selection_macro_auc"] is None
 
 def test_optimizer_rejects_frozen_parameters() -> None:
     model = EvidenceModel()

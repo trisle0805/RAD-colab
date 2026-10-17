@@ -26,13 +26,16 @@ from .metrics import evaluate_modalities, modality_metrics
 
 @dataclass
 class TrainerConfig:
-    """Runtime controls for a Stage-1 evidence-only run."""
-
     device: str = "cpu"
     early_stopping_patience: int = 10
     score_threshold: float = 0.5
     learning_rate: float = 1e-4
     weight_decay: float = 1e-4
+
+    # Strict weak-label eligibility for checkpoint selection/evaluation
+    selection_min_present: int = 5
+    selection_min_absent: int = 5
+
     config: Mapping[str, Any] = field(default_factory=dict)
 
 
@@ -189,30 +192,89 @@ class Stage1Trainer:
         image = torch.as_tensor(self.artifacts.label_img[indices][:, self.active_indices], device=self.device)
         return text, image
 
-    def _metrics(self, prediction: Mapping[str, np.ndarray]) -> dict[str, Any]:
-        outputs = {"text": prediction["score_text"], "image": prediction["score_image"]}
-        labels = {"text": prediction["label_text"], "image": prediction["label_img"]}
+    def _metrics(
+        self,
+        prediction: Mapping[str, np.ndarray],
+    ) -> dict[str, Any]:
+
+        outputs = {
+            "text": prediction["score_text"],
+            "image": prediction["score_image"],
+        }
+
+        labels = {
+            "text": prediction["label_text"],
+            "image": prediction["label_img"],
+        }
+
+        metric_kwargs = {
+            "proposition_ids": self.proposition_ids,
+            "threshold": self.config.score_threshold,
+            "min_present": self.config.selection_min_present,
+            "min_absent": self.config.selection_min_absent,
+        }
+
         metrics = {
             "text": evaluate_modalities(
-                {"text": outputs["text"]}, {"text": labels["text"]},
-                proposition_ids=self.proposition_ids,
-                valid_propositions=self.text_trainable.detach().cpu().numpy(),
-                threshold=self.config.score_threshold,
+                {
+                    "text": outputs["text"],
+                },
+                {
+                    "text": labels["text"],
+                },
+                valid_propositions=(
+                    self.text_trainable
+                    .detach()
+                    .cpu()
+                    .numpy()
+                ),
+                **metric_kwargs,
             )["text"],
+
             "image": evaluate_modalities(
-                {"image": outputs["image"]}, {"image": labels["image"]},
-                proposition_ids=self.proposition_ids,
-                valid_propositions=self.image_trainable.detach().cpu().numpy(),
-                threshold=self.config.score_threshold,
+                {
+                    "image": outputs["image"],
+                },
+                {
+                    "image": labels["image"],
+                },
+                valid_propositions=(
+                    self.image_trainable
+                    .detach()
+                    .cpu()
+                    .numpy()
+                ),
+                **metric_kwargs,
             )["image"],
         }
-        auc_values = [
-            row["roc_auc"]
-            for modality in ("text", "image")
-            for row in metrics[modality]["rows"]
-            if row["eligible"] and row["roc_auc"] is not None
-        ]
-        metrics["selection_macro_auc"] = float(np.mean(auc_values)) if auc_values else None
+
+        # --------------------------------------------------------
+        # IMPORTANT:
+        # Checkpoint selection uses IMAGE branch only.
+        #
+        # Text metrics are still reported, but text does not
+        # influence best-checkpoint selection because its weak
+        # labels currently contain too few reliable negatives.
+        # --------------------------------------------------------
+
+        metrics["selection_macro_auc"] = (
+            metrics["image"]["macro_roc_auc"]
+        )
+
+        metrics["selection"] = {
+            "source": "image",
+            "metric": "macro_roc_auc",
+            "min_present": (
+                self.config.selection_min_present
+            ),
+            "min_absent": (
+                self.config.selection_min_absent
+            ),
+            "n_eligible": (
+                metrics["image"]["n_eligible"]
+            ),
+        }
+
         return metrics
 
     def _prepare_output(self) -> None:
@@ -244,6 +306,8 @@ class Stage1Trainer:
                 result.predictions["label_img"],
                 self.text_trainable.detach().cpu().numpy(),
                 self.image_trainable.detach().cpu().numpy(),
+                min_present=self.config.selection_min_present,
+                min_absent=self.config.selection_min_absent,
             ),
         }
         queries = getattr(self.model, "_queries")(self.device).detach()
@@ -259,6 +323,8 @@ class Stage1Trainer:
                     result.predictions["label_img"],
                     self.text_trainable.detach().cpu().numpy(),
                     self.image_trainable.detach().cpu().numpy(),
+                    min_present=self.config.selection_min_present,
+                    min_absent=self.config.selection_min_absent,
                 ),
                 "within_patient_differentiation": within_patient_differentiation(control),
             }
@@ -400,11 +466,20 @@ def _fused_macro_auc(
     label_image: np.ndarray,
     text_trainable: np.ndarray,
     image_trainable: np.ndarray,
+    *,
+    min_present: int = 1,
+    min_absent: int = 1,
 ) -> float | None:
     """Macro AUC over all eligible modality/proposition pairs using fused scores."""
     metrics = {
-        "text": modality_metrics(scores, label_text, valid_propositions=text_trainable),
-        "image": modality_metrics(scores, label_image, valid_propositions=image_trainable),
+        "text": modality_metrics(
+            scores, label_text, valid_propositions=text_trainable,
+            min_present=min_present, min_absent=min_absent,
+        ),
+        "image": modality_metrics(
+            scores, label_image, valid_propositions=image_trainable,
+            min_present=min_present, min_absent=min_absent,
+        ),
     }
     values = [
         row["roc_auc"]

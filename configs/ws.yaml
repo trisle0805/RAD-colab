@@ -36,6 +36,9 @@ stage1:
   optimizer: adamw
   lr: 1.0e-4
   weight_decay: 1.0e-4
-  epochs: 50
+  epochs: 30
   early_stopping_patience: 10
+  # Best checkpoint: image macro ROC-AUC only, with >=5 PRESENT and >=5 ABSENT on validation.
+  selection_min_present: 5
+  selection_min_absent: 5
   pos_weight_cap: 10.0
