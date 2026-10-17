@@ -22,9 +22,52 @@ class EvidenceModel(nn.Module):
         super().__init__()
         self.linear = nn.Linear(1, 2)
 
-    def forward(self, images, caption_tokens):
+    def _queries(self, device):
+        return torch.tensor(
+            [[1.0], [2.0]],
+            dtype=torch.float32,
+            device=device,
+        )
+
+    def forward(
+        self,
+        images,
+        caption_tokens,
+        *,
+        query_embeddings=None,
+        return_attention=False,
+    ):
         logits = self.linear(images.float())
-        return {"logits_txt": logits, "logits_img": logits, "scores_txt": logits.sigmoid(), "scores_img": logits.sigmoid(), "support_scores": logits.sigmoid()}
+
+        # Support query-control diagnostics used by Stage1Trainer.
+        if query_embeddings is not None:
+            query_effect = query_embeddings.squeeze(-1).unsqueeze(0)
+            logits = logits + 0.01 * query_effect
+
+        scores = logits.sigmoid()
+
+        output = {
+            "logits_txt": logits,
+            "logits_img": logits,
+            "scores_txt": scores,
+            "scores_img": scores,
+            "support_scores": scores,
+        }
+
+        if return_attention:
+            batch = images.shape[0]
+            output["attention"] = {
+                "image": torch.zeros(
+                    batch, 2, 1,
+                    device=images.device,
+                ),
+                "text": torch.zeros(
+                    batch, 2, 1,
+                    device=images.device,
+                ),
+            }
+
+        return output
 
 
 def artifacts(*, text_trainable=(True, True), image_trainable=(True, True)) -> WeakSupervisionArtifacts:
