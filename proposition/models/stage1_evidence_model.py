@@ -100,13 +100,48 @@ class Stage1EvidenceModel(nn.Module):
 
     @staticmethod
     def _sequence_features(output: Any) -> Tensor:
-        if isinstance(output, tuple):
-            return output[0]
+        """
+        Extract sequence/token/patch features with shape [B, N, D].
+
+        Supports:
+        - HuggingFace model outputs: .last_hidden_state
+        - tuple outputs such as (pooled, sequence)
+        - direct [B, N, D] tensors
+        """
         if hasattr(output, "last_hidden_state"):
-            return output.last_hidden_state
-        if isinstance(output, Tensor):
-            return output
-        raise TypeError("encoder output must be a Tensor, tuple, or model output with last_hidden_state")
+            output = output.last_hidden_state
+
+        elif isinstance(output, tuple):
+            # Prefer the tensor that actually contains a sequence dimension.
+            sequence_candidates = [
+                item
+                for item in output
+                if isinstance(item, Tensor) and item.ndim == 3
+            ]
+
+            if len(sequence_candidates) == 1:
+                output = sequence_candidates[0]
+            elif len(sequence_candidates) > 1:
+                output = sequence_candidates[0]
+            else:
+                raise ValueError(
+                    "tuple encoder output does not contain "
+                    "a [B, N, D] sequence tensor"
+                )
+
+        if not isinstance(output, Tensor):
+            raise TypeError(
+                "encoder output must be a Tensor, tuple, "
+                "or model output with last_hidden_state"
+            )
+
+        if output.ndim != 3:
+            raise ValueError(
+                f"sequence features must have shape [B, N, D], "
+                f"got {tuple(output.shape)}"
+            )
+
+        return output
 
     def _encode_text(self, tokens: Mapping[str, Tensor]) -> Any:
         if hasattr(self.text_encoder, "bert_model"):
