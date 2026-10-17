@@ -1,1 +1,1 @@
-"""Models for proposition-based prediction."""
+"""Stage-1 evidence models."""

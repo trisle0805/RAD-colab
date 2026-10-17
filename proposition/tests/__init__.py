@@ -1,1 +1,1 @@
-"""Tests for the proposition extension."""
+"""Tests for the active Stage-1 proposition architecture."""

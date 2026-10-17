@@ -1,1 +1,1 @@
-"""Training, evaluation, and artifacts for proposition-based prediction."""
+"""Stage-1 training, metrics, artifacts, and diagnostics."""

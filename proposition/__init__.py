@@ -1,1 +1,1 @@
-"""Proposition-based extension for the RAD baseline."""
+"""Stage-1 proposition evidence learning package for the RAD baseline."""

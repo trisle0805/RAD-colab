@@ -1,53 +1,41 @@
-# Proposition extension
+# Stage 1 proposition evidence learning
 
-This package contains the proposition-based extension built on top of the RAD baseline.
+This package is the isolated implementation of **Stage 1: weakly supervised
+proposition evidence learning**. It learns evidence for whether a proposition
+concept is present in an image or disease-masked caption. It does **not**
+predict diseases, aggregate propositions into disease scores, apply polarity,
+or use disease labels in the model or loss.
 
-The original RAD implementation remains in the repository's existing `dataset`, `engine`, `factory`, and `models` packages. New proposition-specific data loading, models, losses, training utilities, artifacts, and tests are isolated here.
+The RAD baseline remains outside this package. In particular,
+[`main_rad.py`](../main_rad.py) is unchanged.
 
-The dedicated experiment entry point is `main_proposition.py`; `main_rad.py` remains the unchanged baseline entry point.
-
-## Complete experiment artifacts
-
-A completed `main_proposition.py` run writes the comparable validation history to
-`<output_dir>/metrics/metrics_history.csv`, final test metrics to
-`<output_dir>/final_metrics.json`, and primary test predictions to
-`<output_dir>/predictions/test_best.npz`.
-
-It also performs one extra **test-only** pass from the selected `best.pt` checkpoint
-and writes UI-ready explanation data under `<output_dir>/checklist/`:
-
-- `test_proposition_evidence.npz`: disease probabilities, raw support,
-	polarity-aware compatibility, pre-calibration disease scores, attention entropy,
-	top attention positions for every test sample, caption tokens, labels, and image
-	paths. Full proposition attention is retained as float16 only for 20
-	deterministically selected samples, together with their dataset indices;
-- `proposition_index.json` and `disease_index.json`: stable IDs and evidence
-	provenance needed to interpret tensors;
-- `test_proposition_evidence.schema.json`: array shapes, memory layout, and
-	renderer metadata.
-
-For SkinCAP, image attention occupies the first `image_token_count` memory
-positions; caption-token attention occupies the remaining positions. The schema
-records the split rather than relying on a hard-coded token count.
-
-## Render attention reports
-
-The renderer consumes saved checklist artifacts only; it does not train or load a
-model checkpoint. Run it after a completed experiment:
+## Current package structure
 
 ```text
-python proposition/visualization/render_attention.py \
-	--evidence <output_dir>/checklist/test_proposition_evidence.npz \
-	--bert_model_name <the same ClinicalBERT path or Hugging Face ID> \
-	--samples 0 1 2
+proposition/
++-- data/       # KB and immutable v3 weak-supervision contracts
++-- models/     # Stage-1 frozen-backbone evidence model (added in Commit 3)
++-- losses/     # Masked weak-supervision loss (added in Commit 4)
++-- engine/     # Trainer, metrics, artifacts, diagnostics (Commits 5–6)
++-- tests/      # Tests only for the current Stage-1 architecture
 ```
 
-When `--samples` is omitted, it renders every sample for which full attention was
-stored. Explicit sample IDs must be among those selected samples.
+## Stage 1 weak-supervision contracts
 
-It creates `<output_dir>/checklist/rendered_attention/sample_XXXX/report.html`.
-Each report contains the top predicted diseases, the strongest propositions for
-each disease, image-patch heatmaps, caption-token highlighting, support,
-compatibility, attention entropy, polarity, and evidence provenance. These HTML
-reports and the underlying NPZ schema are intended as the data contract for a
-future inference UI.
+The immutable v3 artifacts are loaded through
+`proposition.data.weak_supervision`:
+
+- `labels_raw_v3.npz` requires `case_id`, `split`, `proposition_id`,
+  `label_text`, `label_img`, and `p_img`;
+- `active_masks_v3.npz` requires proposition IDs plus text/image trainability,
+  active-scoring flags, and `min_labels`;
+- `active_propositions_v3.csv` is reconciled by `proposition_id` and provides
+  audit metadata; and
+- `metadata_final_v3.json` is retained as the manifest and can optionally
+  verify SHA256 digests.
+
+Labels retain `1 = PRESENT`, `0 = ABSENT`, and `-1 = UNKNOWN`. Unknown labels
+are never converted to absent labels. Matrix columns are aligned by their
+explicit proposition IDs (and case lookup is by `case_id`), rather than by an
+assumed file order. Inactive propositions remain unavailable (`N/A`), not zero
+scores.

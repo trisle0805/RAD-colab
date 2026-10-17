@@ -1,1 +1,1 @@
-"""Losses for proposition-based prediction."""
+"""Stage-1 losses."""
