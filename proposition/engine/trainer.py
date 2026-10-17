@@ -411,9 +411,36 @@ def _rng_state() -> dict[str, Any]:
 
 
 def _restore_rng_state(state: Mapping[str, Any]) -> None:
-    random.setstate(state["python"]); np.random.set_state(state["numpy"]); torch.set_rng_state(state["torch"])
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+
+    # torch.set_rng_state requires a CPU ByteTensor.
+    torch_state = state["torch"]
+    if isinstance(torch_state, torch.Tensor):
+        torch_state = (
+            torch_state
+            .detach()
+            .cpu()
+            .to(dtype=torch.uint8)
+        )
+
+    torch.set_rng_state(torch_state)
+
     if "cuda" in state and torch.cuda.is_available():
-        torch.cuda.set_rng_state_all(state["cuda"])
+        cuda_states = []
+
+        for cuda_state in state["cuda"]:
+            if isinstance(cuda_state, torch.Tensor):
+                cuda_state = (
+                    cuda_state
+                    .detach()
+                    .cpu()
+                    .to(dtype=torch.uint8)
+                )
+
+            cuda_states.append(cuda_state)
+
+        torch.cuda.set_rng_state_all(cuda_states)
 
 
 def _git_commit() -> str | None:
