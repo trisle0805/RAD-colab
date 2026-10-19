@@ -69,3 +69,20 @@ prediction artifacts; label-distribution auditing; query-control diagnostics
 (including fused-score macro AUC); and a captured run config. `ws.yaml` uses
 512-pixel inputs to match the RAD SkinCAP comparison setting. These artifacts
 contain proposition evidence only—never disease probabilities.
+
+## Text-support retraining
+
+The text-only Stage-1 retraining experiment starts from an existing Stage-1
+weights checkpoint and trains only `text_cross_attention` and `text_head`:
+
+```powershell
+python -m proposition.cli.text_retrain --config configs/ws.yaml `
+  --init_checkpoint <stage1_checkpoint> --output_dir <run_dir> `
+  --disease_aliases_json <aliases.json> --device cuda
+```
+
+Its text targets are `PRESENT -> 1` and `ABSENT/UNKNOWN -> 0`. Image
+supervision and the Stage-1 fusion rule remain unchanged, while image loss is
+excluded from text-only train/validation loss. The run verifies frozen module
+hashes and image scores, selects the best checkpoint by validation text
+macro ROC-AUC, and exports Stage-2-compatible scores for each available split.

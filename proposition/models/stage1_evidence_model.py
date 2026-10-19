@@ -30,6 +30,7 @@ class Stage1EvidenceModel(nn.Module):
         embed_dim: int = 768,
         num_heads: int = 8,
         query_chunk_size: int | None = None,
+        training_scope: str = "full_stage1",
     ) -> None:
         super().__init__()
         if query_chunk_size is not None and query_chunk_size < 1:
@@ -38,6 +39,7 @@ class Stage1EvidenceModel(nn.Module):
         self.text_encoder = text_encoder
         self.query_tokenizer = query_tokenizer
         self.query_chunk_size = query_chunk_size
+        self.training_scope = training_scope
         self.image_projection = nn.Linear(2048, embed_dim)
         self.image_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
         self.text_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
@@ -60,6 +62,7 @@ class Stage1EvidenceModel(nn.Module):
         self.register_buffer("query_cache", torch.empty((0, embed_dim)), persistent=False)
         self._freeze_encoder(self.image_encoder)
         self._freeze_encoder(self.text_encoder)
+        self.set_training_scope(training_scope)
 
     @staticmethod
     def _freeze_encoder(encoder: nn.Module) -> None:
@@ -72,7 +75,31 @@ class Stage1EvidenceModel(nn.Module):
         # Keep frozen BERT dropout and ResNet BatchNorm deterministic/frozen.
         self.image_encoder.eval()
         self.text_encoder.eval()
+        if self.training_scope == "text_only":
+            self.image_projection.eval()
+            self.image_cross_attention.eval()
+            self.image_head.eval()
         return self
+
+    def set_training_scope(self, training_scope: str) -> None:
+        """Set the explicit Stage-1 parameter and module training scope."""
+        if training_scope not in {"full_stage1", "text_only"}:
+            raise ValueError("training_scope must be 'full_stage1' or 'text_only'")
+        self.training_scope = training_scope
+        if training_scope == "text_only":
+            trainable_names = {"text_cross_attention", "text_head"}
+            for name, module in self.named_children():
+                if isinstance(module, nn.Module):
+                    enabled = name in trainable_names
+                    module.requires_grad_(enabled)
+                    module.train(enabled)
+                    if not enabled:
+                        module.eval()
+            self.image_encoder.eval()
+            self.text_encoder.eval()
+        else:
+            self._freeze_encoder(self.image_encoder)
+            self._freeze_encoder(self.text_encoder)
 
     @torch.no_grad()
     def refresh_query_cache(self) -> None:
