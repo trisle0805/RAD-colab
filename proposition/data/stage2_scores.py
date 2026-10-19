@@ -172,9 +172,15 @@ def load_stage2_disease_targets(csv_path: str | Path, expected_case_ids: Sequenc
             if reader.fieldnames is None:
                 raise ValueError(f"{source}: CSV must include a header")
             fields = tuple(reader.fieldnames)
-            label_columns = tuple(sorted(column for column in fields if column.startswith("label_")))
-            if not label_columns:
-                raise ValueError(f"{source}: no label_* disease columns")
+            prefixed_label_columns = tuple(
+                column for column in fields if column.startswith("label_")
+            )
+            if prefixed_label_columns:
+                label_columns = prefixed_label_columns
+            else:
+                if len(fields) < 3:
+                    raise ValueError(f"{source}: expected image, caption, and disease columns")
+                label_columns = tuple(fields[2:])
             image_column = "image" if "image" in fields else fields[0]
             rows: dict[str, np.ndarray] = {}
             for number, row in enumerate(reader, start=2):

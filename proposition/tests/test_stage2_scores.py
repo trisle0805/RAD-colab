@@ -55,8 +55,29 @@ def test_metadata_targets_and_routing_contracts(tmp_path):
     labels = tmp_path / "labels.csv"
     labels.write_text("image,label_z,label_a\nfolder/b.png,1,0\nfolder/a.png,0,1\n", encoding="utf-8")
     target = load_stage2_disease_targets(labels, ["a.png", "b.png"])
-    assert target.disease_ids == ("a", "z")
-    np.testing.assert_array_equal(target.targets, [[1, 0], [0, 1]])
+    assert target.disease_ids == ("z", "a")
+    np.testing.assert_array_equal(target.targets, [[0, 1], [1, 0]])
+
+def test_targets_support_skincap_schema_and_preserve_csv_disease_order(tmp_path):
+    labels = tmp_path / "skincap.csv"
+    labels.write_text(
+        "image,caption,disease_z,disease_a\n"
+        "folder/b.png,caption b,1,0\n"
+        "folder/a.png,caption a,0,1\n",
+        encoding="utf-8",
+    )
+
+    target = load_stage2_disease_targets(labels, ["a.png", "b.png"])
+
+    assert target.disease_ids == ("disease_z", "disease_a")
+    np.testing.assert_array_equal(target.targets, [[0, 1], [1, 0]])
+
+def test_targets_reject_non_prefixed_schema_without_disease_columns(tmp_path):
+    labels = tmp_path / "invalid.csv"
+    labels.write_text("image,caption\nfolder/a.png,caption a\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="expected image, caption, and disease columns"):
+        load_stage2_disease_targets(labels, ["a.png"])
 
 
 def test_fusion_mismatch_is_rejected(tmp_path):
