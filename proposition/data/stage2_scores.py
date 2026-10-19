@@ -149,9 +149,17 @@ def load_stage2_propositions(active_csv: str | Path, expected_proposition_ids: S
     expected = tuple(str(value) for value in expected_proposition_ids)
     if len(set(expected)) != len(expected):
         raise ValueError("expected proposition IDs contain duplicates")
-    missing, extra = set(expected).difference(rows), set(rows).difference(expected)
-    if missing or extra:
-        raise ValueError(f"{source}: proposition IDs differ; missing={sorted(missing)[:5]!r}, extra={sorted(extra)[:5]!r}")
+    missing = set(expected).difference(rows)
+    active_extra = sorted(
+        identifier
+        for identifier in set(rows).difference(expected)
+        if rows[identifier].active_scoring
+    )
+    if missing or active_extra:
+        raise ValueError(
+            f"{source}: proposition IDs differ; missing={sorted(missing)[:5]!r}, "
+            f"active_extra={active_extra[:5]!r}"
+        )
     return tuple(rows[identifier] for identifier in expected)
 
 

@@ -24,7 +24,7 @@ class Stage2TrainerConfig:
     weight_decay: float = 0.0
     max_epochs: int = 100
     early_stopping_patience: int = 10
-    selection_metric: str = "macro_roc_auc"
+    selection_metric: str = "val_loss"
     threshold: float = 0.5
     batch_size: int = 64
 
@@ -32,7 +32,7 @@ class Stage2TrainerConfig:
 class Stage2Trainer:
     """Fit only calibration parameters; Stage-1 evidence remains immutable input."""
 
-    _SUPPORTED_SELECTION = frozenset(("macro_roc_auc", "macro_f1", "micro_f1", "balanced_accuracy"))
+    _SUPPORTED_SELECTION = frozenset(("val_loss", "macro_roc_auc", "macro_f1", "micro_f1", "balanced_accuracy"))
 
     def __init__(
         self,
@@ -64,7 +64,7 @@ class Stage2Trainer:
         actual = {id(parameter) for group in self.optimizer.param_groups for parameter in group["params"]}
         if actual != expected or expected != {id(self.model.raw_gamma), id(self.model.bias)}:
             raise ValueError("optimizer must contain exactly raw_gamma and bias")
-        self.epoch, self.best_epoch, self.best_metric, self.bad_epochs = 0, None, float("-inf"), 0
+        self.epoch, self.best_epoch, self.best_metric, self.bad_epochs = 0, None, float("inf"), 0
         self.history: list[dict[str, Any]] = []
         self.output_dir = Path(output_dir) if output_dir else None
         if self.output_dir:
@@ -75,10 +75,10 @@ class Stage2Trainer:
         for epoch in range(1, self.config.max_epochs + 1):
             train_loss = self._train_epoch(train)
             validation_result = self.evaluate(validation)
-            value = validation_result["metrics"].get(self.config.selection_metric)
+            value = self._selection_value(validation_result)
             record = {"epoch": epoch, "train_loss": train_loss, "val_loss": validation_result["loss"], "selection_metric": value}
             self.history.append(record); self.epoch = epoch
-            improved = value is not None and np.isfinite(value) and float(value) > self.best_metric
+            improved = value is not None and np.isfinite(value) and self._is_improved(float(value))
             if improved:
                 self.best_metric, self.best_epoch, self.bad_epochs = float(value), epoch, 0
                 self.save_checkpoint("best.pt")
@@ -90,8 +90,20 @@ class Stage2Trainer:
                 break
         if self.best_epoch is None:
             raise RuntimeError("validation never produced a finite selection metric")
+        completed_epoch, completed_bad_epochs, completed_history = self.epoch, self.bad_epochs, self.history
         self.load_checkpoint(self._checkpoint_path("best.pt"), load_optimizer=False)
+        self.epoch, self.bad_epochs, self.history = completed_epoch, completed_bad_epochs, completed_history
         return self.history
+
+    def _selection_value(self, validation_result: Mapping[str, Any]) -> float | None:
+        if self.config.selection_metric == "val_loss":
+            return float(validation_result["loss"])
+        return validation_result["metrics"].get(self.config.selection_metric)
+
+    def _is_improved(self, value: float) -> bool:
+        if self.config.selection_metric == "val_loss":
+            return value < self.best_metric
+        return value > self.best_metric
 
     def evaluate(self, dataset: Stage2Dataset) -> dict[str, Any]:
         self._validate_dataset(dataset)

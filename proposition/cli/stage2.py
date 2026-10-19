@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import subprocess
 import json
 import random
 from pathlib import Path
@@ -37,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--patience", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
     parser.add_argument("--weight_decay", type=float, default=0.0)
-    parser.add_argument("--selection_metric", default="macro_roc_auc")
+    parser.add_argument("--selection_metric", default="val_loss", choices=("val_loss", "macro_roc_auc", "macro_f1", "micro_f1", "balanced_accuracy"))
     parser.add_argument("--threshold", type=float, default=0.5)
     parser.add_argument("--batch_size", type=int, required=True)
     return parser.parse_args()
@@ -81,7 +82,7 @@ def main() -> None:
     after = {name: sha256_file(path) for name, path in paths.items()}
     if after != hashes:
         raise RuntimeError("input artifact hashes changed during Stage-2 execution")
-    _write_json(output_dir / "stage2_manifest.json", {"routing_mode": args.mode, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "input_hashes": hashes, "seed": args.seed, "hyperparameters": vars(args), "best_epoch": trainer.best_epoch, "best_validation_metric": trainer.best_metric, "selection_metric": args.selection_metric, "stage1_provenance": {key: hashes[key] for key in ("stage1_manifest", "stage1_evidence_hashes") if key in hashes}})
+    _write_json(output_dir / "stage2_manifest.json", {"routing_mode": args.mode, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "input_hashes": hashes, "seed": args.seed, "hyperparameters": vars(args), "best_epoch": trainer.best_epoch, "best_validation_metric": trainer.best_metric, "selection_metric": args.selection_metric, "selection_mode": "min" if args.selection_metric == "val_loss" else "max", "stage2_git_commit": _git_commit(), "stage1_provenance": {key: hashes[key] for key in ("stage1_manifest", "stage1_evidence_hashes") if key in hashes}})
     print(json.dumps({"best_epoch": trainer.best_epoch, "best_validation_metric": trainer.best_metric, "test_metrics": {key: value for key, value in results["test"]["metrics"].items() if key != "per_disease"}}, sort_keys=True, default=_json_default))
 
 
@@ -111,6 +112,18 @@ def _write_rows(path: Path, rows: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=sorted({key for row in rows for key in row}))
         writer.writeheader(); writer.writerows(rows)
+
+def _git_commit() -> str | None:
+    """Return the source revision when the CLI runs inside a Git checkout."""
+    try:
+        return subprocess.check_output(
+            ("git", "rev-parse", "HEAD"),
+            cwd=Path(__file__).resolve().parents[2],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 
 def _json_default(value: Any) -> Any:

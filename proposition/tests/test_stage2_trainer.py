@@ -32,3 +32,20 @@ def test_trainer_optimizes_only_calibration_selects_validation_and_exports(tmp_p
     trainer.input_hashes = {"input": "changed"}
     with pytest.raises(ValueError, match="hashes"):
         trainer.load_checkpoint(tmp_path / "checkpoints" / "best.pt")
+
+def test_trainer_selects_lowest_validation_bce_loss_by_default(tmp_path, monkeypatch):
+    trainer = _trainer(tmp_path)
+    assert trainer.config.selection_metric == "val_loss"
+    losses = iter((0.8, 0.4, 0.6))
+    monkeypatch.setattr(trainer, "_train_epoch", lambda dataset: 0.0)
+    monkeypatch.setattr(
+        trainer,
+        "evaluate",
+        lambda dataset: {"loss": next(losses), "metrics": {"macro_roc_auc": 0.5}},
+    )
+
+    trainer.fit(_dataset(), _dataset())
+
+    assert trainer.best_epoch == 2
+    assert trainer.best_metric == pytest.approx(0.4)
+    assert [record["selection_metric"] for record in trainer.history] == [0.8, 0.4, 0.6]

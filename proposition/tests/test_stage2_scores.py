@@ -65,3 +65,16 @@ def test_fusion_mismatch_is_rejected(tmp_path):
     bad = artifacts.__class__(**{**artifacts.__dict__, "score_fused": np.zeros_like(artifacts.score_image)})
     with pytest.raises(ValueError, match="does not match"):
         build_stage2_support(bad, props, "full_fused")
+
+def test_metadata_allows_inactive_extra_rows_but_rejects_active_extras(tmp_path):
+    path = tmp_path / "scores.npz"; _artifact(path); artifacts = load_stage2_score_artifact(path)
+    manifest = tmp_path / "active.csv"; _csv(manifest)
+    with manifest.open("a", encoding="utf-8") as handle:
+        handle.write("p_inactive,d3,other,1,0,0,0\n")
+    propositions = load_stage2_propositions(manifest, artifacts.proposition_ids)
+    assert [item.proposition_id for item in propositions] == ["p1", "p2"]
+
+    with manifest.open("a", encoding="utf-8") as handle:
+        handle.write("p_unexpected_active,d3,other,1,1,0,1\n")
+    with pytest.raises(ValueError, match="active_extra"):
+        load_stage2_propositions(manifest, artifacts.proposition_ids)
