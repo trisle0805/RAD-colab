@@ -373,6 +373,7 @@ class Stage1Trainer:
                     image_trainable,
                     min_present=self.config.selection_min_present,
                     min_absent=self.config.selection_min_absent,
+                    text_target_semantics=self.config.text_target_semantics,
                 ),
                 "mean_absolute_score_delta": float(
                     np.nanmean(np.abs(control["score_fused"] - baseline["score_fused"]))

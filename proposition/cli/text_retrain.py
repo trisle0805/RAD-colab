@@ -40,13 +40,23 @@ def _cfg(config: Mapping[str, Any], section: str, key: str, value: Any, default:
     return value if value is not None else config.get(section, {}).get(key, default)
 
 
-def _loader(dataset: Stage1SkinCAPDataset, batch_size: int, workers: int) -> DataLoader:
+def _loader(
+    dataset: Stage1SkinCAPDataset,
+    batch_size: int,
+    workers: int,
+    *,
+    shuffle: bool,
+    seed: int,
+) -> DataLoader:
+    generator = torch.Generator()
+    generator.manual_seed(seed)
     return DataLoader(
         dataset,
         batch_size=batch_size,
-        shuffle=False,
+        shuffle=shuffle,
         num_workers=workers,
         pin_memory=torch.cuda.is_available(),
+        generator=generator,
     )
 
 
@@ -67,9 +77,11 @@ def _score_equal(before: np.ndarray, after: np.ndarray, tolerance: float = 1e-7)
 
 
 def _distribution(scores: np.ndarray, labels: np.ndarray, semantics: str) -> dict[str, Any]:
-    values = scores[np.isfinite(scores)]
-    effective = labels == 1 if semantics == "caption_support_binary" else labels == 1
-    negatives = labels == 0 if semantics != "caption_support_binary" else labels != 1
+    target = labels == 1 if semantics == "caption_support_binary" else labels
+    valid = np.isfinite(scores)
+    values = scores[valid]
+    effective = valid & (target == 1)
+    negatives = valid & (target == 0)
     return {
         "mean_score": float(values.mean()) if values.size else None,
         "std_score": float(values.std()) if values.size else None,
@@ -82,6 +94,31 @@ def _distribution(scores: np.ndarray, labels: np.ndarray, semantics: str) -> dic
         "mean_score_effective_negative": float(scores[negatives].mean()) if np.any(negatives) else None,
         "fraction_scores_ge_0_5": float(np.mean(values >= .5)) if values.size else None,
     }
+
+
+def _file_sha256(path: str | Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _effective_single_class_count(
+    labels: np.ndarray,
+    trainable: np.ndarray,
+    semantics: str,
+) -> tuple[int, float]:
+    target = labels == 1 if semantics == "caption_support_binary" else labels
+    counts = []
+    for column, enabled in enumerate(trainable):
+        if not enabled:
+            continue
+        positive = int(np.count_nonzero(target[:, column] == 1))
+        negative = int(np.count_nonzero(target[:, column] == 0))
+        counts.append(positive == 0 or negative == 0)
+    count = int(sum(counts))
+    return count, count / len(counts) if counts else 0.0
 
 
 def main(args: argparse.Namespace) -> None:
@@ -157,13 +194,34 @@ def main(args: argparse.Namespace) -> None:
     )
     trainer.load_initial_weights(args.init_checkpoint)
     before_hashes = _module_hashes(model)
-    val_loader = _loader(val, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2)))
+    val_loader = _loader(
+        val,
+        int(skincap.get("eval_batch_size", 64)),
+        int(skincap.get("num_workers", 2)),
+        shuffle=False,
+        seed=seed,
+    )
+    init_checkpoint_sha256 = _file_sha256(args.init_checkpoint)
+    init_checkpoint_payload = torch.load(args.init_checkpoint, map_location="cpu", weights_only=False)
+    init_git_commit = init_checkpoint_payload.get("git_commit")
     baseline = trainer.evaluate(val_loader, split="val", epoch=0)
     trainer.fit(
-        _loader(train, int(skincap.get("batch_size", 32)), int(skincap.get("num_workers", 2))),
+        _loader(
+            train,
+            int(skincap.get("batch_size", 32)),
+            int(skincap.get("num_workers", 2)),
+            shuffle=True,
+            seed=seed,
+        ),
         val_loader,
         max_epochs=int(args.epochs or stage1.get("epochs", 30)),
-        test_dataloader=_loader(test, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2))) if test else None,
+        test_dataloader=_loader(
+            test,
+            int(skincap.get("eval_batch_size", 64)),
+            int(skincap.get("num_workers", 2)),
+            shuffle=False,
+            seed=seed,
+        ) if test else None,
     )
     if trainer.best_epoch is None:
         raise RuntimeError("text-only retraining produced no eligible validation checkpoint")
@@ -172,25 +230,53 @@ def main(args: argparse.Namespace) -> None:
     if not all(hash_flags.values()):
         raise RuntimeError("a frozen module changed during text-only retraining")
     final_val = trainer.evaluate(val_loader, split="val", epoch=trainer.best_epoch or 0)
+    image_score_max_abs_diff = float(
+        np.nanmax(np.abs(baseline.predictions["score_image"] - final_val.predictions["score_image"]))
+    )
     if not _score_equal(baseline.predictions["score_image"], final_val.predictions["score_image"]):
         raise RuntimeError("image scores changed during text-only retraining")
-    loaders = {"train": _loader(train, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2))),
-               "val": val_loader}
+    loaders = {
+        "train": _loader(
+            train,
+            int(skincap.get("eval_batch_size", 64)),
+            int(skincap.get("num_workers", 2)),
+            shuffle=False,
+            seed=seed,
+        ),
+        "val": val_loader,
+    }
     if test:
-        loaders["test"] = _loader(test, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2)))
+        loaders["test"] = _loader(
+            test,
+            int(skincap.get("eval_batch_size", 64)),
+            int(skincap.get("num_workers", 2)),
+            shuffle=False,
+            seed=seed,
+        )
     trainer.export_best_predictions(loaders)
 
     summaries: dict[str, Any] = {}
     for split, loader in loaders.items():
         result = trainer.evaluate(loader, split=split, epoch=trainer.best_epoch or 0)
         text_metrics = result.metrics["text"]
+        score_mask = trainer.text_trainable.detach().cpu().numpy()
         summaries[split] = {
             "text_macro_roc_auc": text_metrics["macro_roc_auc"],
             "text_macro_pr_auc": text_metrics["macro_pr_auc"],
             "n_eligible_strict": text_metrics["n_eligible"],
-            "n_effectively_single_class": sum(not row["eligible"] for row in text_metrics["rows"]),
-            **_distribution(result.predictions["score_text"], result.predictions["label_text"], "caption_support_binary"),
+            **_distribution(
+                result.predictions["score_text"][:, score_mask],
+                result.predictions["label_text"][:, score_mask],
+                "caption_support_binary",
+            ),
         }
+        count, fraction = _effective_single_class_count(
+            result.predictions["label_text"],
+            score_mask,
+            "caption_support_binary",
+        )
+        summaries[split]["n_effectively_single_class"] = count
+        summaries[split]["fraction_effectively_single_class"] = fraction
     (output / "metrics" / "text_retrain_summary.json").write_text(json.dumps(summaries, indent=2), encoding="utf-8")
     (output / "diagnostics" / "frozen_module_hashes.json").write_text(
         json.dumps({"pre": before_hashes, "post": after_hashes, "equal": hash_flags}, indent=2), encoding="utf-8"
@@ -201,8 +287,11 @@ def main(args: argparse.Namespace) -> None:
         "text_target_semantics": "caption_support_binary",
         "selection": {"metric": "validation_text_macro_roc_auc", "min_present": minimum_present, "min_absent_effective": minimum_absent},
         "best_epoch": trainer.best_epoch,
+        "init_checkpoint_sha256": init_checkpoint_sha256,
+        "init_checkpoint_git_commit": init_git_commit,
         "frozen_module_hashes_equal": all(hash_flags.values()),
         "image_scores_unchanged": True,
+        "image_score_max_abs_diff": image_score_max_abs_diff,
         "proposition_ids": list(trainer.proposition_ids),
         "artifact_hashes": dict(artifacts.artifact_hashes),
     }

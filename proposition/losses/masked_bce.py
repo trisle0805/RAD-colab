@@ -140,7 +140,7 @@ def write_label_distribution(
     with output_path.open("w", newline="", encoding="utf-8") as handle:
         fieldnames = (
             (
-                "proposition_id", "modality", "N_present", "N_absent", "N_unknown",
+                "proposition_id", "modality", "N_present_raw", "N_absent_raw", "N_unknown_raw",
                 "target_semantics", "N_effective_positive", "N_effective_negative",
                 "pos_weight", "single_class_effective",
             )
@@ -156,6 +156,9 @@ def write_label_distribution(
             payload = {
                 "proposition_id": row.proposition_id,
                 "modality": row.modality,
+                "N_present_raw": row.n_present,
+                "N_absent_raw": row.n_absent,
+                "N_unknown_raw": row.n_unknown,
                 "N_present": row.n_present,
                 "N_absent": row.n_absent,
                 "N_unknown": row.n_unknown,
