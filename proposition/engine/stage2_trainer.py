@@ -64,7 +64,8 @@ class Stage2Trainer:
         actual = {id(parameter) for group in self.optimizer.param_groups for parameter in group["params"]}
         if actual != expected or expected != {id(self.model.raw_gamma), id(self.model.bias)}:
             raise ValueError("optimizer must contain exactly raw_gamma and bias")
-        self.epoch, self.best_epoch, self.best_metric, self.bad_epochs = 0, None, float("inf"), 0
+        initial_best_metric = float("inf") if self.config.selection_metric == "val_loss" else float("-inf")
+        self.epoch, self.best_epoch, self.best_metric, self.bad_epochs = 0, None, initial_best_metric, 0
         self.history: list[dict[str, Any]] = []
         self.output_dir = Path(output_dir) if output_dir else None
         if self.output_dir:
