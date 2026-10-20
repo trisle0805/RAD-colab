@@ -19,7 +19,7 @@ from main_proposition import _load_aliases, _seed_everything, _transform
 from models.clip_tqn import ModelRes, Text_Encoder_Bert
 from proposition.data import Stage1SkinCAPDataset, load_weak_supervision_v3
 from proposition.engine import Stage1Trainer, TrainerConfig
-from proposition.engine.text_encoder_adaptation import component_hashes
+from proposition.engine.text_encoder_adaptation import component_hashes, selected_bert_layers
 from proposition.losses import MaskedBCELoss, build_pos_weight_artifacts, write_label_distribution
 from proposition.models import Stage1EvidenceModel
 
@@ -90,6 +90,42 @@ def _assert_image_invariance(before: np.ndarray, after: np.ndarray, tolerance: f
     if not np.allclose(before, after, rtol=0.0, atol=tolerance, equal_nan=True):
         raise RuntimeError(f"image scores changed during text adaptation (max abs diff={maximum})")
     return maximum
+
+def _parameter_names(model: torch.nn.Module, parameters: list[torch.nn.Parameter]) -> list[str]:
+    by_id = {id(parameter): name for name, parameter in model.named_parameters()}
+    return [by_id[id(parameter)] for parameter in parameters]
+
+def _audit_round_b_optimizer(
+    model: Stage1EvidenceModel,
+    optimizer: torch.optim.Optimizer,
+    adaptation: str,
+    head_lr: float,
+    bert_lr: float,
+) -> dict[str, Any]:
+    """Fail closed unless the Round-B optimizer has its exact two-group contract."""
+    head_parameters = [parameter for name in ("text_cross_attention", "text_head") for parameter in getattr(model, name).parameters()]
+    bert_parameters = [parameter for layer in selected_bert_layers(model.text_encoder, adaptation) for parameter in layer.parameters()]
+    expected_head_ids, expected_bert_ids = {id(parameter) for parameter in head_parameters}, {id(parameter) for parameter in bert_parameters}
+    if expected_head_ids & expected_bert_ids:
+        raise RuntimeError("Round-B head and BERT parameter sets overlap")
+    if len(optimizer.param_groups) != 2:
+        raise RuntimeError("Round-B optimizer must contain exactly head and BERT parameter groups")
+    head_group, bert_group = optimizer.param_groups
+    head_ids = {id(parameter) for parameter in head_group["params"]}
+    bert_ids = {id(parameter) for parameter in bert_group["params"]}
+    if head_ids != expected_head_ids or bert_ids != expected_bert_ids:
+        raise RuntimeError("Round-B optimizer parameter groups do not match selected heads and BERT layers")
+    if head_ids & bert_ids or (head_ids | bert_ids) != (expected_head_ids | expected_bert_ids):
+        raise RuntimeError("Round-B optimizer parameter groups overlap or omit expected parameters")
+    if any(not parameter.requires_grad for group in optimizer.param_groups for parameter in group["params"]):
+        raise RuntimeError("Round-B optimizer contains a frozen parameter")
+    if float(head_group["lr"]) != head_lr or float(bert_group["lr"]) != bert_lr:
+        raise RuntimeError("Round-B optimizer learning rates do not match head_lr and bert_lr")
+    return {
+        "head": {"lr": float(head_group["lr"]), "parameter_names": _parameter_names(model, head_parameters), "parameter_count": sum(p.numel() for p in head_parameters)},
+        "bert": {"lr": float(bert_group["lr"]), "parameter_names": _parameter_names(model, bert_parameters), "parameter_count": sum(p.numel() for p in bert_parameters), "adaptation": adaptation},
+        "groups_overlap": False,
+    }
 
 
 def main(args: argparse.Namespace) -> None:
@@ -165,6 +201,7 @@ def main(args: argparse.Namespace) -> None:
         {"params": head_parameters, "lr": head_lr},
         {"params": bert_parameters, "lr": bert_lr},
     ), weight_decay=weight_decay)
+    optimizer_audit = _audit_round_b_optimizer(model, optimizer, args.adaptation, head_lr, bert_lr)
     trainer = Stage1Trainer(
         model=model, tokenizer=tokenize, weak_supervision=artifacts,
         loss_fn=MaskedBCELoss(weights.text_pos_weight, weights.image_pos_weight, text_target_semantics="caption_support_binary"),
@@ -183,6 +220,11 @@ def main(args: argparse.Namespace) -> None:
     if isinstance(trainer.config.config, dict):
         trainer.config.config["round_b_image_hashes_before"] = image_before
         trainer.config.config["round_b_query_anchor_sha256"] = anchor_hash
+        trainer.config.config["round_b_optimizer_audit"] = optimizer_audit
+        trainer.write_run_config()
+    (output / "diagnostics" / "optimizer_parameter_audit.json").write_text(
+        json.dumps(optimizer_audit, indent=2), encoding="utf-8"
+    )
     val_loader = _loader(val, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2)), shuffle=False, seed=seed)
     baseline = trainer.evaluate(val_loader, split="val", epoch=0)
     trainer.fit(_loader(train, int(skincap.get("batch_size", 32)), int(skincap.get("num_workers", 2)), shuffle=True, seed=seed),
@@ -233,6 +275,16 @@ def main(args: argparse.Namespace) -> None:
     summary = {"trainable_parameter_count": audit["trainable_parameter_count"], "trainable_bert_parameter_count": audit["trainable_bert_parameter_count"],
                "best_epoch": trainer.best_epoch, "best_validation_text_macro_auc": trainer.best_metric,
                "best_validation_text_bce": trainer.best_loss}
+    if isinstance(trainer.config.config, dict):
+        trainer.config.config.update({
+            "best_epoch": trainer.best_epoch,
+            "best_validation_text_macro_auc": trainer.best_metric,
+            "best_validation_text_bce": trainer.best_loss,
+            "round_b_image_hashes_after": image_after,
+            "round_b_query_anchor_sha256_after": _anchor_sha256(restored_anchor),
+            "round_b_query_anchor_equal": True,
+        })
+        trainer.write_run_config()
     (output / "metrics" / "text_adapt_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     init_payload = torch.load(args.init_checkpoint, map_location="cpu", weights_only=False)
     manifest = {**summary, "git_commit": _git_commit(), "adaptation_mode": args.adaptation, "seed": seed,

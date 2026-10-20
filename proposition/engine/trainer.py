@@ -352,7 +352,14 @@ class Stage1Trainer:
     def _prepare_output(self) -> None:
         for name in ("checkpoints", "metrics", "predictions", "diagnostics", "supervision"):
             (self.output_dir / name).mkdir(parents=True, exist_ok=True)
-        (self.output_dir / "run_config.json").write_text(json.dumps(dict(self.config.config), indent=2, sort_keys=True), encoding="utf-8")
+        self.write_run_config()
+
+    def write_run_config(self) -> None:
+        """Persist the current immutable-by-convention experiment configuration."""
+        if self.output_dir is not None:
+            (self.output_dir / "run_config.json").write_text(
+                json.dumps(dict(self.config.config), indent=2, sort_keys=True), encoding="utf-8"
+            )
 
     def _save_best_outputs(self, result: EpochResult) -> None:
         if self.output_dir is None:

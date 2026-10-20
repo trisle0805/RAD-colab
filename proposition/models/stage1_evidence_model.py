@@ -139,6 +139,10 @@ class Stage1EvidenceModel(nn.Module):
 
     def _queries(self, device: torch.device) -> Tensor:
         if self.query_cache.numel() == 0:
+            if self.training_scope == "text_adapt":
+                raise RuntimeError(
+                    "text_adapt requires a fixed query anchor; create or restore it before adapted BERT use"
+                )
             self.refresh_query_cache()
         return self.query_cache.to(device)
 
