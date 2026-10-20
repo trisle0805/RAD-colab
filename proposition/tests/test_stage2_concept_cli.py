@@ -27,6 +27,22 @@ def _write_scores(path, case_ids: tuple[str, ...]) -> None:
         active_scoring=np.asarray((True, True)),
     )
 
+def _write_distinct_scores(path, case_ids: tuple[str, ...]) -> None:
+    count = len(case_ids)
+    image = np.tile(np.asarray([[0.2, 0.9]], dtype=np.float32), (count, 1))
+    text = np.tile(np.asarray([[0.1, 0.8]], dtype=np.float32), (count, 1))
+    np.savez(
+        path,
+        case_id=np.asarray(case_ids),
+        proposition_id=np.asarray(("p1", "p2")),
+        score_image=image,
+        score_text=text,
+        score_fused=np.column_stack(((image[:, 0] + text[:, 0]) / 2, text[:, 1])),
+        image_trainable=np.asarray((True, False)),
+        text_trainable=np.asarray((True, True)),
+        active_scoring=np.asarray((True, True)),
+    )
+
 
 def _write_labels(path, case_ids: tuple[str, ...]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
@@ -78,10 +94,13 @@ def test_default_cli_does_not_access_or_export_test_artifacts(tmp_path, monkeypa
 
 
 def test_cli_evaluates_test_only_when_explicitly_enabled(tmp_path, monkeypatch):
-    for split in ("train", "val", "test"):
+    for split in ("train", "val"):
         case_ids = (f"{split}-a", f"{split}-b")
         _write_scores(tmp_path / f"{split}.npz", case_ids)
         _write_labels(tmp_path / f"{split}.csv", case_ids)
+    test_case_ids = ("test-a", "test-b")
+    _write_distinct_scores(tmp_path / "test.npz", test_case_ids)
+    _write_labels(tmp_path / "test.csv", test_case_ids)
     _write_active(tmp_path / "active.csv")
     output_dir = tmp_path / "with-test"
 
@@ -92,3 +111,16 @@ def test_cli_evaluates_test_only_when_explicitly_enabled(tmp_path, monkeypatch):
     assert (output_dir / "metrics" / "test_confidence_intervals.json").is_file()
     assert (output_dir / "predictions" / "test_best.npz").is_file()
     assert (output_dir / "contributions" / "test_contributions.npz").is_file()
+    assert (output_dir / "diagnostics" / "same_disease_contribution_fraction_val.csv").is_file()
+    assert (output_dir / "diagnostics" / "same_disease_contribution_fraction_test.csv").is_file()
+    assert (output_dir / "diagnostics" / "same_disease_contribution_fraction_summary_test.json").is_file()
+    assert (output_dir / "diagnostics" / "contribution_reconstruction_check_test.json").is_file()
+    test_artifact = np.load(output_dir / "contributions" / "test_contributions.npz")
+    expected_fractions = stage2_concept.same_disease_contribution_fraction(
+        test_artifact["input_scores"], test_artifact["weights"], ("d1", "d2"), ("d1", "d2"),
+    )[0]
+    with (output_dir / "diagnostics" / "same_disease_contribution_fraction_test.csv").open(newline="", encoding="utf-8") as handle:
+        audit_rows = list(csv.DictReader(handle))
+    assert [float(row["same_disease_contribution_fraction"]) for row in audit_rows] == pytest.approx(
+        [row["same_disease_contribution_fraction"] for row in expected_fractions]
+    )

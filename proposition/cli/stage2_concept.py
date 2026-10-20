@@ -87,7 +87,9 @@ def main() -> None:
     if args.evaluate_test:
         results["test"] = trainer.export_best_split(datasets["test"], "test")
         _write_json(output_dir / "metrics" / "test_confidence_intervals.json", bootstrap_topk_confidence_intervals(results["test"]["outputs"]["logits"], datasets["test"].targets, seed=args.seed, n_bootstrap=args.bootstrap_samples))
-    _write_audits(output_dir, model, results["val"]["outputs"], disease_ids, artifacts["train"].proposition_ids.tolist(), proposition_diseases, args.nonzero_threshold)
+    _write_audits(output_dir, model, results["val"]["outputs"], "val", disease_ids, artifacts["train"].proposition_ids.tolist(), proposition_diseases, args.nonzero_threshold)
+    if args.evaluate_test:
+        _write_audits(output_dir, model, results["test"]["outputs"], "test", disease_ids, artifacts["train"].proposition_ids.tolist(), proposition_diseases, args.nonzero_threshold)
     after = {name: sha256_file(path) for name, path in paths.items()}
     if after != hashes:
         raise RuntimeError("input artifact hashes changed during Stage-2 execution")
@@ -98,7 +100,9 @@ def main() -> None:
     print(json.dumps(summary, sort_keys=True))
 
 
-def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str, np.ndarray], disease_ids: tuple[str, ...], proposition_ids: list[str], proposition_disease_ids: tuple[str, ...], threshold: float) -> None:
+def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str, np.ndarray], split: str, disease_ids: tuple[str, ...], proposition_ids: list[str], proposition_disease_ids: tuple[str, ...], threshold: float) -> None:
+    if split not in {"val", "test"}:
+        raise ValueError("contribution audits support only val or test splits")
     weights = outputs["weights"]
     _write_rows(output_dir / "diagnostics" / "concept_weights.csv", concept_weight_rows(weights, disease_ids, proposition_ids, proposition_disease_ids, nonzero_threshold=threshold))
     sparsity = disease_sparsity_rows(weights, disease_ids, proposition_disease_ids, nonzero_threshold=threshold)
@@ -106,8 +110,8 @@ def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str,
     fractions, summary = same_disease_contribution_fraction(outputs["input_scores"], weights, disease_ids, proposition_disease_ids)
     if model.head_mode == "local" and not np.allclose([row["same_disease_contribution_fraction"] for row in fractions], 1.0):
         raise AssertionError("S2-L must have a same-disease contribution fraction of 1.0")
-    _write_rows(output_dir / "diagnostics" / "same_disease_contribution_fraction.csv", fractions)
-    _write_json(output_dir / "diagnostics" / "same_disease_contribution_fraction_summary.json", summary)
+    _write_rows(output_dir / "diagnostics" / f"same_disease_contribution_fraction_{split}.csv", fractions)
+    _write_json(output_dir / "diagnostics" / f"same_disease_contribution_fraction_summary_{split}.json", summary)
     reconstruction = outputs["reconstructed_logits"] - outputs["logits"]
     ranking = np.argsort(-outputs["logits"], axis=1, kind="mergesort")
     rows = np.arange(len(ranking))
@@ -116,7 +120,7 @@ def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str,
     bias_margin = outputs["bias"][top1] - outputs["bias"][top2]
     delta = outputs["contributions"][rows, top1] - outputs["contributions"][rows, top2]
     margin_error = bias_margin + delta.sum(axis=1) - margin
-    _write_json(output_dir / "diagnostics" / "contribution_reconstruction_check.json", {
+    _write_json(output_dir / "diagnostics" / f"contribution_reconstruction_check_{split}.json", {
         "max_abs_logit_error": float(np.abs(reconstruction).max()),
         "max_abs_margin_error": float(np.abs(margin_error).max()),
         "passes": bool(np.allclose(outputs["reconstructed_logits"], outputs["logits"], atol=1e-6) and np.allclose(margin_error, 0.0, atol=1e-6)),
