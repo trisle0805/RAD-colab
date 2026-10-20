@@ -33,6 +33,7 @@ class TrainerConfig:
     weight_decay: float = 1e-4
     training_scope: str = "full_stage1"
     text_target_semantics: TextTargetSemantics = "ternary_masked"
+    max_grad_norm: float | None = None
 
     # Strict weak-label eligibility for checkpoint selection/evaluation
     selection_min_present: int = 5
@@ -68,16 +69,20 @@ class Stage1Trainer:
         optimizer: torch.optim.Optimizer | None = None,
         config: TrainerConfig | None = None,
         output_dir: str | Path | None = None,
+        inference_only: bool = False,
     ) -> None:
         self.model = model
         self.tokenizer = tokenizer
         self.artifacts = weak_supervision
         self.loss_fn = loss_fn
         self.config = config or TrainerConfig()
-        if self.config.training_scope not in {"full_stage1", "text_only"}:
+        self.inference_only = inference_only
+        if self.config.training_scope not in {"full_stage1", "text_only", "text_adapt"}:
             raise ValueError("unsupported training_scope")
-        if self.config.training_scope == "text_only" and self.config.text_target_semantics != "caption_support_binary":
-            raise ValueError("text_only requires caption_support_binary text targets")
+        if _is_text_evidence_only_scope(self.config.training_scope) and self.config.text_target_semantics != "caption_support_binary":
+            raise ValueError("text-only evidence scopes require caption_support_binary text targets")
+        if self.config.max_grad_norm is not None and self.config.max_grad_norm <= 0:
+            raise ValueError("max_grad_norm must be positive when supplied")
         self.device = torch.device(self.config.device)
         self.model.to(self.device)
         self.active_indices = weak_supervision.active_indices
@@ -86,11 +91,26 @@ class Stage1Trainer:
             raise ValueError("model active proposition IDs do not match weak-supervision artifacts")
         self.text_trainable = torch.as_tensor(weak_supervision.text_trainable[self.active_indices], dtype=torch.bool, device=self.device)
         self.image_trainable = torch.as_tensor(weak_supervision.image_trainable[self.active_indices], dtype=torch.bool, device=self.device)
-        self.optimizer = optimizer or torch.optim.AdamW(
-            [parameter for parameter in model.parameters() if parameter.requires_grad],
-            lr=self.config.learning_rate,
-            weight_decay=self.config.weight_decay,
-        )
+        self.optimizer = optimizer
+        if self.optimizer is None and not inference_only:
+            self.optimizer = torch.optim.AdamW(
+                [parameter for parameter in model.parameters() if parameter.requires_grad],
+                lr=self.config.learning_rate,
+                weight_decay=self.config.weight_decay,
+            )
+        if self.optimizer is None and not inference_only:
+            raise RuntimeError("optimizer construction failed")
+        if inference_only:
+            self.output_dir = Path(output_dir) if output_dir is not None else None
+            self.epoch = 0
+            self.best_metric = float("-inf")
+            self.best_epoch = None
+            self.best_loss = None
+            self.bad_epochs = 0
+            self.history = []
+            if self.output_dir is not None:
+                self._prepare_output()
+            return
         if any(not parameter.requires_grad for group in self.optimizer.param_groups for parameter in group["params"]):
             raise ValueError("optimizer must contain only requires_grad parameters")
         optimizer_ids = {id(parameter) for group in self.optimizer.param_groups for parameter in group["params"]}
@@ -115,6 +135,8 @@ class Stage1Trainer:
 
     def train_epoch(self, dataloader: Iterable[Mapping[str, Any]], *, epoch: int | None = None) -> EpochResult:
         """Perform one optimizer epoch using weak labels looked up by ``case_id``."""
+        if self.inference_only:
+            raise RuntimeError("inference-only trainer cannot train")
         self.model.train()
         return self._run_epoch(dataloader, split="train", training=True, epoch=self.epoch + 1 if epoch is None else epoch)
 
@@ -133,6 +155,8 @@ class Stage1Trainer:
         test_dataloader: Iterable[Mapping[str, Any]] | None = None,
     ) -> list[dict[str, Any]]:
         """Run train/validation epochs, select by validation proposition macro AUC."""
+        if self.inference_only:
+            raise RuntimeError("inference-only trainer cannot fit")
         if max_epochs < 1:
             raise ValueError("max_epochs must be positive")
         for epoch in range(self.epoch + 1, max_epochs + 1):
@@ -141,7 +165,7 @@ class Stage1Trainer:
             selection = _selection_metric(validation.metrics)
             selection_key = (
                 "selection_text_macro_auc"
-                if self.config.training_scope == "text_only"
+                if _is_text_evidence_only_scope(self.config.training_scope)
                 else "selection_macro_auc"
             )
             record = {
@@ -150,6 +174,8 @@ class Stage1Trainer:
                 "val_loss": validation.loss,
                 selection_key: selection,
             }
+            if _is_text_evidence_only_scope(self.config.training_scope):
+                record["validation_text_bce"] = validation.loss
             self.history.append(record)
             self.epoch = epoch
             improved = selection is not None and (
@@ -192,11 +218,16 @@ class Stage1Trainer:
                 labels_image,
                 self.text_trainable,
                 self.image_trainable,
-                include_image=self.config.training_scope != "text_only",
+                include_image=not _is_text_evidence_only_scope(self.config.training_scope),
             )
             if training:
                 self.optimizer.zero_grad(set_to_none=True)
                 loss.backward()
+                if self.config.max_grad_norm is not None:
+                    torch.nn.utils.clip_grad_norm_(
+                        [parameter for group in self.optimizer.param_groups for parameter in group["params"]],
+                        self.config.max_grad_norm,
+                    )
                 self.optimizer.step()
             losses.append(float(loss.detach().cpu()))
             collected["case_id"].append(np.asarray(case_ids, dtype=str))
@@ -292,7 +323,7 @@ class Stage1Trainer:
         # labels currently contain too few reliable negatives.
         # --------------------------------------------------------
 
-        if self.config.training_scope == "text_only":
+        if _is_text_evidence_only_scope(self.config.training_scope):
             metrics["selection_text_macro_auc"] = metrics["text"]["macro_roc_auc"]
             metrics["selection_macro_auc"] = metrics["selection_text_macro_auc"]
             selection_source = "text"
@@ -465,8 +496,10 @@ class Stage1Trainer:
         if self.output_dir is None or not self.history:
             return
         with (self.output_dir / "metrics" / "history.csv").open("w", newline="", encoding="utf-8") as handle:
-            selection_field = "selection_text_macro_auc" if self.config.training_scope == "text_only" else "selection_macro_auc"
+            selection_field = "selection_text_macro_auc" if _is_text_evidence_only_scope(self.config.training_scope) else "selection_macro_auc"
             fieldnames = ("epoch", "train_loss", "val_loss", selection_field)
+            if _is_text_evidence_only_scope(self.config.training_scope):
+                fieldnames += ("validation_text_bce",)
             writer = csv.DictWriter(handle, fieldnames=fieldnames)
             writer.writeheader(); writer.writerows(self.history)
 
@@ -492,6 +525,13 @@ class Stage1Trainer:
             "artifact_hashes": dict(self.artifacts.artifact_hashes),
             "git_commit": _git_commit(),
         }
+        if self.config.training_scope == "text_adapt":
+            anchor = getattr(self.model, "query_cache", None)
+            if not isinstance(anchor, Tensor) or anchor.numel() == 0:
+                raise RuntimeError("Round-B checkpoint requires a fixed query anchor")
+            anchor_cpu = anchor.detach().cpu().contiguous()
+            payload["query_anchor"] = anchor_cpu
+            payload["query_anchor_sha256"] = _tensor_sha256(anchor_cpu)
 
         tmp_path = path.with_suffix(
             path.suffix + ".tmp"
@@ -520,7 +560,20 @@ class Stage1Trainer:
         if dict(checkpoint.get("artifact_hashes", {})) != dict(self.artifacts.artifact_hashes):
             raise ValueError("checkpoint artifact hashes do not match active artifacts")
         self.model.load_state_dict(checkpoint["model_state"])
+        if self.config.training_scope == "text_adapt":
+            anchor = checkpoint.get("query_anchor")
+            expected_hash = checkpoint.get("query_anchor_sha256")
+            if not isinstance(anchor, Tensor) or not isinstance(expected_hash, str):
+                raise ValueError("Round-B checkpoint is missing its query anchor")
+            if _tensor_sha256(anchor) != expected_hash:
+                raise ValueError("Round-B checkpoint query anchor hash does not match")
+            restore_anchor = getattr(self.model, "restore_query_anchor", None)
+            if not callable(restore_anchor):
+                raise ValueError("Round-B model cannot restore a query anchor")
+            restore_anchor(anchor)
         if load_optimizer:
+            if self.inference_only:
+                raise RuntimeError("inference-only trainer cannot load optimizer state")
             self.optimizer.load_state_dict(checkpoint["optimizer_state"])
         self.epoch, self.best_metric, self.best_epoch = checkpoint["epoch"], checkpoint["best_metric"], checkpoint["best_epoch"]
         self.best_loss = checkpoint.get("best_loss")
@@ -599,6 +652,21 @@ def _query_controls(queries: Tensor) -> list[tuple[str, Tensor]]:
 def _selection_metric(metrics: Mapping[str, Any]) -> float | None:
     value = metrics.get("selection_macro_auc")
     return None if value is None or not np.isfinite(value) else float(value)
+
+
+def _is_text_evidence_only_scope(training_scope: str) -> bool:
+    return training_scope in {"text_only", "text_adapt"}
+
+
+def _tensor_sha256(value: Tensor) -> str:
+    import hashlib
+
+    tensor = value.detach().cpu().contiguous()
+    digest = hashlib.sha256()
+    digest.update(str(tuple(tensor.shape)).encode("utf-8"))
+    digest.update(str(tensor.dtype).encode("utf-8"))
+    digest.update(tensor.numpy().tobytes())
+    return digest.hexdigest()
 
 
 def _rng_state() -> dict[str, Any]:

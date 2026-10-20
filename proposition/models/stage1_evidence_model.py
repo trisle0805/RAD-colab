@@ -9,6 +9,11 @@ import torch
 from torch import Tensor, nn
 
 from proposition.data.weak_supervision import WeakSupervisionArtifacts
+from proposition.engine.text_encoder_adaptation import (
+    configure_text_encoder_adaptation,
+    enforce_text_encoder_modes,
+    selected_bert_layers,
+)
 
 from .cross_attention import PropositionCrossAttention
 
@@ -31,6 +36,7 @@ class Stage1EvidenceModel(nn.Module):
         num_heads: int = 8,
         query_chunk_size: int | None = None,
         training_scope: str = "full_stage1",
+        bert_adaptation: str = "frozen",
     ) -> None:
         super().__init__()
         if query_chunk_size is not None and query_chunk_size < 1:
@@ -40,6 +46,8 @@ class Stage1EvidenceModel(nn.Module):
         self.query_tokenizer = query_tokenizer
         self.query_chunk_size = query_chunk_size
         self.training_scope = training_scope
+        self.bert_adaptation = bert_adaptation
+        self._adapted_bert_layers: list[nn.Module] = []
         self.image_projection = nn.Linear(2048, embed_dim)
         self.image_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
         self.text_cross_attention = PropositionCrossAttention(embed_dim, num_heads)
@@ -74,8 +82,11 @@ class Stage1EvidenceModel(nn.Module):
         super().train(mode)
         # Keep frozen BERT dropout and ResNet BatchNorm deterministic/frozen.
         self.image_encoder.eval()
-        self.text_encoder.eval()
-        if self.training_scope == "text_only":
+        if self.training_scope == "text_adapt":
+            enforce_text_encoder_modes(self.text_encoder, self._adapted_bert_layers, mode)
+        else:
+            self.text_encoder.eval()
+        if self.training_scope in {"text_only", "text_adapt"}:
             self.image_projection.eval()
             self.image_cross_attention.eval()
             self.image_head.eval()
@@ -83,10 +94,10 @@ class Stage1EvidenceModel(nn.Module):
 
     def set_training_scope(self, training_scope: str) -> None:
         """Set the explicit Stage-1 parameter and module training scope."""
-        if training_scope not in {"full_stage1", "text_only"}:
-            raise ValueError("training_scope must be 'full_stage1' or 'text_only'")
+        if training_scope not in {"full_stage1", "text_only", "text_adapt"}:
+            raise ValueError("training_scope must be 'full_stage1', 'text_only', or 'text_adapt'")
         self.training_scope = training_scope
-        if training_scope == "text_only":
+        if training_scope in {"text_only", "text_adapt"}:
             trainable_names = {"text_cross_attention", "text_head"}
             for name, module in self.named_children():
                 if isinstance(module, nn.Module):
@@ -96,7 +107,11 @@ class Stage1EvidenceModel(nn.Module):
                     if not enabled:
                         module.eval()
             self.image_encoder.eval()
-            self.text_encoder.eval()
+            if training_scope == "text_adapt":
+                self._adapted_bert_layers = configure_text_encoder_adaptation(self.text_encoder, self.bert_adaptation)
+                enforce_text_encoder_modes(self.text_encoder, self._adapted_bert_layers, self.training)
+            else:
+                self.text_encoder.eval()
         else:
             self._freeze_encoder(self.image_encoder)
             self._freeze_encoder(self.text_encoder)
@@ -109,6 +124,18 @@ class Stage1EvidenceModel(nn.Module):
         tokens = {name: value.to(device) for name, value in tokens.items()}
         query_output = self._encode_text(tokens)
         self.query_cache = self._pooled_features(query_output).detach()
+
+    def create_query_anchor(self) -> Tensor:
+        """Create the detached Round-B query anchor before BERT adaptation."""
+        self.refresh_query_cache()
+        if self.query_cache.requires_grad:
+            raise RuntimeError("query anchor must be detached")
+        return self.query_cache.detach().clone()
+
+    def restore_query_anchor(self, anchor: Tensor) -> None:
+        if anchor.ndim != 2 or anchor.shape != (len(self.active_proposition_ids), self.image_projection.out_features):
+            raise ValueError("query anchor shape does not match active propositions and embed_dim")
+        self.query_cache = anchor.detach().to(next(self.parameters()).device).clone()
 
     def _queries(self, device: torch.device) -> Tensor:
         if self.query_cache.numel() == 0:
@@ -221,7 +248,11 @@ class Stage1EvidenceModel(nn.Module):
         """
         with torch.no_grad():
             image_memory = self._sequence_features(self._encode_image(images))
+        if self.training_scope == "text_adapt" and self.bert_adaptation != "frozen":
             text_memory = self._sequence_features(self._encode_text(caption_tokens))
+        else:
+            with torch.no_grad():
+                text_memory = self._sequence_features(self._encode_text(caption_tokens))
         if hasattr(self.image_encoder, "res_features"):
             image_memory = self.image_projection(image_memory)
         queries = self._queries(image_memory.device) if query_embeddings is None else query_embeddings.to(image_memory.device)
