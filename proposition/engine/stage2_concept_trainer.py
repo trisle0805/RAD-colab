@@ -104,6 +104,27 @@ class Stage2ConceptTrainer:
         self.epoch, self.bad_epochs, self.history = completed
         return self.history
 
+    def fit_fixed_epochs(self, train: Stage2Dataset, *, epochs: int) -> list[dict[str, Any]]:
+        """Train on a complete pooled set for a frozen number of epochs.
+
+        This path deliberately performs no validation, checkpoint selection, or
+        test access.  It is used only after CV configuration and epoch count
+        have been frozen.
+        """
+        self._validate_dataset(train)
+        if epochs < 1:
+            raise ValueError("epochs must be positive")
+        self.history = []
+        self.best_epoch = None
+        self.bad_epochs = 0
+        for epoch in range(1, epochs + 1):
+            train_loss = self._train_epoch(train, epoch=epoch)
+            self.epoch = epoch
+            self.history.append({"epoch": epoch, "train_loss": train_loss})
+        if self.output_dir:
+            self._write_rows("metrics/fixed_epoch_history.csv", self.history)
+        return self.history
+
     def evaluate(self, dataset: Stage2Dataset) -> dict[str, Any]:
         self._validate_dataset(dataset)
         self.model.eval()

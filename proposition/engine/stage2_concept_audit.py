@@ -6,6 +6,8 @@ from typing import Any, Sequence
 
 import numpy as np
 
+DEFAULT_CONTRIBUTION_AUDIT_TOLERANCE = 1e-4
+
 
 def concept_weight_rows(weights: Any, disease_ids: Sequence[str], proposition_ids: Sequence[str], proposition_disease_ids: Sequence[str], *, nonzero_threshold: float) -> list[dict[str, Any]]:
     matrix = np.asarray(weights, dtype=float)
@@ -42,3 +44,28 @@ def same_disease_contribution_fraction(input_scores: Any, weights: Any, disease_
         rows.append({"disease_id": disease, "same_disease_contribution_fraction": fraction})
     values = np.asarray([item["same_disease_contribution_fraction"] for item in rows], dtype=float)
     return rows, {"macro_mean": float(values.mean()), "median": float(np.median(values)), "min": float(values.min()), "max": float(values.max())}
+
+def audit_linear_contributions(logits: Any, contributions: Any, bias: Any, *, tolerance: float = DEFAULT_CONTRIBUTION_AUDIT_TOLERANCE) -> dict[str, float | bool]:
+    """Verify feature contributions in float64 without weakening the identity."""
+    values = np.asarray(logits, dtype=np.float64)
+    terms = np.asarray(contributions, dtype=np.float64)
+    intercept = np.asarray(bias, dtype=np.float64)
+    if tolerance <= 0 or values.ndim != 2 or terms.shape[:2] != values.shape or terms.ndim != 3 or intercept.shape != (values.shape[1],):
+        raise ValueError("invalid logits, contributions, bias, or audit tolerance")
+    reconstructed = intercept[None, :] + terms.sum(axis=2, dtype=np.float64)
+    ranking = np.argsort(-values, axis=1, kind="mergesort")
+    rows = np.arange(len(values))
+    top1, top2 = ranking[:, 0], ranking[:, 1]
+    margin = values[rows, top1] - values[rows, top2]
+    margin_from_terms = (
+        intercept[top1] - intercept[top2]
+        + (terms[rows, top1] - terms[rows, top2]).sum(axis=1, dtype=np.float64)
+    )
+    max_logit_error = float(np.abs(reconstructed - values).max())
+    max_margin_error = float(np.abs(margin_from_terms - margin).max())
+    return {
+        "verification_tolerance": float(tolerance),
+        "max_abs_logit_error": max_logit_error,
+        "max_abs_margin_error": max_margin_error,
+        "passes": bool(max_logit_error <= tolerance and max_margin_error <= tolerance),
+    }

@@ -15,7 +15,7 @@ import torch
 
 from proposition.data.stage2_scores import Stage2Dataset, build_stage2_support, load_stage2_disease_targets, load_stage2_propositions, load_stage2_score_artifact, validate_stage2_splits
 from proposition.data.weak_supervision import sha256_file
-from proposition.engine.stage2_concept_audit import concept_weight_rows, disease_sparsity_rows, same_disease_contribution_fraction
+from proposition.engine.stage2_concept_audit import audit_linear_contributions, concept_weight_rows, disease_sparsity_rows, same_disease_contribution_fraction
 from proposition.engine.stage2_concept_metrics import bootstrap_topk_confidence_intervals
 from proposition.engine.stage2_concept_trainer import Stage2ConceptTrainer, Stage2ConceptTrainerConfig
 from proposition.models.stage2_concept_head import Stage2ConceptHead
@@ -112,19 +112,10 @@ def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str,
         raise AssertionError("S2-L must have a same-disease contribution fraction of 1.0")
     _write_rows(output_dir / "diagnostics" / f"same_disease_contribution_fraction_{split}.csv", fractions)
     _write_json(output_dir / "diagnostics" / f"same_disease_contribution_fraction_summary_{split}.json", summary)
-    reconstruction = outputs["reconstructed_logits"] - outputs["logits"]
-    ranking = np.argsort(-outputs["logits"], axis=1, kind="mergesort")
-    rows = np.arange(len(ranking))
-    top1, top2 = ranking[:, 0], ranking[:, 1]
-    margin = outputs["logits"][rows, top1] - outputs["logits"][rows, top2]
-    bias_margin = outputs["bias"][top1] - outputs["bias"][top2]
-    delta = outputs["contributions"][rows, top1] - outputs["contributions"][rows, top2]
-    margin_error = bias_margin + delta.sum(axis=1) - margin
-    _write_json(output_dir / "diagnostics" / f"contribution_reconstruction_check_{split}.json", {
-        "max_abs_logit_error": float(np.abs(reconstruction).max()),
-        "max_abs_margin_error": float(np.abs(margin_error).max()),
-        "passes": bool(np.allclose(outputs["reconstructed_logits"], outputs["logits"], atol=1e-6) and np.allclose(margin_error, 0.0, atol=1e-6)),
-    })
+    _write_json(
+        output_dir / "diagnostics" / f"contribution_reconstruction_check_{split}.json",
+        audit_linear_contributions(outputs["logits"], outputs["contributions"], outputs["bias"]),
+    )
 
 
 def _summary(result: dict[str, Any]) -> dict[str, Any]:

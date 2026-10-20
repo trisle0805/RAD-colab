@@ -22,9 +22,12 @@ class Stage2ConceptHead(nn.Module):
     def __init__(
         self,
         *,
-        proposition_disease_index: Tensor,
-        proposition_polarity: Tensor,
-        proposition_mask: Tensor,
+        proposition_disease_index: Tensor | None = None,
+        proposition_polarity: Tensor | None = None,
+        proposition_mask: Tensor | None = None,
+        feature_disease_index: Tensor | None = None,
+        feature_polarity: Tensor | None = None,
+        feature_mask: Tensor | None = None,
         num_diseases: int,
         head_mode: ConceptHeadMode,
     ) -> None:
@@ -33,15 +36,20 @@ class Stage2ConceptHead(nn.Module):
             raise ValueError("head_mode must be 'local' or 'global'")
         if num_diseases < 2:
             raise ValueError("num_diseases must be at least two for single-label diagnosis")
-        disease_index = torch.as_tensor(proposition_disease_index, dtype=torch.long).reshape(-1)
-        polarity = torch.as_tensor(proposition_polarity, dtype=torch.float32).reshape(-1)
-        mask = torch.as_tensor(proposition_mask, dtype=torch.bool).reshape(-1)
+        disease_index, polarity, mask = _feature_structure(
+            proposition_disease_index=proposition_disease_index,
+            proposition_polarity=proposition_polarity,
+            proposition_mask=proposition_mask,
+            feature_disease_index=feature_disease_index,
+            feature_polarity=feature_polarity,
+            feature_mask=feature_mask,
+        )
         if not (len(disease_index) == len(polarity) == len(mask)):
-            raise ValueError("proposition structure tensors must have identical length")
+            raise ValueError("feature structure tensors must have identical length")
         if torch.any((disease_index < 0) | (disease_index >= num_diseases)):
-            raise ValueError("proposition disease indices are out of range")
+            raise ValueError("feature disease indices are out of range")
         if torch.any((polarity != -1) & (polarity != 1)):
-            raise ValueError("proposition polarity must be -1 or 1")
+            raise ValueError("feature polarity must be -1 or 1")
 
         local_connectivity = torch.zeros((num_diseases, len(disease_index)), dtype=torch.bool)
         local_connectivity[disease_index, torch.arange(len(disease_index))] = True
@@ -52,6 +60,8 @@ class Stage2ConceptHead(nn.Module):
 
         self.head_mode = head_mode
         self.num_diseases = int(num_diseases)
+        # The proposition-named buffers remain stable for baseline checkpoints.
+        # They now represent generic scalar concept-feature coordinates.
         self.register_buffer("proposition_disease_index", disease_index)
         self.register_buffer("proposition_polarity", polarity)
         self.register_buffer("proposition_mask", mask)
@@ -68,10 +78,10 @@ class Stage2ConceptHead(nn.Module):
 
     def _input_scores(self, support_scores: Tensor) -> Tensor:
         if support_scores.ndim != 2 or support_scores.shape[1] != self.proposition_mask.numel():
-            raise ValueError("support_scores must have shape [batch, proposition]")
+            raise ValueError("support_scores must have shape [batch, feature]")
         included = support_scores[:, self.proposition_mask]
         if not torch.isfinite(included).all():
-            raise ValueError("included proposition support scores must be finite")
+            raise ValueError("included feature support scores must be finite")
         if torch.any(included < -1e-6) or torch.any(included > 1.0 + 1e-6):
             raise ValueError("included proposition support scores must lie in [0, 1]")
         scores = torch.nan_to_num(support_scores, nan=0.0).to(dtype=self.raw_weights.dtype)
@@ -93,7 +103,7 @@ class Stage2ConceptHead(nn.Module):
         }
 
     def contribution_outputs(self, support_scores: Tensor) -> dict[str, Tensor]:
-        """Return exact per-proposition terms satisfying bias + sum = logit."""
+        """Return exact per-feature terms satisfying bias + sum = logit."""
         outputs = self(support_scores)
         contributions = outputs["input_scores"][:, None, :] * outputs["weights"][None, :, :]
         outputs["contributions"] = contributions
@@ -110,3 +120,28 @@ class Stage2ConceptHead(nn.Module):
         if regularization == "l2":
             return weights.square().sum()
         raise ValueError("regularization must be 'none', 'l1', or 'l2'")
+
+
+def _feature_structure(
+    *,
+    proposition_disease_index: Tensor | None,
+    proposition_polarity: Tensor | None,
+    proposition_mask: Tensor | None,
+    feature_disease_index: Tensor | None,
+    feature_polarity: Tensor | None,
+    feature_mask: Tensor | None,
+) -> tuple[Tensor, Tensor, Tensor]:
+    """Resolve legacy proposition or explicit generic feature structure inputs."""
+    legacy = (proposition_disease_index, proposition_polarity, proposition_mask)
+    generic = (feature_disease_index, feature_polarity, feature_mask)
+    if any(value is not None for value in legacy) and any(value is not None for value in generic):
+        raise ValueError("provide either proposition or feature structure tensors, not both")
+    values = generic if any(value is not None for value in generic) else legacy
+    if any(value is None for value in values):
+        raise ValueError("all feature structure tensors are required")
+    disease_index, polarity, mask = values
+    return (
+        torch.as_tensor(disease_index, dtype=torch.long).reshape(-1),
+        torch.as_tensor(polarity, dtype=torch.float32).reshape(-1),
+        torch.as_tensor(mask, dtype=torch.bool).reshape(-1),
+    )
