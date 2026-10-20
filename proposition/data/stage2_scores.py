@@ -98,15 +98,20 @@ def load_stage2_score_artifact(path: str | Path) -> Stage2ScoreArtifacts:
     return Stage2ScoreArtifacts(case_ids, proposition_ids, image, text, fused, image_trainable, text_trainable, active)
 
 
-def validate_stage2_splits(train: Stage2ScoreArtifacts, val: Stage2ScoreArtifacts, test: Stage2ScoreArtifacts) -> None:
-    """Require identical proposition order/masks and disjoint case populations."""
-    for label, artifact in (("validation", val), ("test", test)):
+def validate_stage2_splits(train: Stage2ScoreArtifacts, val: Stage2ScoreArtifacts, test: Stage2ScoreArtifacts | None = None) -> None:
+    """Require train/validation alignment and optionally validate a test split."""
+    compared = [("validation", val)]
+    if test is not None:
+        compared.append(("test", test))
+    for label, artifact in compared:
         if not np.array_equal(train.proposition_ids, artifact.proposition_ids):
             raise ValueError(f"{label} proposition IDs/order differ from train; reordering is forbidden")
         for field in ("image_trainable", "text_trainable", "active_scoring"):
             if not np.array_equal(getattr(train, field), getattr(artifact, field)):
                 raise ValueError(f"{label} {field} differs from train")
-    groups = (("train", train.case_ids), ("val", val.case_ids), ("test", test.case_ids))
+    groups = [("train", train.case_ids), ("val", val.case_ids)]
+    if test is not None:
+        groups.append(("test", test.case_ids))
     for index, (left_name, left_ids) in enumerate(groups):
         for right_name, right_ids in groups[index + 1:]:
             overlap = set(left_ids.tolist()).intersection(right_ids.tolist())

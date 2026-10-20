@@ -37,6 +37,12 @@ def test_load_validates_duplicate_case_and_split_order(tmp_path):
     with pytest.raises(ValueError, match="order"):
         validate_stage2_splits(train, load_stage2_score_artifact(other), load_stage2_score_artifact(other))
 
+def test_split_validation_allows_train_and_validation_without_test(tmp_path):
+    train_path = tmp_path / "train.npz"; _artifact(train_path, ids=("a", "b"))
+    validation_path = tmp_path / "validation.npz"; _artifact(validation_path, ids=("c", "d"))
+
+    validate_stage2_splits(load_stage2_score_artifact(train_path), load_stage2_score_artifact(validation_path))
+
 
 def test_metadata_targets_and_routing_contracts(tmp_path):
     path = tmp_path / "scores.npz"; _artifact(path); artifacts = load_stage2_score_artifact(path)

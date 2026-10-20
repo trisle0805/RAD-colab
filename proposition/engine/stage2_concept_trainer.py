@@ -27,13 +27,11 @@ class Stage2ConceptTrainerConfig:
     max_epochs: int = 100
     early_stopping_patience: int = 10
     batch_size: int = 64
-    selection_metric: str = "top_1_accuracy"
+    base_seed: int = 0
 
 
 class Stage2ConceptTrainer:
     """Fit linear concept weights using multiclass CE over frozen scalar scores."""
-
-    _SUPPORTED_SELECTION = frozenset(("top_1_accuracy", "cross_entropy"))
 
     def __init__(
         self,
@@ -50,8 +48,6 @@ class Stage2ConceptTrainer:
         self.config = config or Stage2ConceptTrainerConfig()
         if self.config.regularization not in {"none", "l1", "l2"} or self.config.lambda_reg < 0:
             raise ValueError("regularization must be none/l1/l2 and lambda_reg must be non-negative")
-        if self.config.selection_metric not in self._SUPPORTED_SELECTION:
-            raise ValueError("selection_metric must be top_1_accuracy or cross_entropy")
         if min(self.config.max_epochs, self.config.early_stopping_patience, self.config.batch_size) < 1:
             raise ValueError("max_epochs, early_stopping_patience, and batch_size must be positive")
         self.model, self.device = model.to(self.config.device), torch.device(self.config.device)
@@ -64,7 +60,10 @@ class Stage2ConceptTrainer:
             raise ValueError("score_source must align with proposition_ids")
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
         self.epoch, self.best_epoch, self.bad_epochs = 0, None, 0
-        self.best_metric = float("inf") if self.config.selection_metric == "cross_entropy" else float("-inf")
+        self.best_top_1_accuracy = float("-inf")
+        self.best_cross_entropy = float("inf")
+        # Retained for checkpoints written by earlier cleanup revisions.
+        self.best_metric = self.best_top_1_accuracy
         self.history: list[dict[str, Any]] = []
         self.output_dir = Path(output_dir) if output_dir else None
         if self.output_dir:
@@ -74,16 +73,24 @@ class Stage2ConceptTrainer:
         self._validate_dataset(train)
         self._validate_dataset(validation)
         for epoch in range(1, self.config.max_epochs + 1):
-            train_loss = self._train_epoch(train)
+            train_loss = self._train_epoch(train, epoch=epoch)
             validation_result = self.evaluate(validation)
-            value = float(validation_result["metrics"][self.config.selection_metric])
-            record = {"epoch": epoch, "train_loss": train_loss, "val_cross_entropy": validation_result["loss"], "selection_metric": value}
+            top_1 = float(validation_result["metrics"]["top_1_accuracy"])
+            cross_entropy = float(validation_result["loss"])
+            record = {"epoch": epoch, "train_loss": train_loss, "val_top_1_accuracy": top_1, "val_cross_entropy": cross_entropy}
             self.history.append(record)
             self.epoch = epoch
-            if self._is_improved(value):
-                self.best_metric, self.best_epoch, self.bad_epochs = value, epoch, 0
+            if self._is_improved(top_1, cross_entropy):
+                self.best_top_1_accuracy, self.best_cross_entropy = top_1, cross_entropy
+                self.best_metric, self.best_epoch, self.bad_epochs = top_1, epoch, 0
                 self.save_checkpoint("best.pt")
-                self._write_json("metrics/best_validation.json", {"epoch": epoch, "loss": validation_result["loss"], "metrics": validation_result["metrics"]})
+                self._write_json("metrics/best_validation.json", {
+                    "epoch": epoch,
+                    "loss": cross_entropy,
+                    "metrics": validation_result["metrics"],
+                    "best_top_1_accuracy": top_1,
+                    "best_cross_entropy": cross_entropy,
+                })
             else:
                 self.bad_epochs += 1
             self.save_checkpoint("latest.pt")
@@ -125,7 +132,9 @@ class Stage2ConceptTrainer:
     def save_checkpoint(self, name: str) -> Path:
         path = self._checkpoint_path(name)
         payload = {"model_state": self.model.state_dict(), "optimizer_state": self.optimizer.state_dict(), "epoch": self.epoch,
-                   "best_epoch": self.best_epoch, "best_metric": self.best_metric, "bad_epochs": self.bad_epochs, "history": self.history,
+                   "best_epoch": self.best_epoch, "best_metric": self.best_metric,
+                   "best_top_1_accuracy": self.best_top_1_accuracy, "best_cross_entropy": self.best_cross_entropy,
+                   "bad_epochs": self.bad_epochs, "history": self.history,
                    "config": asdict(self.config), "disease_ids": self.disease_ids, "proposition_ids": self.proposition_ids,
                    "routing_mode": self.routing_mode, "input_hashes": self.input_hashes}
         temporary = path.with_suffix(path.suffix + ".tmp")
@@ -144,10 +153,14 @@ class Stage2ConceptTrainer:
         if load_optimizer:
             self.optimizer.load_state_dict(checkpoint["optimizer_state"])
         self.epoch, self.best_epoch, self.best_metric, self.bad_epochs, self.history = (checkpoint[key] for key in ("epoch", "best_epoch", "best_metric", "bad_epochs", "history"))
+        self.best_top_1_accuracy = float(checkpoint.get("best_top_1_accuracy", self.best_metric))
+        self.best_cross_entropy = float(checkpoint.get("best_cross_entropy", float("inf")))
 
-    def _train_epoch(self, dataset: Stage2Dataset) -> float:
+    def _train_epoch(self, dataset: Stage2Dataset, *, epoch: int) -> float:
         self.model.train()
         support, targets = self._tensors(dataset)
+        permutation = self._training_permutation(len(dataset.case_ids), epoch).to(self.device)
+        support, targets = support[permutation], targets[permutation]
         losses: list[float] = []
         for start in range(0, len(dataset.case_ids), self.config.batch_size):
             batch_support, batch_targets = support[start:start + self.config.batch_size], targets[start:start + self.config.batch_size]
@@ -160,8 +173,17 @@ class Stage2ConceptTrainer:
             losses.append(float(loss.detach().cpu()))
         return float(np.mean(losses))
 
-    def _is_improved(self, value: float) -> bool:
-        return value < self.best_metric if self.config.selection_metric == "cross_entropy" else value > self.best_metric
+    def _training_permutation(self, size: int, epoch: int) -> Tensor:
+        if size < 1 or epoch < 1:
+            raise ValueError("training permutation requires positive size and epoch")
+        generator = torch.Generator(device="cpu")
+        generator.manual_seed(self.config.base_seed + epoch)
+        return torch.randperm(size, generator=generator)
+
+    def _is_improved(self, top_1_accuracy: float, cross_entropy: float) -> bool:
+        if top_1_accuracy > self.best_top_1_accuracy and not np.isclose(top_1_accuracy, self.best_top_1_accuracy):
+            return True
+        return bool(np.isclose(top_1_accuracy, self.best_top_1_accuracy) and cross_entropy < self.best_cross_entropy)
 
     def _tensors(self, dataset: Stage2Dataset) -> tuple[Tensor, Tensor]:
         return (torch.as_tensor(dataset.support_scores, dtype=torch.float32, device=self.device),

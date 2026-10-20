@@ -23,9 +23,12 @@ from proposition.models.stage2_concept_head import Stage2ConceptHead
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train a scalar-only learned Stage-2 concept head.")
-    for split in ("train", "val", "test"):
+    for split in ("train", "val"):
         parser.add_argument(f"--{split}_scores", required=True)
         parser.add_argument(f"--{split}_csv", required=True)
+    parser.add_argument("--test_scores")
+    parser.add_argument("--test_csv")
+    parser.add_argument("--evaluate_test", action="store_true", help="Evaluate the selected configuration on the held-out test split.")
     parser.add_argument("--active_csv", required=True)
     parser.add_argument("--output_dir", required=True)
     parser.add_argument("--device", default="cpu")
@@ -40,7 +43,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--nonzero_threshold", type=float, default=1e-4)
     parser.add_argument("--bootstrap_samples", type=int, default=2000)
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.evaluate_test and (not args.test_scores or not args.test_csv):
+        parser.error("--evaluate_test requires --test_scores and --test_csv")
+    return args
 
 
 def main() -> None:
@@ -48,19 +54,20 @@ def main() -> None:
     if args.head_mode == "local" and args.regularization == "l1":
         raise ValueError("S2-L supports regularization=none or l2; use S2-G for L1 experiments")
     _seed(args.seed)
-    paths = {f"{split}_scores": Path(getattr(args, f"{split}_scores")) for split in ("train", "val", "test")}
-    paths.update({f"{split}_csv": Path(getattr(args, f"{split}_csv")) for split in ("train", "val", "test")})
+    splits = ("train", "val", "test") if args.evaluate_test else ("train", "val")
+    paths = {f"{split}_scores": Path(getattr(args, f"{split}_scores")) for split in splits}
+    paths.update({f"{split}_csv": Path(getattr(args, f"{split}_csv")) for split in splits})
     paths["active_csv"] = Path(args.active_csv)
     hashes = {name: sha256_file(path) for name, path in paths.items()}
-    artifacts = {split: load_stage2_score_artifact(paths[f"{split}_scores"]) for split in ("train", "val", "test")}
-    validate_stage2_splits(artifacts["train"], artifacts["val"], artifacts["test"])
+    artifacts = {split: load_stage2_score_artifact(paths[f"{split}_scores"]) for split in splits}
+    validate_stage2_splits(artifacts["train"], artifacts["val"], artifacts.get("test"))
     propositions = load_stage2_propositions(paths["active_csv"], artifacts["train"].proposition_ids)
-    routed = {split: build_stage2_support(artifacts[split], propositions, args.routing_mode) for split in ("train", "val", "test")}
-    if any(not np.array_equal(routed["train"].proposition_mask, routed[split].proposition_mask) for split in ("val", "test")):
+    routed = {split: build_stage2_support(artifacts[split], propositions, args.routing_mode) for split in splits}
+    if any(not np.array_equal(routed["train"].proposition_mask, routed[split].proposition_mask) for split in splits[1:]):
         raise ValueError("routing masks differ across splits")
-    targets = {split: load_stage2_disease_targets(paths[f"{split}_csv"], artifacts[split].case_ids) for split in ("train", "val", "test")}
+    targets = {split: load_stage2_disease_targets(paths[f"{split}_csv"], artifacts[split].case_ids) for split in splits}
     disease_ids = targets["train"].disease_ids
-    if any(targets[split].disease_ids != disease_ids for split in ("val", "test")):
+    if any(targets[split].disease_ids != disease_ids for split in splits[1:]):
         raise ValueError("disease label columns/order must match across splits")
     disease_index = {disease: index for index, disease in enumerate(disease_ids)}
     proposition_diseases = tuple(item.disease_id for item in propositions)
@@ -69,21 +76,26 @@ def main() -> None:
                               proposition_mask=torch.from_numpy(routed["train"].proposition_mask), num_diseases=len(disease_ids), head_mode=args.head_mode)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    _write_json(output_dir / "input_contract.json", {"input_hashes": hashes, "routing_mode": args.routing_mode, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "case_orders": {split: artifacts[split].case_ids.tolist() for split in ("train", "val", "test")}, "proposition_metadata_hash": hashes["active_csv"]})
+    _write_json(output_dir / "input_contract.json", {"input_hashes": hashes, "routing_mode": args.routing_mode, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "case_orders": {split: artifacts[split].case_ids.tolist() for split in splits}, "proposition_metadata_hash": hashes["active_csv"]})
     trainer = Stage2ConceptTrainer(model=model, disease_ids=disease_ids, proposition_ids=artifacts["train"].proposition_ids.tolist(), routing_mode=args.routing_mode,
                                    input_hashes=hashes, score_source=routed["train"].score_source.tolist(),
                                    config=Stage2ConceptTrainerConfig(device=args.device, learning_rate=args.learning_rate, regularization=args.regularization,
-                                   lambda_reg=args.lambda_reg, max_epochs=args.epochs, early_stopping_patience=args.patience, batch_size=args.batch_size), output_dir=output_dir)
-    datasets = {split: Stage2Dataset(artifacts[split].case_ids, routed[split].support_scores, targets[split].targets) for split in ("train", "val", "test")}
+                                   lambda_reg=args.lambda_reg, max_epochs=args.epochs, early_stopping_patience=args.patience, batch_size=args.batch_size, base_seed=args.seed), output_dir=output_dir)
+    datasets = {split: Stage2Dataset(artifacts[split].case_ids, routed[split].support_scores, targets[split].targets) for split in splits}
     trainer.fit(datasets["train"], datasets["val"])
-    results = {split: trainer.export_best_split(dataset, split) for split, dataset in datasets.items() if split in {"val", "test"}}
-    _write_audits(output_dir, model, results["test"]["outputs"], disease_ids, artifacts["train"].proposition_ids.tolist(), proposition_diseases, args.nonzero_threshold)
-    _write_json(output_dir / "metrics" / "test_confidence_intervals.json", bootstrap_topk_confidence_intervals(results["test"]["outputs"]["logits"], datasets["test"].targets, seed=args.seed, n_bootstrap=args.bootstrap_samples))
+    results = {"val": trainer.export_best_split(datasets["val"], "val")}
+    if args.evaluate_test:
+        results["test"] = trainer.export_best_split(datasets["test"], "test")
+        _write_json(output_dir / "metrics" / "test_confidence_intervals.json", bootstrap_topk_confidence_intervals(results["test"]["outputs"]["logits"], datasets["test"].targets, seed=args.seed, n_bootstrap=args.bootstrap_samples))
+    _write_audits(output_dir, model, results["val"]["outputs"], disease_ids, artifacts["train"].proposition_ids.tolist(), proposition_diseases, args.nonzero_threshold)
     after = {name: sha256_file(path) for name, path in paths.items()}
     if after != hashes:
         raise RuntimeError("input artifact hashes changed during Stage-2 execution")
-    _write_json(output_dir / "stage2_concept_manifest.json", {"head_mode": args.head_mode, "routing_mode": args.routing_mode, "regularization": args.regularization, "lambda_reg": args.lambda_reg, "nonzero_threshold": args.nonzero_threshold, "input_hashes": hashes, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "seed": args.seed, "best_epoch": trainer.best_epoch, "best_validation_top_1": results["val"]["metrics"]["top_1_accuracy"], "git_commit": _git_commit()})
-    print(json.dumps({"best_epoch": trainer.best_epoch, "val": _summary(results["val"]), "test": _summary(results["test"])}, sort_keys=True))
+    _write_json(output_dir / "stage2_concept_manifest.json", {"head_mode": args.head_mode, "routing_mode": args.routing_mode, "regularization": args.regularization, "lambda_reg": args.lambda_reg, "nonzero_threshold": args.nonzero_threshold, "input_hashes": hashes, "proposition_ids": artifacts["train"].proposition_ids.tolist(), "disease_ids": list(disease_ids), "seed": args.seed, "evaluate_test": args.evaluate_test, "best_epoch": trainer.best_epoch, "best_validation_top_1": trainer.best_top_1_accuracy, "best_validation_cross_entropy": trainer.best_cross_entropy, "git_commit": _git_commit()})
+    summary = {"best_epoch": trainer.best_epoch, "val": _summary(results["val"])}
+    if args.evaluate_test:
+        summary["test"] = _summary(results["test"])
+    print(json.dumps(summary, sort_keys=True))
 
 
 def _write_audits(output_dir: Path, model: Stage2ConceptHead, outputs: dict[str, np.ndarray], disease_ids: tuple[str, ...], proposition_ids: list[str], proposition_disease_ids: tuple[str, ...], threshold: float) -> None:
