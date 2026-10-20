@@ -184,6 +184,13 @@ class _FinalizationTrainer:
         self.config = SimpleNamespace(config={"training_scope": "text_adapt"})
         self.evaluated_epochs: list[int] = []
 
+    def fit(self, model: Stage1EvidenceModel) -> None:
+        """Simulate fit restoring the selected epoch-2 checkpoint after epoch 3."""
+        self.epoch = 3  # Latest epoch before Stage1Trainer.fit restores best.pt.
+        with torch.no_grad():
+            model.text_encoder.bert_model.encoder.layer[-1].weight.add_(0.25)
+        self.epoch = self.best_epoch
+
     def evaluate(self, _loader: object, *, split: str, epoch: int) -> SimpleNamespace:
         assert split == "val"
         self.evaluated_epochs.append(epoch)
@@ -206,9 +213,8 @@ def test_round_b_finalization_audits_restored_best_state_and_writes_contract_art
     _persist_round_b_pretraining_audits(
         trainer, output, image_before=image_before, anchor_hash=anchor_hash, optimizer_audit=optimizer_audit,
     )
-    # Simulate the selected best checkpoint after fit restored it: only last1 BERT changes.
-    with torch.no_grad():
-        model.text_encoder.bert_model.encoder.layer[-1].weight.add_(0.25)
+    # Run the post-fit restoration simulation before invoking CLI finalization.
+    trainer.fit(model)
     init_checkpoint = tmp_path / "initial.pt"
     torch.save({"git_commit": "initial-sha"}, init_checkpoint)
     baseline = SimpleNamespace(predictions={"score_image": np.asarray([[0.25, 0.75]], dtype=np.float32)})
