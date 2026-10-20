@@ -19,7 +19,7 @@ from main_proposition import _load_aliases, _seed_everything, _transform
 from models.clip_tqn import ModelRes, Text_Encoder_Bert
 from proposition.data import Stage1SkinCAPDataset, load_weak_supervision_v3
 from proposition.engine import Stage1Trainer, TrainerConfig
-from proposition.engine.text_encoder_adaptation import component_hashes, selected_bert_layers
+from proposition.engine.text_encoder_adaptation import compare_module_hashes, component_hashes, selected_bert_layers
 from proposition.losses import MaskedBCELoss, build_pos_weight_artifacts, write_label_distribution
 from proposition.models import Stage1EvidenceModel
 
@@ -128,6 +128,119 @@ def _audit_round_b_optimizer(
     }
 
 
+def _persist_round_b_pretraining_audits(
+    trainer: Stage1Trainer,
+    output: Path,
+    *,
+    image_before: Mapping[str, str],
+    anchor_hash: str,
+    optimizer_audit: Mapping[str, Any],
+) -> None:
+    """Persist the initialization state that finalization must audit against."""
+    if isinstance(trainer.config.config, dict):
+        trainer.config.config["round_b_image_hashes_before"] = dict(image_before)
+        trainer.config.config["round_b_query_anchor_sha256"] = anchor_hash
+        trainer.config.config["round_b_optimizer_audit"] = dict(optimizer_audit)
+        trainer.write_run_config()
+    (output / "diagnostics" / "optimizer_parameter_audit.json").write_text(
+        json.dumps(dict(optimizer_audit), indent=2), encoding="utf-8"
+    )
+
+
+def _finalize_round_b(
+    trainer: Stage1Trainer,
+    model: Stage1EvidenceModel,
+    val_loader: DataLoader,
+    *,
+    baseline: Any,
+    anchor: torch.Tensor,
+    anchor_hash: str,
+    image_before: Mapping[str, str],
+    components_before: Mapping[str, str],
+    adaptation: str,
+    output: Path,
+    bert_parameters: list[torch.nn.Parameter],
+    init_checkpoint: str | Path,
+    seed: int,
+    head_lr: float,
+    bert_lr: float,
+    weight_decay: float,
+    max_grad_norm: float,
+) -> dict[str, Any]:
+    """Audit and serialize the restored best Round-B checkpoint state."""
+    if trainer.best_epoch is None:
+        raise RuntimeError("text adaptation produced no strict 5/5 eligible validation checkpoint")
+    restored_anchor = model.query_cache.detach()
+    if _anchor_sha256(restored_anchor) != anchor_hash or not torch.equal(restored_anchor.cpu(), anchor.cpu()):
+        raise RuntimeError("query anchor changed during Round-B adaptation")
+
+    # Stage1Trainer.fit restores best.pt before returning; every audit below is
+    # deliberately against that restored best state rather than the latest epoch.
+    image_after, components_after = _image_hashes(model), component_hashes(model)
+    image_equal = compare_module_hashes(image_before, image_after)
+    if not all(image_equal.values()):
+        raise RuntimeError("a frozen image module changed during text adaptation")
+    final = trainer.evaluate(val_loader, split="val", epoch=trainer.best_epoch)
+    image_diff = _assert_image_invariance(baseline.predictions["score_image"], final.predictions["score_image"])
+
+    component_equal = compare_module_hashes(components_before, components_after)
+    changed = {name: not equal for name, equal in component_equal.items()}
+    allowed = {"text_cross_attention", "text_head"}
+    layers = len(getattr(model.text_encoder.bert_model.encoder, "layer"))
+    if adaptation == "last1":
+        allowed.add(f"bert_encoder_layer_{layers - 1}")
+    elif adaptation == "last2":
+        allowed.update({f"bert_encoder_layer_{layers - 2}", f"bert_encoder_layer_{layers - 1}"})
+    invalid = [name for name, did_change in changed.items() if did_change and name not in allowed]
+    if invalid:
+        raise RuntimeError(f"frozen text components changed: {invalid}")
+    adapted_layers = [name for name in allowed if name.startswith("bert_encoder_layer_")]
+    unchanged_adapted_layers = [name for name in adapted_layers if not changed[name]]
+    if trainer.epoch > 0 and unchanged_adapted_layers:
+        raise RuntimeError(
+            "adapted BERT layers did not change after training; verify caption-gradient flow: "
+            f"{unchanged_adapted_layers}"
+        )
+    audit = {"adaptation_mode": adaptation, "pre_hash": dict(components_before), "post_hash": components_after,
+             "changed": changed, "allowed_to_change": {name: name in allowed for name in changed},
+             "unchanged_adapted_bert_layers": unchanged_adapted_layers,
+             "trainable_parameter_names": [name for name, p in model.named_parameters() if p.requires_grad],
+             "trainable_parameter_count": sum(p.numel() for p in model.parameters() if p.requires_grad),
+             "trainable_bert_parameter_count": sum(p.numel() for p in bert_parameters)}
+    (output / "diagnostics" / "module_parameter_audit.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
+    (output / "diagnostics" / "image_branch_freeze_audit.json").write_text(json.dumps({
+        "pre_hash": dict(image_before), "post_hash": image_after, "equal": image_equal,
+        "max_abs_image_score_diff": image_diff,
+    }, indent=2), encoding="utf-8")
+    (output / "diagnostics" / "query_anchor_audit.json").write_text(json.dumps({
+        "query_anchor_sha256_before": anchor_hash, "query_anchor_sha256_after": _anchor_sha256(restored_anchor),
+        "query_anchor_equal": True, "proposition_ids": list(trainer.proposition_ids), "shape": list(anchor.shape),
+    }, indent=2), encoding="utf-8")
+    summary = {"trainable_parameter_count": audit["trainable_parameter_count"], "trainable_bert_parameter_count": audit["trainable_bert_parameter_count"],
+               "best_epoch": trainer.best_epoch, "best_validation_text_macro_auc": trainer.best_metric,
+               "best_validation_text_bce": trainer.best_loss}
+    if isinstance(trainer.config.config, dict):
+        trainer.config.config.update({
+            "best_epoch": trainer.best_epoch,
+            "best_validation_text_macro_auc": trainer.best_metric,
+            "best_validation_text_bce": trainer.best_loss,
+            "round_b_image_hashes_after": image_after,
+            "round_b_query_anchor_sha256_after": _anchor_sha256(restored_anchor),
+            "round_b_query_anchor_equal": True,
+        })
+        trainer.write_run_config()
+    (output / "metrics" / "text_adapt_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    init_payload = torch.load(init_checkpoint, map_location="cpu", weights_only=False)
+    manifest = {**summary, "git_commit": _git_commit(), "adaptation_mode": adaptation, "seed": seed,
+                "init_checkpoint_sha256": _sha256_file(init_checkpoint), "init_checkpoint_git_commit_if_available": init_payload.get("git_commit"),
+                "weak_supervision_artifact_hashes": dict(trainer.artifacts.artifact_hashes), "query_anchor_sha256": anchor_hash,
+                "head_lr": head_lr, "bert_lr": bert_lr, "weight_decay": weight_decay, "max_grad_norm": max_grad_norm,
+                "image_branch_unchanged": True, "image_score_max_abs_diff": image_diff,
+                "diagnosis_supervision_used": False}
+    (output / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    return summary
+
+
 def main(args: argparse.Namespace) -> None:
     config = yaml.safe_load(Path(args.config or "configs/ws.yaml").read_text(encoding="utf-8")) or {}
     weak_config, skincap, stage1 = config.get("weak_supervision", {}), config.get("skincap", {}), config.get("stage1", {})
@@ -217,83 +330,36 @@ def main(args: argparse.Namespace) -> None:
         ), output_dir=output,
     )
     image_before, components_before = _image_hashes(model), component_hashes(model)
-    if isinstance(trainer.config.config, dict):
-        trainer.config.config["round_b_image_hashes_before"] = image_before
-        trainer.config.config["round_b_query_anchor_sha256"] = anchor_hash
-        trainer.config.config["round_b_optimizer_audit"] = optimizer_audit
-        trainer.write_run_config()
-    (output / "diagnostics" / "optimizer_parameter_audit.json").write_text(
-        json.dumps(optimizer_audit, indent=2), encoding="utf-8"
+    _persist_round_b_pretraining_audits(
+        trainer,
+        output,
+        image_before=image_before,
+        anchor_hash=anchor_hash,
+        optimizer_audit=optimizer_audit,
     )
     val_loader = _loader(val, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2)), shuffle=False, seed=seed)
     baseline = trainer.evaluate(val_loader, split="val", epoch=0)
     trainer.fit(_loader(train, int(skincap.get("batch_size", 32)), int(skincap.get("num_workers", 2)), shuffle=True, seed=seed),
                 val_loader, max_epochs=int(args.epochs or stage1.get("epochs", 30)))
-    if trainer.best_epoch is None:
-        raise RuntimeError("text adaptation produced no strict 5/5 eligible validation checkpoint")
-    restored_anchor = model.query_cache.detach()
-    if _anchor_sha256(restored_anchor) != anchor_hash or not torch.equal(restored_anchor.cpu(), anchor.cpu()):
-        raise RuntimeError("query anchor changed during Round-B adaptation")
-    image_after, components_after = _image_hashes(model), component_hashes(model)
-    image_unchanged = image_before == image_after
-    if not all(image_unchanged.values()):
-        raise RuntimeError("a frozen image module changed during text adaptation")
-    final = trainer.evaluate(val_loader, split="val", epoch=trainer.best_epoch)
-    image_diff = _assert_image_invariance(baseline.predictions["score_image"], final.predictions["score_image"])
-    changed = {name: components_before[name] != components_after[name] for name in components_before}
-    allowed = {"text_cross_attention", "text_head"}
-    layers = len(getattr(model.text_encoder.bert_model.encoder, "layer"))
-    if args.adaptation == "last1":
-        allowed.add(f"bert_encoder_layer_{layers - 1}")
-    elif args.adaptation == "last2":
-        allowed.update({f"bert_encoder_layer_{layers - 2}", f"bert_encoder_layer_{layers - 1}"})
-    invalid = [name for name, did_change in changed.items() if did_change and name not in allowed]
-    if invalid:
-        raise RuntimeError(f"frozen text components changed: {invalid}")
-    adapted_layers = [name for name in allowed if name.startswith("bert_encoder_layer_")]
-    unchanged_adapted_layers = [name for name in adapted_layers if not changed[name]]
-    if trainer.epoch > 0 and unchanged_adapted_layers:
-        raise RuntimeError(
-            "adapted BERT layers did not change after training; verify caption-gradient flow: "
-            f"{unchanged_adapted_layers}"
-        )
-    audit = {"adaptation_mode": args.adaptation, "pre_hash": components_before, "post_hash": components_after,
-             "changed": changed, "allowed_to_change": {name: name in allowed for name in changed},
-             "unchanged_adapted_bert_layers": unchanged_adapted_layers,
-             "trainable_parameter_names": [name for name, p in model.named_parameters() if p.requires_grad],
-             "trainable_parameter_count": sum(p.numel() for p in model.parameters() if p.requires_grad),
-             "trainable_bert_parameter_count": sum(p.numel() for p in bert_parameters)}
-    (output / "diagnostics" / "module_parameter_audit.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
-    (output / "diagnostics" / "image_branch_freeze_audit.json").write_text(json.dumps({
-        "pre_hash": image_before, "post_hash": image_after, "equal": image_unchanged,
-        "max_abs_image_score_diff": image_diff,
-    }, indent=2), encoding="utf-8")
-    (output / "diagnostics" / "query_anchor_audit.json").write_text(json.dumps({
-        "query_anchor_sha256_before": anchor_hash, "query_anchor_sha256_after": _anchor_sha256(restored_anchor),
-        "query_anchor_equal": True, "proposition_ids": list(trainer.proposition_ids), "shape": list(anchor.shape),
-    }, indent=2), encoding="utf-8")
-    summary = {"trainable_parameter_count": audit["trainable_parameter_count"], "trainable_bert_parameter_count": audit["trainable_bert_parameter_count"],
-               "best_epoch": trainer.best_epoch, "best_validation_text_macro_auc": trainer.best_metric,
-               "best_validation_text_bce": trainer.best_loss}
-    if isinstance(trainer.config.config, dict):
-        trainer.config.config.update({
-            "best_epoch": trainer.best_epoch,
-            "best_validation_text_macro_auc": trainer.best_metric,
-            "best_validation_text_bce": trainer.best_loss,
-            "round_b_image_hashes_after": image_after,
-            "round_b_query_anchor_sha256_after": _anchor_sha256(restored_anchor),
-            "round_b_query_anchor_equal": True,
-        })
-        trainer.write_run_config()
-    (output / "metrics" / "text_adapt_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    init_payload = torch.load(args.init_checkpoint, map_location="cpu", weights_only=False)
-    manifest = {**summary, "git_commit": _git_commit(), "adaptation_mode": args.adaptation, "seed": seed,
-                "init_checkpoint_sha256": _sha256_file(args.init_checkpoint), "init_checkpoint_git_commit_if_available": init_payload.get("git_commit"),
-                "weak_supervision_artifact_hashes": dict(artifacts.artifact_hashes), "query_anchor_sha256": anchor_hash,
-                "head_lr": head_lr, "bert_lr": bert_lr, "weight_decay": weight_decay, "max_grad_norm": max_grad_norm,
-                "image_branch_unchanged": True, "image_score_max_abs_diff": image_diff,
-                "diagnosis_supervision_used": False}
-    (output / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    _finalize_round_b(
+        trainer,
+        model,
+        val_loader,
+        baseline=baseline,
+        anchor=anchor,
+        anchor_hash=anchor_hash,
+        image_before=image_before,
+        components_before=components_before,
+        adaptation=args.adaptation,
+        output=output,
+        bert_parameters=bert_parameters,
+        init_checkpoint=args.init_checkpoint,
+        seed=seed,
+        head_lr=head_lr,
+        bert_lr=bert_lr,
+        weight_decay=weight_decay,
+        max_grad_norm=max_grad_norm,
+    )
 
 
 if __name__ == "__main__":

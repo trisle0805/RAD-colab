@@ -18,7 +18,7 @@ from main_proposition import _load_aliases, _seed_everything, _transform
 from models.clip_tqn import ModelRes, Text_Encoder_Bert
 from proposition.data import Stage1SkinCAPDataset, load_weak_supervision_v3
 from proposition.engine import Stage1Trainer, TrainerConfig
-from proposition.engine.text_encoder_adaptation import module_sha256
+from proposition.engine.text_encoder_adaptation import compare_module_hashes, module_sha256
 from proposition.losses import MaskedBCELoss, build_pos_weight_artifacts
 from proposition.models import Stage1EvidenceModel
 
@@ -146,8 +146,11 @@ def main(args: argparse.Namespace) -> None:
         raise RuntimeError("saved query anchor was not restored exactly")
     before_image_hashes = run_config.get("round_b_image_hashes_before")
     after_image_hashes = _image_hashes(model)
-    if before_image_hashes is not None and before_image_hashes != after_image_hashes:
-        raise RuntimeError("export checkpoint image branch differs from its Round-B baseline")
+    image_equal = None
+    if before_image_hashes is not None:
+        image_equal = compare_module_hashes(before_image_hashes, after_image_hashes)
+        if not all(image_equal.values()):
+            raise RuntimeError("export checkpoint image branch differs from its Round-B baseline")
     loaders = {split: _loader(dataset, int(skincap.get("eval_batch_size", 64)), int(skincap.get("num_workers", 2)), shuffle=False, seed=seed)
                for split, dataset in datasets.items()}
     results = {split: trainer.evaluate(loader, split=split, epoch=trainer.best_epoch or 0) for split, loader in loaders.items()}
@@ -161,7 +164,7 @@ def main(args: argparse.Namespace) -> None:
         "query_anchor_sha256": anchor_hash, "query_anchor_equal": True, "proposition_ids": list(trainer.proposition_ids), "shape": list(anchor.shape),
     }, indent=2), encoding="utf-8")
     (trainer.output_dir / "diagnostics" / "image_branch_freeze_audit.json").write_text(json.dumps({
-        "pre_hash": before_image_hashes, "post_hash": after_image_hashes, "equal": before_image_hashes == after_image_hashes if before_image_hashes else None,
+        "pre_hash": before_image_hashes, "post_hash": after_image_hashes, "equal": image_equal,
     }, indent=2), encoding="utf-8")
     (trainer.output_dir / "export_manifest.json").write_text(json.dumps({
         "checkpoint": str(Path(args.checkpoint).name), "adaptation_mode": adaptation, "seed": seed,

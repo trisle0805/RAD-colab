@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -8,8 +10,15 @@ import pytest
 torch = pytest.importorskip("torch")
 from torch import nn
 
-from proposition.cli.text_adapt import _audit_round_b_optimizer
+from proposition.cli.text_adapt import (
+    _anchor_sha256,
+    _audit_round_b_optimizer,
+    _finalize_round_b,
+    _image_hashes,
+    _persist_round_b_pretraining_audits,
+)
 from proposition.data.weak_supervision import ActiveProposition, WeakSupervisionArtifacts
+from proposition.engine.text_encoder_adaptation import compare_module_hashes, component_hashes
 from proposition.models import Stage1EvidenceModel
 
 
@@ -143,3 +152,96 @@ def test_round_b_optimizer_audit_requires_exact_groups_and_learning_rates() -> N
     optimizer.param_groups[1]["lr"] = 1e-4
     with pytest.raises(RuntimeError, match="learning rates"):
         _audit_round_b_optimizer(model, optimizer, "last2", 3e-4, 2e-5)
+
+
+def test_compare_module_hashes_returns_per_module_results_and_rejects_mismatches() -> None:
+    before = {
+        "image_encoder": "encoder", "image_projection": "projection",
+        "image_cross_attention": "cross_attention", "image_head": "head",
+    }
+    equal = compare_module_hashes(before, dict(before))
+    assert isinstance(equal, dict)
+    assert equal == {name: True for name in before}
+    changed = compare_module_hashes(before, {**before, "image_head": "changed"})
+    assert changed == {**{name: True for name in before if name != "image_head"}, "image_head": False}
+    with pytest.raises(RuntimeError, match="module hash keys differ"):
+        compare_module_hashes(before, {name: value for name, value in before.items() if name != "image_head"})
+    with pytest.raises(RuntimeError, match="module hash keys differ"):
+        compare_module_hashes(before, {**before, "unexpected": "value"})
+
+
+class _FinalizationTrainer:
+    """Small post-fit trainer double whose model state represents restored best.pt."""
+
+    def __init__(self, output: Path) -> None:
+        self.output = output
+        self.best_epoch = 2
+        self.best_metric = 0.75
+        self.best_loss = 0.25
+        self.epoch = 2
+        self.proposition_ids = ("p1", "p2")
+        self.artifacts = _artifacts()
+        self.config = SimpleNamespace(config={"training_scope": "text_adapt"})
+        self.evaluated_epochs: list[int] = []
+
+    def evaluate(self, _loader: object, *, split: str, epoch: int) -> SimpleNamespace:
+        assert split == "val"
+        self.evaluated_epochs.append(epoch)
+        return SimpleNamespace(predictions={"score_image": np.asarray([[0.25, 0.75]], dtype=np.float32)})
+
+    def write_run_config(self) -> None:
+        (self.output / "run_config.json").write_text(json.dumps(self.config.config, indent=2), encoding="utf-8")
+
+
+def test_round_b_finalization_audits_restored_best_state_and_writes_contract_artifacts(tmp_path: Path) -> None:
+    output = tmp_path / "round_b"
+    (output / "diagnostics").mkdir(parents=True)
+    (output / "metrics").mkdir()
+    model = _model("last1").eval()
+    trainer = _FinalizationTrainer(output)
+    anchor = model.query_cache.detach().clone()
+    anchor_hash = _anchor_sha256(anchor)
+    image_before, components_before = _image_hashes(model), component_hashes(model)
+    optimizer_audit = {"head": {"lr": 1e-4}, "bert": {"lr": 1e-5}, "groups_overlap": False}
+    _persist_round_b_pretraining_audits(
+        trainer, output, image_before=image_before, anchor_hash=anchor_hash, optimizer_audit=optimizer_audit,
+    )
+    # Simulate the selected best checkpoint after fit restored it: only last1 BERT changes.
+    with torch.no_grad():
+        model.text_encoder.bert_model.encoder.layer[-1].weight.add_(0.25)
+    init_checkpoint = tmp_path / "initial.pt"
+    torch.save({"git_commit": "initial-sha"}, init_checkpoint)
+    baseline = SimpleNamespace(predictions={"score_image": np.asarray([[0.25, 0.75]], dtype=np.float32)})
+    _finalize_round_b(
+        trainer,
+        model,
+        object(),
+        baseline=baseline,
+        anchor=anchor,
+        anchor_hash=anchor_hash,
+        image_before=image_before,
+        components_before=components_before,
+        adaptation="last1",
+        output=output,
+        bert_parameters=list(model.text_encoder.bert_model.encoder.layer[-1].parameters()),
+        init_checkpoint=init_checkpoint,
+        seed=7,
+        head_lr=1e-4,
+        bert_lr=1e-5,
+        weight_decay=1e-4,
+        max_grad_norm=1.0,
+    )
+    assert trainer.evaluated_epochs == [trainer.best_epoch]
+    for relative_path in (
+        "diagnostics/module_parameter_audit.json",
+        "diagnostics/image_branch_freeze_audit.json",
+        "diagnostics/query_anchor_audit.json",
+        "diagnostics/optimizer_parameter_audit.json",
+        "metrics/text_adapt_summary.json",
+        "run_manifest.json",
+        "run_config.json",
+    ):
+        assert (output / relative_path).is_file()
+    image_audit = json.loads((output / "diagnostics" / "image_branch_freeze_audit.json").read_text(encoding="utf-8"))
+    assert isinstance(image_audit["equal"], dict)
+    assert all(image_audit["equal"].values())

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Iterable
+from typing import Mapping
 
 from torch import nn
 
@@ -83,3 +84,16 @@ def module_sha256(module: nn.Module) -> str:
 
 def component_hashes(model: nn.Module) -> dict[str, str]:
     return {name: module_sha256(module) for name, module in named_text_components(model).items()}
+
+
+def compare_module_hashes(before: Mapping[str, str], after: Mapping[str, str]) -> dict[str, bool]:
+    """Compare every named module hash and reject incomplete audit inputs."""
+    before_keys, after_keys = set(before), set(after)
+    if before_keys != after_keys:
+        missing = sorted(before_keys - after_keys)
+        unexpected = sorted(after_keys - before_keys)
+        raise RuntimeError(
+            "module hash keys differ between audit states "
+            f"(missing_after={missing}, unexpected_after={unexpected})"
+        )
+    return {name: before[name] == after[name] for name in sorted(before)}
