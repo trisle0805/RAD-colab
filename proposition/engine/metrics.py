@@ -63,6 +63,7 @@ def modality_metrics(
     threshold: float = 0.5,
     min_present: int = 1,
     min_absent: int = 1,
+    target_semantics: str = "ternary_masked",
 ) -> dict[str, Any]:
     """Score valid weak-label pairs, excluding unknown and single-class pairs.
 
@@ -72,7 +73,11 @@ def modality_metrics(
     """
     if min_present < 1 or min_absent < 1:
         raise ValueError("min_present and min_absent must both be at least one")
+    if target_semantics not in {"ternary_masked", "caption_support_binary"}:
+        raise ValueError("unsupported target_semantics")
     score_array, label_array, ids = _validate(scores, labels, proposition_ids)
+    if target_semantics == "caption_support_binary":
+        label_array = (label_array == 1).astype(np.int8)
     eligible_columns = np.ones(score_array.shape[1], dtype=bool) if valid_propositions is None else _array(valid_propositions).astype(bool)
     if eligible_columns.shape != (score_array.shape[1],):
         raise ValueError("valid_propositions must have one value per proposition")
@@ -108,6 +113,7 @@ def modality_metrics(
         "threshold": float(threshold),
         "min_present": int(min_present),
         "min_absent": int(min_absent),
+        "target_semantics": target_semantics,
 
         "n_eligible": len(eligible),
 
@@ -123,10 +129,22 @@ def modality_metrics(
     }
 
 
-def masked_binary_cross_entropy(logits: Any, labels: Any, *, valid_pairs: Any | None = None) -> float | None:
+def masked_binary_cross_entropy(
+    logits: Any,
+    labels: Any,
+    *,
+    valid_pairs: Any | None = None,
+    target_semantics: str = "ternary_masked",
+) -> float | None:
     """Mean BCE over finite, known weak-label pairs; returns None when empty."""
     logit_array, label_array, _ = _validate(logits, labels, None)
-    valid = np.isfinite(logit_array) & np.isin(label_array, tuple(_VALID))
+    if target_semantics not in {"ternary_masked", "caption_support_binary"}:
+        raise ValueError("unsupported target_semantics")
+    if target_semantics == "caption_support_binary":
+        label_array = (label_array == 1).astype(np.int8)
+        valid = np.isfinite(logit_array)
+    else:
+        valid = np.isfinite(logit_array) & np.isin(label_array, tuple(_VALID))
     if valid_pairs is not None:
         pair_mask = _array(valid_pairs).astype(bool)
         valid &= np.broadcast_to(pair_mask, valid.shape)
@@ -136,10 +154,30 @@ def masked_binary_cross_entropy(logits: Any, labels: Any, *, valid_pairs: Any | 
     return float(np.mean(np.maximum(x, 0) - x * y + np.log1p(np.exp(-np.abs(x)))))
 
 
-def evaluate_modalities(outputs: Mapping[str, Any], labels: Mapping[str, Any], **kwargs: Any) -> dict[str, Any]:
+def evaluate_modalities(
+    outputs: Mapping[str, Any],
+    labels: Mapping[str, Any],
+    *,
+    text_target_semantics: str = "ternary_masked",
+    image_target_semantics: str = "ternary_masked",
+    **kwargs: Any,
+) -> dict[str, Any]:
     """Evaluate text/image evidence mappings and optional masked validation loss."""
-    result = {modality: modality_metrics(outputs[modality], labels[modality], **kwargs) for modality in ("text", "image") if modality in outputs and modality in labels}
+    result = {
+        modality: modality_metrics(
+            outputs[modality],
+            labels[modality],
+            target_semantics=text_target_semantics if modality == "text" else image_target_semantics,
+            **kwargs,
+        )
+        for modality in ("text", "image")
+        if modality in outputs and modality in labels
+    }
     for modality, logit_key in (("text", "logits_txt"), ("image", "logits_img")):
         if logit_key in outputs and modality in labels:
-            result[modality]["masked_val_loss"] = masked_binary_cross_entropy(outputs[logit_key], labels[modality])
+            result[modality]["masked_val_loss"] = masked_binary_cross_entropy(
+                outputs[logit_key],
+                labels[modality],
+                target_semantics=text_target_semantics if modality == "text" else image_target_semantics,
+            )
     return result

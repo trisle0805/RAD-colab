@@ -19,7 +19,7 @@ import torch
 from torch import Tensor, nn
 
 from proposition.data.weak_supervision import UNKNOWN_LABEL, WeakSupervisionArtifacts
-from proposition.losses.masked_bce import MaskedBCELoss
+from proposition.losses.masked_bce import MaskedBCELoss, TextTargetSemantics
 from .diagnostics import proposition_correlation, within_patient_differentiation
 from .metrics import evaluate_modalities, modality_metrics
 
@@ -31,6 +31,8 @@ class TrainerConfig:
     score_threshold: float = 0.5
     learning_rate: float = 1e-4
     weight_decay: float = 1e-4
+    training_scope: str = "full_stage1"
+    text_target_semantics: TextTargetSemantics = "ternary_masked"
 
     # Strict weak-label eligibility for checkpoint selection/evaluation
     selection_min_present: int = 5
@@ -72,6 +74,10 @@ class Stage1Trainer:
         self.artifacts = weak_supervision
         self.loss_fn = loss_fn
         self.config = config or TrainerConfig()
+        if self.config.training_scope not in {"full_stage1", "text_only"}:
+            raise ValueError("unsupported training_scope")
+        if self.config.training_scope == "text_only" and self.config.text_target_semantics != "caption_support_binary":
+            raise ValueError("text_only requires caption_support_binary text targets")
         self.device = torch.device(self.config.device)
         self.model.to(self.device)
         self.active_indices = weak_supervision.active_indices
@@ -87,6 +93,16 @@ class Stage1Trainer:
         )
         if any(not parameter.requires_grad for group in self.optimizer.param_groups for parameter in group["params"]):
             raise ValueError("optimizer must contain only requires_grad parameters")
+        optimizer_ids = {id(parameter) for group in self.optimizer.param_groups for parameter in group["params"]}
+        expected_ids = {
+            id(parameter)
+            for name in ("text_cross_attention", "text_head")
+            for parameter in getattr(model, name).parameters()
+        } if self.config.training_scope == "text_only" else {
+            id(parameter) for parameter in model.parameters() if parameter.requires_grad
+        }
+        if optimizer_ids != expected_ids:
+            raise ValueError("optimizer parameters do not match the requested training scope")
         self.output_dir = Path(output_dir) if output_dir is not None else None
         self.epoch = 0
         self.best_metric = float("-inf")
@@ -123,7 +139,17 @@ class Stage1Trainer:
             train = self.train_epoch(train_dataloader, epoch=epoch)
             validation = self.evaluate(validation_dataloader, split="val", epoch=epoch)
             selection = _selection_metric(validation.metrics)
-            record = {"epoch": epoch, "train_loss": train.loss, "val_loss": validation.loss, "selection_macro_auc": selection}
+            selection_key = (
+                "selection_text_macro_auc"
+                if self.config.training_scope == "text_only"
+                else "selection_macro_auc"
+            )
+            record = {
+                "epoch": epoch,
+                "train_loss": train.loss,
+                "val_loss": validation.loss,
+                selection_key: selection,
+            }
             self.history.append(record)
             self.epoch = epoch
             improved = selection is not None and (
@@ -159,7 +185,15 @@ class Stage1Trainer:
             labels_text, labels_image = self._weak_labels(case_ids)
             tokens = {key: value.to(self.device) for key, value in self.tokenizer(captions).items()}
             outputs = self.model(images, tokens)
-            loss = self.loss_fn(outputs["logits_txt"], outputs["logits_img"], labels_text, labels_image, self.text_trainable, self.image_trainable)
+            loss = self.loss_fn(
+                outputs["logits_txt"],
+                outputs["logits_img"],
+                labels_text,
+                labels_image,
+                self.text_trainable,
+                self.image_trainable,
+                include_image=self.config.training_scope != "text_only",
+            )
             if training:
                 self.optimizer.zero_grad(set_to_none=True)
                 loss.backward()
@@ -228,6 +262,7 @@ class Stage1Trainer:
                     .cpu()
                     .numpy()
                 ),
+                text_target_semantics=self.config.text_target_semantics,
                 **metric_kwargs,
             )["text"],
 
@@ -257,12 +292,18 @@ class Stage1Trainer:
         # labels currently contain too few reliable negatives.
         # --------------------------------------------------------
 
-        metrics["selection_macro_auc"] = (
-            metrics["image"]["macro_roc_auc"]
-        )
+        if self.config.training_scope == "text_only":
+            metrics["selection_text_macro_auc"] = metrics["text"]["macro_roc_auc"]
+            metrics["selection_macro_auc"] = metrics["selection_text_macro_auc"]
+            selection_source = "text"
+            selection_metrics = metrics["text"]
+        else:
+            metrics["selection_macro_auc"] = metrics["image"]["macro_roc_auc"]
+            selection_source = "image"
+            selection_metrics = metrics["image"]
 
         metrics["selection"] = {
-            "source": "image",
+            "source": selection_source,
             "metric": "macro_roc_auc",
             "min_present": (
                 self.config.selection_min_present
@@ -271,7 +312,7 @@ class Stage1Trainer:
                 self.config.selection_min_absent
             ),
             "n_eligible": (
-                metrics["image"]["n_eligible"]
+                selection_metrics["n_eligible"]
             ),
         }
 
@@ -312,6 +353,7 @@ class Stage1Trainer:
                 image_trainable,
                 min_present=self.config.selection_min_present,
                 min_absent=self.config.selection_min_absent,
+                text_target_semantics=self.config.text_target_semantics,
             ),
             "within_patient_differentiation": within_patient_differentiation(baseline["score_fused"]),
             "proposition_correlation": proposition_correlation(baseline["score_fused"]),
@@ -331,6 +373,7 @@ class Stage1Trainer:
                     image_trainable,
                     min_present=self.config.selection_min_present,
                     min_absent=self.config.selection_min_absent,
+                    text_target_semantics=self.config.text_target_semantics,
                 ),
                 "mean_absolute_score_delta": float(
                     np.nanmean(np.abs(control["score_fused"] - baseline["score_fused"]))
@@ -392,11 +435,14 @@ class Stage1Trainer:
         if self.output_dir is None:
             return
         predictions = result.predictions
-        count = len(predictions["case_id"])
         payload = dict(predictions)
         payload.update({
             "proposition_id": np.asarray(self.proposition_ids),
-            "text_valid_mask": (predictions["label_text"] != UNKNOWN_LABEL) & self.text_trainable.detach().cpu().numpy(),
+            "text_valid_mask": (
+                (predictions["label_text"] != UNKNOWN_LABEL)
+                if self.config.text_target_semantics == "ternary_masked"
+                else np.ones_like(predictions["label_text"], dtype=bool)
+            ) & self.text_trainable.detach().cpu().numpy(),
             "image_valid_mask": (predictions["label_img"] != UNKNOWN_LABEL) & self.image_trainable.detach().cpu().numpy(),
             "text_trainable": self.text_trainable.detach().cpu().numpy(),
             "image_trainable": self.image_trainable.detach().cpu().numpy(),
@@ -419,7 +465,9 @@ class Stage1Trainer:
         if self.output_dir is None or not self.history:
             return
         with (self.output_dir / "metrics" / "history.csv").open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=("epoch", "train_loss", "val_loss", "selection_macro_auc"))
+            selection_field = "selection_text_macro_auc" if self.config.training_scope == "text_only" else "selection_macro_auc"
+            fieldnames = ("epoch", "train_loss", "val_loss", selection_field)
+            writer = csv.DictWriter(handle, fieldnames=fieldnames)
             writer.writeheader(); writer.writerows(self.history)
 
     def _checkpoint_path(self, name: str) -> Path:
@@ -479,6 +527,31 @@ class Stage1Trainer:
         self.bad_epochs, self.history = checkpoint.get("bad_epochs", 0), checkpoint.get("history", [])
         _restore_rng_state(checkpoint["rng_state"])
 
+    def load_initial_weights(self, path: str | Path) -> None:
+        """Load only model weights for a fresh retraining experiment."""
+        checkpoint = torch.load(Path(path), map_location=self.device, weights_only=False)
+        if tuple(checkpoint["proposition_ids"]) != self.proposition_ids:
+            raise ValueError("checkpoint proposition ID order does not match active artifacts")
+        if dict(checkpoint.get("artifact_hashes", {})) != dict(self.artifacts.artifact_hashes):
+            raise ValueError("checkpoint artifact hashes do not match active artifacts")
+        self.model.load_state_dict(checkpoint["model_state"])
+        self.epoch = 0
+        self.best_metric = float("-inf")
+        self.best_epoch = None
+        self.best_loss = None
+        self.bad_epochs = 0
+        self.history = []
+
+    @torch.no_grad()
+    def export_best_predictions(
+        self,
+        loaders: Mapping[str, Iterable[Mapping[str, Any]]],
+    ) -> None:
+        """Export deterministic split predictions from the currently loaded best model."""
+        for split, loader in loaders.items():
+            result = self.evaluate(loader, split=split, epoch=self.best_epoch or 0)
+            self._save_predictions(result, f"scores_{split}_best.npz")
+
 
 def _modality_macro_aucs(
     scores: Mapping[str, np.ndarray],
@@ -489,6 +562,7 @@ def _modality_macro_aucs(
     *,
     min_present: int = 1,
     min_absent: int = 1,
+    text_target_semantics: str = "ternary_masked",
 ) -> dict[str, float | None]:
     """Evaluate each modality against its own weak-label target."""
     image = modality_metrics(
@@ -504,6 +578,7 @@ def _modality_macro_aucs(
         valid_propositions=text_trainable,
         min_present=min_present,
         min_absent=min_absent,
+        target_semantics=text_target_semantics,
     )
     return {
         "image_macro_auc": image["macro_roc_auc"],
